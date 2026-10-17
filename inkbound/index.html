@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0b0c0e">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Inkbound — steer your ink across the plane, close the loop, claim what you enclose.">
+  <title>Inkbound</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script type="module" src="src/main.js"></script>
+</head>
+<body>
+  <main class="stage">
+    <canvas id="game" aria-label="Inkbound arena">
+      Inkbound needs a browser with Canvas support.
+    </canvas>
+
+    <!--
+      HUD root. src/render/Hud.js owns everything inside #hud.
+      The child elements below are optional hooks; Hud.js may fill, replace, or ignore them.
+      Class contract is documented in css/style.css.
+    -->
+    <div id="hud" class="hud">
+      <header class="hud__brand brand" aria-hidden="true">
+        <span class="brand__seal"></span>
+        <span class="brand__word">Inkbound</span>
+      </header>
+
+      <section class="hud-percent" aria-live="polite" aria-atomic="true">
+        <span class="hud-percent__value" data-hud="percent">0.0<small>%</small></span>
+        <span class="hud-percent__label">of the plane</span>
+      </section>
+
+      <ol class="hud-board" data-hud="board" aria-label="Leaderboard"></ol>
+
+      <p class="hud-hint" data-hud="hint">Point to steer. Close the loop to claim.</p>
+
+      <div class="hud-overlay" data-hud="overlay" role="dialog" aria-modal="true" aria-labelledby="hud-overlay-title" hidden>
+        <div class="hud-overlay__card">
+          <h2 class="hud-overlay__title" id="hud-overlay-title" data-hud="overlay-title"></h2>
+          <p class="hud-overlay__stats" data-hud="overlay-stats"></p>
+          <button type="button" class="btn-restart" data-hud="restart">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <noscript>
+      <p class="noscript">Inkbound needs JavaScript to run.</p>
+    </noscript>
+  </main>
+</body>
+</html>

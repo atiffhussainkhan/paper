@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Inkbound — style.css
+   Tokens are canonical: src/render/* should read them via getComputedStyle
+   rather than hard-coding hex values. See docs/BRAND.md.
+
+   HUD class contract (owned by src/render/Hud.js):
+     #hud.hud                      root, pointer-events: none
+     .hud-percent__value           big % readout (put the unit in <small>)
+     .hud-board > li.hud-board__row
+        style="--row-ink: var(--ink-bot-1)"   per-row ink color
+        .is-self / .is-dead                    row states
+        > .hud-board__swatch  .hud-board__name  .hud-board__pct
+     .hud-hint                     add .is-faded to dismiss
+     .hud-overlay[hidden]          death / win card; remove [hidden] to show
+        .hud-overlay--win          win variant
+        .hud-overlay__title  .hud-overlay__stats  .btn-restart
+   ========================================================================== */
+
+:root {
+  /* Surface */
+  --sumi-950: #0b0c0e;
+  --sumi-900: #111316;
+  --sumi-800: #181b1f;
+  --sumi-700: #23272c;
+  --sumi-600: #353a41;
+
+  /* Text */
+  --bone-100: #efe9db;
+  --bone-300: #c9c2b2;
+  --bone-500: #8f897c;
+
+  /* Inks: dry = owned territory, wet = open trail */
+  --ink-player: #d9452b;
+  --ink-player-wet: #ff6a4a;
+  --ink-bot-1: #1f9e94;
+  --ink-bot-1-wet: #3fd1c4;
+  --ink-bot-2: #c9962e;
+  --ink-bot-2-wet: #f2bd4f;
+  --ink-bot-3: #6f9a3c;
+  --ink-bot-3-wet: #9cc95c;
+
+  /* State */
+  --state-cut: #ff6a4a;
+  --state-win: #efe9db;
+  --focus-ring: #f2bd4f;
+
+  /* Type */
+  --font-display: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-ui: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Layout */
+  --hud-pad: clamp(12px, 2.4vw, 28px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --radius: 4px;
+  --hairline: 1px solid var(--sumi-700);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ---------- Reset / base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: var(--sumi-950);
+  color: var(--bone-100);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+/* ---------- Stage + canvas ---------- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+#game {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--sumi-950);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Soft vignette + faint fibre grain over the canvas; never intercepts input. */
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.55) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.94 0 0 0 0 0.91 0 0 0 0 0.86 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- HUD root ---------- */
+
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  padding:
+    calc(var(--hud-pad) + var(--safe-t))
+    calc(var(--hud-pad) + var(--safe-r))
+    calc(var(--hud-pad) + var(--safe-b))
+    calc(var(--hud-pad) + var(--safe-l));
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "brand  board"
+    ".      board"
+    "score  hint";
+  gap: var(--hud-pad);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+
+/* ---------- Brand ---------- */
+
+.brand {
+  grid-area: brand;
+  align-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand__seal {
+  width: 14px;
+  height: 14px;
+  background: var(--ink-player);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
+  transform: rotate(-4deg);
+}
+
+.brand__word {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  letter-spacing: 0.01em;
+  color: var(--bone-100);
+}
+
+/* ---------- Territory % ---------- */
+
+.hud-percent {
+  grid-area: score;
+  align-self: end;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-percent__value {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 9vw, 104px);
+  line-height: 0.85;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone-100);
+  letter-spacing: -0.02em;
+}
+
+.hud-percent__value small {
+  font-size: 0.42em;
+  font-style: italic;
+  margin-left: 0.08em;
+  color: var(--ink-player-wet);
+  letter-spacing: 0;
+}
+
+.hud-percent__label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--bone-500);
+  padding-left: 2px;
+}
+
+/* ---------- Leaderboard ---------- */
+
+.hud-board {
+  grid-area: board;
+  align-self: start;
+  justify-self: end;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  min-width: 196px;
+  background: rgb(17 19 22 / 0.72);
+  border: var(--hairline);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-shadow: none;
+}
+
+.hud-board:empty {
+  display: none;
+}
+
+.hud-board__row {
+  --row-ink: var(--bone-500);
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px;
+  font-size: 14px;
+  color: var(--bone-300);
+  transition: opacity 240ms var(--ease-out);
+}
+
+.hud-board__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--row-ink);
+}
+
+.hud-board__name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hud-board__pct {
+  font-family: var(--font-num);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone-100);
+}
+
+.hud-board__row.is-self {
+  color: var(--bone-100);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--ink-player);
+}
+
+.hud-board__row.is-dead {
+  opacity: 0.38;
+}
+
+.hud-board__row.is-dead .hud-board__name {
+  text-decoration: line-through;
+  text-decoration-color: var(--row-ink);
+}
+
+/* ---------- Hint ---------- */
+
+.hud-hint {
+  grid-area: hint;
+  align-self: end;
+  justify-self: end;
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--bone-500);
+  transition: opacity 600ms var(--ease-out);
+}
+
+.hud-hint.is-faded {
+  opacity: 0;
+}
+
+/* ---------- Death / win overlay ---------- */
+
+.hud-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: var(--hud-pad);
+  pointer-events: auto;
+  background: rgb(11 12 14 / 0.62);
+  animation: overlay-in 260ms var(--ease-out) both;
+}
+
+.hud-overlay[hidden] {
+  display: none;
+}
+
+.hud-overlay__card {
+  width: min(380px, 100%);
+  padding: 28px 28px 24px;
+  background: var(--sumi-800);
+  border: var(--hairline);
+  border-top: 3px solid var(--state-cut);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.55);
+  text-align: left;
+  text-shadow: none;
+  animation: card-in 320ms var(--ease-out) both;
+}
+
+.hud-overlay--win .hud-overlay__card {
+  border-top-color: var(--state-win);
+}
+
+.hud-overlay__title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.05;
+  color: var(--bone-100);
+}
+
+.hud-overlay__stats {
+  margin: 0 0 24px;
+  font-size: 15px;
+  color: var(--bone-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-overlay__stats:empty {
+  display: none;
+}
+
+.btn-restart {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--ink-player);
+  color: var(--bone-100);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color 140ms var(--ease-out), transform 140ms var(--ease-out);
+}
+
+.btn-restart:hover {
+  background: var(--ink-player-wet);
+}
+
+.btn-restart:active {
+  transform: translateY(1px);
+}
+
+.btn-restart:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* ---------- Misc ---------- */
+
+.noscript {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--bone-300);
+  background: var(--sumi-950);
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .hud {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      "brand"
+      "board"
+      "."
+      "score";
+  }
+
+  .hud-board {
+    justify-self: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 4px;
+    min-width: 0;
+  }
+
+  .hud-board__row {
+    flex: 1 1 45%;
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+  .hud-hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
