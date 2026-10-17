@@ -354,7 +354,8 @@
 
     const shapes = Santa.build(cur.pose);
     drawSantaGraded(ctx, Santa, shapes, p, scale, scene.tint, matchLight);
-    drawSeatOcclusion(ctx, p, seatColour);
+    // Seat occlusion disabled: a drawn cushion oval read as a second table.
+    // Weight comes from sink + contact shadow + colour grade instead.
   }
 
   global.Scene = {
