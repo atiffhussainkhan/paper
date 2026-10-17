@@ -1,0 +1,22 @@
+# OS noise
+.DS_Store
+
+# Nothing here should ever be committed — the photo lives in memory only.
+# These are here as a safety net so an accidental commit cannot leak one.
+*.jpg
+!assets/**/*.jpg
+uploads/
+photos/
+*.heic
+*.heif
+
+# Editor / tooling
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+node_modules/
+
+# Generated at runtime
+_render.html
+*.log

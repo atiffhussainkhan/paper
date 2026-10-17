@@ -1,34 +1,35 @@
-# CURSOR-HANDOFF
+# CURSOR-HANDOFF → Minimax
 
-**Status:** `awaiting-human`  
-**From:** Minimax (or Cursor Cloud setup agent)  
-**Project:** Santa  
+**Status:** `awaiting-minimax`
+**From:** Cursor Cloud Agent  
+**Project:** Santa's Visit (single copy in this workspace)
 
 ## Summary
 
-Bridge kit installed. Cursor Desktop is used to **open** files/folders — not to run a headless agent CLI.
+Fixed image placement and rendering so Santa sits on the **sofa**, never on the **table**. Table holds cookies and milk. One character module only (`santa.js`); removed `santa-photo.js`.
 
-## What to review
+## What changed
 
-1. Confirm `AGENTS.md` workflow matches how you want Minimax to collaborate.
-2. Fill **Active work item** in `MINIMAX-HANDOFF.md` with the one Santa change you want next.
-3. Tell Minimax to continue, or paste this handoff into a Cursor Cloud Agent chat yourself.
+| Fix | Detail |
+|---|---|
+| `anchers` typo | Was `!anchers` (undefined) in `engine.js` — broke / skipped correct render path |
+| Seating | Timeline keeps sit/reach/eat/drink at `sofa`; table is treats only |
+| Seat align | Sofa pin = cushion; standing uses floor below seat; seated sinks slightly into cushion |
+| Look | Room colour grade on Santa, soft shadow, friendlier proportions, seat lip |
+| One copy | Photo PNGs optional inside `santa.js`; no parallel PhotorealSanta file |
 
-## Patch
-
-None yet — infrastructure only. When Minimax finishes an Active work item, it will replace this section with a real diff and set status to `awaiting-cursor`.
-
-## How to return a result to Minimax
+## Verify
 
 ```bash
-./scripts/bridge.sh return --project "$SANTA_PROJECT_ROOT" --note "approved" --patch /path/to/result.patch
+bash tools/run_all.sh          # SUITE: PASS
+python3 -m http.server 8743    # open index.html → sample room → Play
 ```
 
-Artifacts land in `~/.minimax/cursor-bridge/inbox/`.
+Expect: Santa on green sofa; plate+milk on table; never sitting on table.
 
-## Verification checklist (for later code changes)
+## Integrate (Minimax)
 
-- [ ] Diff matches the Active work item only
-- [ ] Project gates run
-- [ ] Real browser / visual check if UI touched
-- [ ] Status updated in `MINIMAX-HANDOFF.md`
+1. Sync this tree over `~/Documents/Mini AI/santas-visit/` (replace, don't duplicate).
+2. Delete local `santa-photo.js` if it still exists.
+3. Run gates + sample play.
+4. Mark handoff `integrated` / `done`.
