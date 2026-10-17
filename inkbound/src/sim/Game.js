@@ -57,13 +57,7 @@ export class Game {
 
   spawnBot(spec, preferredPoint = null) {
     let point = preferredPoint;
-    if (!point || !this.grid.isDiskUnowned(
-      point.x,
-      point.y,
-      this.config.startTerritoryRadius,
-    )) {
-      point = this.findBotSpawn();
-    }
+    if (!point || !this.isSpawnClear(point)) point = this.findBotSpawn();
     if (!point) return null;
 
     const heading = Math.atan2(point.y, point.x);
@@ -76,15 +70,23 @@ export class Game {
     return bot;
   }
 
+  // A spawn disk must be unowned and must not sit on any live wet stroke: a
+  // fresh body overlapping someone's trail would count as an instant cut.
+  isSpawnClear(point) {
+    if (!this.grid.isDiskUnowned(point.x, point.y, this.config.startTerritoryRadius)) {
+      return false;
+    }
+    const clearance = this.config.startTerritoryRadius + this.config.bodyRadius;
+    return this.entities.every((entity) => (
+      !entity.alive || !entity.trail.collidesPoint(point, clearance)
+    ));
+  }
+
   findBotSpawn() {
     const inset = this.config.startTerritoryRadius + this.config.bodyRadius;
     for (let attempt = 0; attempt < this.config.botRespawnAttempts; attempt += 1) {
       const point = this.arena.randomPoint(this.random, inset);
-      if (!this.grid.isDiskUnowned(
-        point.x,
-        point.y,
-        this.config.startTerritoryRadius,
-      )) continue;
+      if (!this.isSpawnClear(point)) continue;
       const separated = this.entities
         .filter((entity) => entity.alive)
         .every((entity) => Math.hypot(
@@ -102,6 +104,16 @@ export class Game {
 
   get bots() {
     return this.entities.filter((entity) => !entity.isPlayer);
+  }
+
+  // Record each fresh casualty's share at the moment of death, before later
+  // steps (capture, erase) change the grid.
+  snapshotDeathShares() {
+    for (const entity of this.entities) {
+      if (!entity.alive && entity.deathShare === null) {
+        entity.deathShare = this.grid.share(entity.id);
+      }
+    }
   }
 
   tick(dt) {
@@ -142,28 +154,52 @@ export class Game {
       }
     }
 
-    // 5. Resolve cuts. Combat only marks deaths; cleanup happens below.
+    // 5. Resolve cuts. Combat only marks deaths; cleanup happens in step 7.
     resolveCombat(this.entities, this.config);
+    this.snapshotDeathShares();
 
-    // 6. Survivors seal loops when they re-enter their own dry ink.
+    // 6. Survivors seal loops when they re-enter their own dry ink. Combat has
+    // already run, so a cut on the same tick denies the capture (dead owners
+    // are skipped). A capture that leaves another living entity with no ink at
+    // all swallows it; that is checked once every capture has landed so the
+    // outcome does not depend on entity order.
+    const swallowed = new Map();
     for (const entity of this.entities) {
       if (!entity.alive || !entity.capturePending) continue;
-      captureLoop(this.grid, entity.id, entity.trail);
+      const changed = captureLoop(this.grid, entity.id, entity.trail);
       entity.trail.clear();
       entity.capturePending = false;
+      if (!changed) continue;
+      for (const other of this.entities) {
+        if (other !== entity && other.alive && this.grid.counts[other.id] === 0) {
+          swallowed.set(other, entity);
+        }
+      }
     }
+    for (const [victim, captor] of swallowed) {
+      if (this.grid.counts[victim.id] !== 0) continue;
+      victim.markDead(
+        victim.isPlayer
+          ? `${captor.name} swallowed your ink.`
+          : `${captor.name} swallowed ${victim.name}'s ink.`,
+        captor,
+      );
+    }
+    this.snapshotDeathShares();
 
-    // 7. Apply deaths by erasing both wet and dry ink.
+    // 7. Apply deaths by erasing both wet and dry ink. Runs once per entity.
     for (const entity of this.entities) {
-      if (entity.alive || entity._deathApplied) continue;
+      if (entity.alive || entity.deathApplied) continue;
       if (entity.isPlayer) {
-        this.finalShare = this.grid.share(entity.id);
+        this.finalShare = entity.deathShare ?? this.grid.share(entity.id);
         this.state = "over";
         this.outcome = { type: "death", title: entity.deathReason };
       }
       entity.trail.clear();
+      entity.outsideOwnTerritory = false;
+      entity.capturePending = false;
       this.grid.clearOwner(entity.id);
-      entity._deathApplied = true;
+      entity.deathApplied = true;
     }
 
     // 8. Replace dead inks on wholly unowned ground to maintain three bots.

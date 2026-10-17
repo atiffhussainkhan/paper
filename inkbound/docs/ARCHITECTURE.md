@@ -39,7 +39,9 @@
 
 - Grid covering axis-aligned bbox of circle; cells outside circle ignored.  
 - Capture = flood-fill enclosed region of trail polygon clipped to arena.  
-- Own trail collision: exclude last `selfGracePts` samples behind head.
+- Own trail collision: exclude the last `selfGracePoints * trailSampleSpacing` units of arc length behind the head (not a raw sample count); body motion is swept per tick.
+- Enemy cut: attacker body radius + half trail width, swept; the owner's newest `enemyHeadGracePoints * trailSampleSpacing` arc is exempt. Cuts are simultaneous and beat a same-tick capture.
+- A living entity left with zero owned cells after a capture is swallowed (dies, trail + ink cleared).
 
 ## Coordinate space
 

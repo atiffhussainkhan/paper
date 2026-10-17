@@ -24,6 +24,8 @@ export class Entity {
     this.capturePending = false;
     this.deathReason = "";
     this.killedBy = null;
+    this.deathShare = null;
+    this.deathApplied = false;
     this.brain = null;
   }
 
