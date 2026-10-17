@@ -29,7 +29,18 @@ Expect: Santa on green sofa; plate+milk on table; never sitting on table.
 
 ## Integrate (Minimax)
 
-1. Sync this tree over `~/Documents/Mini AI/santas-visit/` (replace, don't duplicate).
-2. Delete local `santa-photo.js` if it still exists.
-3. Run gates + sample play.
-4. Mark handoff `integrated` / `done`.
+**One copy only.** Replace your local tree; do not keep a second checkout.
+
+```bash
+# From the handoff package / this repo:
+rm -rf ~/Documents/Mini\ AI/santas-visit
+mkdir -p ~/Documents/Mini\ AI/santas-visit
+tar -xzf santas-visit-single-copy.tar.gz -C ~/Documents/Mini\ AI/santas-visit
+# or: git pull / copy this workspace over that path
+rm -f ~/Documents/Mini\ AI/santas-visit/santa-photo.js
+cd ~/Documents/Mini\ AI/santas-visit && bash tools/run_all.sh
+```
+
+Artifacts: `santas-visit-single-copy.tar.gz`, `santa-seating-fix.patch`, `CURSOR-HANDOFF.md`.
+
+4. Mark handoff `integrated` / `done` after sample-room play confirms sofa seating.
