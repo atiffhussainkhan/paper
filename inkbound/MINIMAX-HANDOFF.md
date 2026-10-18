@@ -36,6 +36,7 @@ Only if a clear bug blocks match start. No new features.
 **Status:** `done`
 **Verdict:** **MATCH**
 **Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`
+**Report commit:** `ed7d6c908747eff65b3802cefad2b03a6e4554af`
 
 Trail outside own land, loop claim, self-cut, enemy trail kill, non-lethal bodies, non-lethal rim, win at 100%, and death → Restart all **PASS**. No mid-match revive. One Chrome life went 1.0% → trail → 3.8% claim → "Ochre cut your line." → Restart onto a fresh 1.0% disk. Report: `docs/RULE_AUDIT_2_CORE.md`. Shots: `/opt/cursor/artifacts/rule2_*.png`.
 
