@@ -1,32 +1,31 @@
-# MINIMAX-HANDOFF — Inkbound REQ3 meta / economy / progression
+# MINIMAX-HANDOFF — Inkbound RULE1 match start
 
 ## Status
-`done`
+`awaiting-cursor`
 
 ## Task
 
-On branch `cursor/inkbound-final-dev-c3dd` under `/workspace/inkbound`, accept meta against `TerritoryIO_Professional_Requirements_GDD.md` (read with the locked Inkbound decisions).
+On branch `cursor/inkbound-final-dev-c3dd` under `/workspace/inkbound`, compare the **first painted frame** and match start to Paper.io-class rules and `TerritoryIO_Professional_Requirements_GDD.md` (read with the locked Inkbound decisions in `DECISIONS.md`).
 
 Score **PASS / PARTIAL / FAIL** for:
 
-1. **Best %** — live HUD and run summary; new best sticks.
-2. **Skins** — at least five; unlock by best %; equip an unlocked skin; locked skins stay locked.
-3. **Stages** — cumulative credit from the run, clear into the next zone, stage HUD readable.
-4. **FTUE** — one soft claim hint, dismissed after the first claim, and it stays dismissed.
-5. **Persistence** — `localStorage` key `inkbound.profile.v1` keeps best, equipped skin, unlocks, stage credit, and the FTUE flag across an in-game Restart and a full page reload.
-
-Shop, real multiplayer, and revive are **N/A-MVP** when the GDD places them after Must-have MVP. Do not score those FAIL.
+1. **Player spawn disk** — the player is on a small disk of their own ink on the map at match start.
+2. **Camera follow** — the view follows the player with look-ahead and a limited field of view.
+3. **Arena / map presentation** — a circular play surface reads as the arena (plate, ink, rim), not a blank or full-map diagram.
+4. **Bots present at start** — the locked roster is already in the match, each on its own ink, named on the board.
+5. **HUD (% / names)** — own share and the named rows are visible on the first frame.
+6. **Controls ready** — steering is live with no play-button or tutorial wall.
+7. **FTUE hint** — one soft claim line on a fresh profile, first run only.
 
 ### Gates
-- `node tools/smoke_meta.mjs` (complete run)
-- `node tools/smoke_hud.mjs` (complete run)
-- Browser, served from `/workspace/inkbound`: unlock path or a simulated profile, equip, restart shows Best + skin, stage HUD readable. Shots in `/opt/cursor/artifacts/req3_*.png`.
+- Serve `/workspace/inkbound` and cold-load Chrome (fresh `localStorage`).
+- Shots in `/opt/cursor/artifacts/rule1_start_*.png`.
 
 ### Bugfix
-Only if persistence or the HUD is broken. No new meta systems.
+Only if a clear bug blocks match start. No new features.
 
 ### Done when
-`docs/ACCEPTANCE_REQ3_META.md` records the matrix, the tip SHA, and the verdict.
+`docs/RULE_AUDIT_1_START.md` records the matrix, evidence, the tip SHA, and the verdict.
 
 ### Constraints
 - Brand **Inkbound**; no Paper.io IP
