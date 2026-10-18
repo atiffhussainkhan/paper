@@ -4,56 +4,19 @@ One game. The files you play, and the files you later copy onto your own website
 
 ## Public link
 
-**Not live.** No `https://*.github.io/...` URL serves this game. Checked again on 18 Oct 2026 from this workspace:
-
-| URL | Result |
-| --- | --- |
-| `https://github.com/atiffhussainkhan/paper` | 404 — repository does not exist |
-| `https://github.com/atiff-khan/paper` | 404 |
-| `https://github.com/atiffhussainkhan/paper-io` | 200 — public repo, only a README, `has_pages: false` |
-| `https://atiffhussainkhan.github.io/paper/` | 404 |
-| `https://atiffhussainkhan.github.io/paper-io/` | 404 |
-| `https://atiffhussainkhan.github.io/paper/src/main.js?v=pages-1` | 404 |
-| `https://atiffhussainkhan.github.io/paper-io/src/main.js?v=pages-1` | 404 |
-
-This copy of the game is on Cursor Origin (`origin.cursor.com/git/atiff-khan/paper`), not on github.com. Publishing is blocked here:
-
-- `gh auth status`: not logged into any GitHub host
-- `gh auth token`: no oauth token
-- no `GITHUB_TOKEN` / `GH_TOKEN`, no `~/.ssh` key, `git credential fill` for `github.com` has no username
-- no GitHub MCP server in this session
-- the Cursor Origin access token and `CURSOR_AUTH_TOKEN` are rejected by `https://api.github.com/user` (401)
-
-**Expected playable URL** after you create `atiffhussainkhan/paper`, push, and enable Pages:
+**Live:**
 
 ```text
 https://atiffhussainkhan.github.io/paper/
 ```
 
-If you force-push into the existing empty `paper-io` repo instead, the URL is `https://atiffhussainkhan.github.io/paper-io/`.
+Verified 18 Oct 2026: `https://atiffhussainkhan.github.io/paper/` and `https://atiffhussainkhan.github.io/paper/src/main.js` both return HTTP 200. Open that URL and press **Play**.
 
-Exact clicks and commands: [GITHUB_PAGES_USER_STEPS.md](GITHUB_PAGES_USER_STEPS.md).
+Repository: https://github.com/atiffhussainkhan/paper (public).
 
-## Refs that are ready to push
+Pages source: branch `gh-pages`, folder `/ (root)`. That branch is the contents of `inkbound/` (`index.html` beside `css/`, `src/`, and `assets/`). Commit `912904e1f90dccd035f87f1d60645217e38b93d0`.
 
-Cursor Origin already has the game. Do not push local `main` when it is `d6a49f2f8a5611e414b9afcf16266973b585bc9c` (no `inkbound/` folder).
-
-| Ref | Tip when this page was written | Push to GitHub as |
-| --- | --- | --- |
-| `origin/main` | `50c809f6dffa36417da4913b439800fc0cbfd540` | `main` (game + `.github/workflows/pages.yml`) |
-| `origin/cursor/github-pages-user-steps-0043` | this file's branch; `git rev-parse` after `git fetch origin` | `main` (same game, plus these instructions) |
-| `origin/gh-pages` | `git rev-parse origin/gh-pages` after fetch | `gh-pages` (`inkbound/` contents at the branch root) |
-
-## The one Settings click
-
-On the **github.com** repository (not Cursor Origin), after the push:
-
-1. **Settings → Pages**
-2. **Build and deployment → Source: Deploy from a branch → `gh-pages` / `/ (root)`**
-
-Or **Source: GitHub Actions**, which runs `.github/workflows/pages.yml` and publishes `inkbound/`.
-
-Do not deploy `main` / root. That publishes a different project and leaves Inkbound under `/inkbound/`.
+`main` on GitHub is `8f7ec23f95cffbdbf38bd18e1efdc374a4c58adf` (game plus `.github/workflows/pages.yml`). Do not switch Pages to `main` / root. That publishes a different project and leaves Inkbound under `/inkbound/`.
 
 ## Your own website later
 
