@@ -1,0 +1,5 @@
+# Created by the Godot editor on import. Do not commit, and do not require a
+# Godot binary in CI to produce it.
+.godot/
+*.translation
+export_presets.cfg

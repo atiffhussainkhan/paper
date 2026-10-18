@@ -46,3 +46,7 @@
 ## Coordinate space
 
 World units; arena radius `R` at origin. Renderer maps world→screen with camera follow.
+
+## Godot 4
+
+Track G scaffold lives in `godot/`. The module and tick map is `docs/PORT_GODOT4.md`. The web modules in the table above stay authoritative; the Godot scripts are a port skeleton and do not replace this runtime.

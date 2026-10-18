@@ -1,0 +1,145 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/render/match_hud.gd" id="1_hud"]
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Wordmark" type="Label" parent="Root"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 280.0
+offset_bottom = 48.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.937255, 0.913725, 0.858824, 1)
+theme_override_font_sizes/font_size = 22
+text = "Inkbound"
+
+[node name="Percent" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 48.0
+offset_right = 320.0
+offset_bottom = 108.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.937255, 0.913725, 0.858824, 1)
+theme_override_font_sizes/font_size = 48
+text = "0.0%"
+
+[node name="PlaneLabel" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 104.0
+offset_right = 280.0
+offset_bottom = 132.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.560784, 0.537255, 0.486275, 1)
+theme_override_font_sizes/font_size = 16
+text = "of the plane"
+
+[node name="Board" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 148.0
+offset_right = 360.0
+offset_bottom = 280.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.937255, 0.913725, 0.858824, 1)
+theme_override_font_sizes/font_size = 16
+text = ""
+
+[node name="Hint" type="Label" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -48.0
+offset_right = 240.0
+offset_bottom = -18.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.560784, 0.537255, 0.486275, 1)
+theme_override_font_sizes/font_size = 16
+text = "Point to steer. Close the loop to claim."
+horizontal_alignment = 1
+
+[node name="Blocker" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.043137, 0.047059, 0.054902, 0.72)
+
+[node name="Overlay" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -90.0
+offset_right = 200.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.094118, 0.105882, 0.121569, 1)
+
+[node name="Title" type="Label" parent="Root/Overlay"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = 380.0
+offset_bottom = 56.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.937255, 0.913725, 0.858824, 1)
+theme_override_font_sizes/font_size = 22
+text = ""
+
+[node name="Stats" type="Label" parent="Root/Overlay"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 380.0
+offset_bottom = 96.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.788235, 0.760784, 0.698039, 1)
+theme_override_font_sizes/font_size = 16
+text = ""
+
+[node name="Restart" type="Button" parent="Root/Overlay"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 20.0
+offset_top = 112.0
+offset_right = 160.0
+offset_bottom = 152.0
+text = "Restart"

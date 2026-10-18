@@ -80,8 +80,10 @@ inkbound/
 ├── assets/               Static assets
 ├── docs/
 │   ├── ARCHITECTURE.md   Module ownership + locked tick order
+│   ├── PORT_GODOT4.md    Web module → Godot 4 scene/script map
 │   ├── BRAND.md          Name, fantasy, color tokens, tone
 │   └── PHASE0_ACCEPTANCE.md
+├── godot/                Godot 4 scaffold only (not the playable build)
 └── DECISIONS.md          Locked product decisions
 ```
 
