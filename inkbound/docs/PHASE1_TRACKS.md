@@ -49,3 +49,13 @@
 | 4 | Cinnabar Reach | 1.25 |
 | 5 | Obsidian Shallows | 1.50 |
 | 6 | Unsealed Horizon | 2.00 |
+
+## Track J — juice (landed)
+
+Presentation only. `Vfx` reads `Game.drainEvents()` and never writes the sim.
+
+- **Capture float:** a player seal with `delta > 0` spawns `+X.X%` (two decimals under 0.1) in Instrument Serif, bone on sumi, rising off the bead.
+- **Death, three phases:** wet-stroke dissolve, burst at the death point, then the dry territory fades. Cells sealed by someone else during the fade are dropped so the new ink is not painted over. A respawn on the same tick is already a new owner.
+- **Crown:** world-space seal crown on the living ink with the highest share (lowest id wins a tie; a challenger must lead by `crownSwitchMargin` before it moves). The leaderboard row wears the same mark (`.is-lead`) from the current sort.
+- Hooks stay on `Game.emit("capture" | "death")`. Skins flow through `entity.color` / `wetColor`. Reset clears when the `Game` or its grid identity changes.
+- Test: `node tools/smoke_vfx.mjs`.

@@ -8,7 +8,7 @@
      .hud-percent__value           big % readout (put the unit in <small>)
      .hud-board > li.hud-board__row
         style="--row-ink: var(--ink-bot-1)"   per-row ink color
-        .is-self / .is-dead                    row states
+        .is-self / .is-dead / .is-lead          row states (lead wears the crown)
         > .hud-board__swatch  .hud-board__name  .hud-board__pct
      .hud-hint                     add .is-faded to dismiss
      .hud-overlay[hidden]          death / win card; remove [hidden] to show
@@ -345,6 +345,28 @@ body {
 .hud-board__row.is-dead .hud-board__name {
   text-decoration: line-through;
   text-decoration-color: var(--row-ink);
+}
+
+/* Bone seal-crown on the current share leader. Decorative; rank is the order. */
+.hud-board__row.is-lead .hud-board__name::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 9px;
+  margin-right: 6px;
+  vertical-align: -1px;
+  background: var(--bone-100);
+  clip-path: polygon(
+    0% 42%,
+    0% 100%,
+    100% 100%,
+    100% 42%,
+    78% 58%,
+    66% 8%,
+    50% 46%,
+    34% 8%,
+    22% 58%
+  );
 }
 
 /* ---------- Hint ---------- */

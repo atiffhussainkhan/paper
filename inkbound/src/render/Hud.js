@@ -217,10 +217,12 @@ export class Hud {
     const orderKey = ranking.map((item) => item.entity.id).join(",");
     const orderChanged = orderKey !== this.lastOrderKey;
 
-    for (const { entity, share } of ranking) {
+    for (let index = 0; index < ranking.length; index += 1) {
+      const { entity, share } = ranking[index];
       const entry = this.ensureRow(entity);
       entry.row.classList.toggle("is-self", Boolean(entity.isPlayer));
       entry.row.classList.toggle("is-dead", !entity.alive);
+      entry.row.classList.toggle("is-lead", index === 0 && entity.alive && share > 0);
 
       const rowPct = `${(share * 100).toFixed(1)}%`;
       if (rowPct !== entry.lastPct) {

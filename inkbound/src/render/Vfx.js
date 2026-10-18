@@ -32,9 +32,27 @@ const easeOutBack = (t) => {
 };
 const clamp01 = (t) => Math.max(0, Math.min(1, t));
 
+// Share delta → "+X.X%". Sub-tenth seals keep two decimals so a one-cell
+// claim does not read as +0.00%.
 export function formatCaptureDelta(delta) {
   const pct = Math.max(0, delta) * 100;
-  return `+${pct < 0.1 ? pct.toFixed(2) : pct.toFixed(1)}%`;
+  if (!(pct > 0)) return "+0.0%";
+  if (pct < 0.1) {
+    const fine = pct.toFixed(2);
+    return `+${fine === "0.00" ? "0.01" : fine}%`;
+  }
+  return `+${pct.toFixed(1)}%`;
+}
+
+// Indices from a death snapshot whose cells are still unowned. Reclaimed ink
+// belongs to the new seal, so the fade must let those cells go.
+export function retainUnownedCells(cells, owners) {
+  const kept = [];
+  for (let i = 0; i < cells.length; i += 1) {
+    const index = cells[i];
+    if (owners[index] === 0) kept.push(index);
+  }
+  return kept;
 }
 
 export class Vfx {
@@ -47,6 +65,7 @@ export class Vfx {
 
   reset() {
     this.game = null;
+    this.grid = null;
     this.particles = [];
     this.floats = [];
     this.dissolves = [];
@@ -56,9 +75,10 @@ export class Vfx {
   }
 
   update(game, dt) {
-    if (this.game !== game) {
+    if (this.game !== game || this.grid !== game.grid) {
       this.reset();
       this.game = game;
+      this.grid = game.grid;
     }
     const events = typeof game.drainEvents === "function" ? game.drainEvents() : [];
     for (const event of events) {
@@ -179,20 +199,47 @@ export class Vfx {
     this.particles.push({ ...rest, age: -delay });
   }
 
-  buildGhost(grid, cells, color) {
-    if (typeof document === "undefined") return null;
-    const canvas = document.createElement("canvas");
-    canvas.width = grid.size;
-    canvas.height = grid.size;
+  paintGhostCells(ghost) {
+    const { canvas, cells, color, grid } = ghost;
     const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (!cells.length) return;
+    const size = grid.size;
     context.fillStyle = color;
     context.beginPath();
     for (let i = 0; i < cells.length; i += 1) {
       const index = cells[i];
-      context.rect(index % grid.size, Math.floor(index / grid.size), 1, 1);
+      context.rect(index % size, (index / size) | 0, 1, 1);
     }
     context.fill();
-    return { canvas, radius: grid.radius, age: 0 };
+  }
+
+  // Drop cells a living ink has sealed since the death snapshot, and repaint
+  // only when the set actually shrinks.
+  syncGhost(ghost) {
+    const kept = retainUnownedCells(ghost.cells, ghost.grid.cells);
+    if (kept.length === ghost.cells.length) return;
+    ghost.cells = kept;
+    this.paintGhostCells(ghost);
+  }
+
+  buildGhost(grid, cells, color) {
+    if (typeof document === "undefined") return null;
+    const owned = retainUnownedCells(cells, grid.cells);
+    if (!owned.length) return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = grid.size;
+    canvas.height = grid.size;
+    const ghost = {
+      canvas,
+      radius: grid.radius,
+      age: 0,
+      color,
+      cells: owned,
+      grid,
+    };
+    this.paintGhostCells(ghost);
+    return ghost;
   }
 
   updateCrown(game, dt) {
@@ -244,6 +291,8 @@ export class Vfx {
     );
     const alpha = 1 - easeOutCubic(fadeT);
     if (alpha <= 0) return;
+    if (ghost.grid) this.syncGhost(ghost);
+    if (!ghost.cells.length) return;
     context.save();
     context.globalAlpha = alpha;
     context.imageSmoothingEnabled = true;
