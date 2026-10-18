@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "Inkbound IMAGE_INDEX",
-  "description": "Curated game images for Inkbound, mirrored from atiffhussainkhan/Image. Prefer this index for all backgrounds, characters, skins, UI, VFX, and terrain. Do not AI-generate bitmap art.",
+  "description": "Curated game images for Inkbound, mirrored from atiffhussainkhan/Image. Every stage background, terrain layer, character bead, skin pattern, UI seal, and VFX role resolves through bindings. Do not AI-generate bitmap art.",
   "source_of_truth": {
     "repository": "https://github.com/atiffhussainkhan/Image",
     "canonical_index": "catalog/MASTER_ASSET_INDEX.json",
@@ -21,7 +21,8 @@
       "reference_only_external_catalogs": 1,
       "stored_metadata_bundles": 1
     },
-    "upstream_item_count": 34
+    "upstream_item_count": 34,
+    "synced_at": "2026-10-18T12:29:06Z"
   },
   "counts": {
     "background": 7,
@@ -40,6 +41,35 @@
       "cinnabar-reach": "bg-cinnabar-reach",
       "obsidian-shallows": "bg-obsidian-shallows",
       "unsealed-horizon": "bg-unsealed-horizon"
+    },
+    "stageTerrain": {
+      "quiet-plane": "terrain-grass",
+      "rimward-marsh": "terrain-foliage-01",
+      "sumi-basin": "terrain-abstract-01",
+      "cinnabar-reach": "terrain-pixel-01",
+      "obsidian-shallows": "terrain-abstract-02",
+      "unsealed-horizon": "terrain-pixel-02"
+    },
+    "stageAccent": {
+      "quiet-plane": "terrain-foliage-02",
+      "rimward-marsh": "terrain-foliage-03",
+      "sumi-basin": "terrain-abstract-03",
+      "cinnabar-reach": "terrain-abstract-04",
+      "obsidian-shallows": "terrain-foliage-04",
+      "unsealed-horizon": "terrain-pixel-04"
+    },
+    "stageGrain": {
+      "quiet-plane": "terrain-abstract-01",
+      "rimward-marsh": "terrain-abstract-02",
+      "sumi-basin": "terrain-pixel-03",
+      "cinnabar-reach": "terrain-pixel-bg-1",
+      "obsidian-shallows": "terrain-abstract-03",
+      "unsealed-horizon": "terrain-abstract-04"
+    },
+    "fallback": {
+      "background": "bg-plane-fallback",
+      "terrain": "terrain-grass",
+      "grain": "terrain-abstract-01"
     },
     "skins": {
       "seal": {
@@ -74,7 +104,8 @@
       "leaderMedal": "ui-medal-lead",
       "stageMedal": "ui-medal-alt",
       "hudJewel": "ui-hud-jewel",
-      "equippedCheck": "ui-check"
+      "equippedCheck": "ui-check",
+      "iconCircle": "ui-icon-circle"
     },
     "vfx": {
       "dissolve": "vfx-smoke-01",
@@ -91,7 +122,18 @@
     },
     "characters": {
       "defaultBead": "char-bead-red",
-      "botBead": "char-bead-blue"
+      "botBead": "char-bead-blue",
+      "shapeAccent": "char-shape-squircle",
+      "botBeads": {
+        "2": "char-bead-blue",
+        "3": "char-bead-blue-alt",
+        "4": "char-shape-squircle"
+      },
+      "botPatterns": {
+        "2": "skin-paint-circle",
+        "3": "skin-paint-splat",
+        "4": "skin-paint-drips"
+      }
     }
   },
   "images": [
@@ -1009,19 +1051,20 @@
       "tags": [
         "tile",
         "pixel",
-        "background"
+        "grass",
+        "horizon"
       ],
-      "recommended_usage": "Stage floor accent tile",
+      "recommended_usage": "Grass pixel floor \u2014 Unsealed Horizon",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0001.png",
+        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0014.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "cd50302f080010ee"
+      "sha256_16": "51f776f5bb658976"
     },
     {
       "id": "terrain-pixel-03",
@@ -1031,19 +1074,20 @@
       "tags": [
         "tile",
         "pixel",
-        "background"
+        "stars",
+        "night"
       ],
-      "recommended_usage": "Stage floor accent tile",
+      "recommended_usage": "Star-field pixel grain \u2014 Sumi Basin",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0002.png",
+        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0011.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "cd50302f080010ee"
+      "sha256_16": "5d4bcec86326f8c2"
     },
     {
       "id": "terrain-pixel-04",
@@ -1053,19 +1097,20 @@
       "tags": [
         "tile",
         "pixel",
-        "background"
+        "cloud",
+        "horizon"
       ],
-      "recommended_usage": "Stage floor accent tile",
+      "recommended_usage": "Cloud pixel accent \u2014 horizon rim",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0003.png",
+        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0009.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "cd50302f080010ee"
+      "sha256_16": "f44de8d504f662a9"
     },
     {
       "id": "terrain-foliage-01",

@@ -2,15 +2,17 @@ import { CONFIG, ENTITY_SPECS } from "../config.js";
 import { Arena } from "./Arena.js";
 import { TerritoryGrid } from "./TerritoryGrid.js";
 import { Entity } from "./Entity.js";
-import { moveEntity } from "./Movement.js";
+import { moveEntity, updateInkContact } from "./Movement.js";
 import { resolveCombat } from "./Combat.js";
 import { captureLoop } from "./Capture.js";
 import { attachBotBrain, updateBotHeadings } from "./Bots.js";
+import { botBeadId, botPatternId } from "../assets/ImageCatalog.js";
 
 export class Game {
   constructor(input, colors, config = CONFIG, random = Math.random, options = {}) {
     this.input = input;
     this.playerSkin = options.playerSkin ?? null;
+    this.catalog = options.catalog ?? null;
     this.colors = colors;
     this.config = config;
     this.random = random;
@@ -30,6 +32,7 @@ export class Game {
     this.outcome = null;
     this.finalShare = 0;
     this.runPeakShare = 0;
+    this.playerClaimed = false;
     this.matchAge = 0;
     this.events = [];
     this.lastCapture = null;
@@ -49,17 +52,15 @@ export class Game {
   }
 
   createEntity(spec, position, heading) {
-    const skin = spec.role === "player" ? this.playerSkin : null;
-    const botBead = spec.role === "bot"
-      ? (spec.id === 2 ? "char-bead-blue" : spec.id === 3 ? "char-bead-blue-alt" : "char-shape-squircle")
-      : null;
+    const isPlayer = spec.role === "player";
+    const skin = isPlayer ? this.playerSkin : null;
     const entitySpec = {
       ...spec,
       color: skin?.dry ?? this.colors[spec.dryToken],
       wetColor: skin?.wet ?? this.colors[spec.wetToken],
       coreColor: skin?.core,
-      patternImageId: skin?.patternImageId ?? null,
-      beadImageId: skin?.beadImageId ?? botBead,
+      patternImageId: skin?.patternImageId ?? (isPlayer ? null : botPatternId(this.catalog, spec.id)),
+      beadImageId: skin?.beadImageId ?? (isPlayer ? null : botBeadId(this.catalog, spec.id)),
     };
     return new Entity(
       entitySpec,
@@ -183,23 +184,15 @@ export class Game {
     }
 
     // 4. Emit wet trail samples only while outside one's own fill.
+    //    The center must leave before a stroke starts. A body that never
+    //    clears the ink does not commit a line. Once it has cleared, overlapping
+    //    dry ink seals the loop — the first claim uses a slightly wider bead.
     for (const entity of this.entities) {
       if (!entity.alive) continue;
-      const inside = this.grid.isOwnedBy(
-        entity.id,
-        entity.position.x,
-        entity.position.y,
-      );
-      entity.capturePending = false;
-      if (!inside) {
-        if (!entity.outsideOwnTerritory) entity.trail.begin(entity.previousPosition);
-        entity.trail.add(entity.position);
-        entity.outsideOwnTerritory = true;
-      } else if (entity.outsideOwnTerritory && entity.trail.active) {
-        entity.trail.add(entity.position, true);
-        entity.capturePending = true;
-        entity.outsideOwnTerritory = false;
-      }
+      const contactRadius = entity.isPlayer && !this.playerClaimed
+        ? entity.radius * (this.config.firstClaimContactScale ?? 1.28)
+        : entity.radius;
+      updateInkContact(entity, this.grid, contactRadius);
     }
 
     // 5. Resolve cuts. Combat only marks deaths; cleanup happens in step 7.
@@ -226,9 +219,12 @@ export class Game {
       if (!changed) continue;
       const gained = this.grid.counts[entity.id] - cellsBefore;
       if (gained > 0) {
+        const firstClaim = Boolean(entity.isPlayer && !this.playerClaimed);
+        if (entity.isPlayer) this.playerClaimed = true;
         this.lastCapture = {
           entityId: entity.id,
           isPlayer: entity.isPlayer,
+          firstClaim,
           delta: gained / this.grid.insideCount,
           share: this.grid.share(entity.id),
           position: { ...entity.position },
@@ -279,15 +275,22 @@ export class Game {
       });
       entity.trail.clear();
       entity.outsideOwnTerritory = false;
+      entity.clearedHome = false;
       entity.capturePending = false;
       this.grid.clearOwner(entity.id);
       entity.deathApplied = true;
     }
 
     // 8. Replace dead inks on wholly unowned ground to maintain three bots.
-    for (const spec of ENTITY_SPECS.slice(1, this.config.botCount + 1)) {
-      const bot = this.entities.find((entity) => entity.id === spec.id);
-      if (!bot || !bot.alive) this.spawnBot(spec);
+    //    A sealed plane has nowhere legal to spawn; a same-tick disk would
+    //    steal the win.
+    const planeSealed = Boolean(player?.alive)
+      && this.grid.share(player.id) >= this.config.winShare;
+    if (!planeSealed) {
+      for (const spec of ENTITY_SPECS.slice(1, this.config.botCount + 1)) {
+        const bot = this.entities.find((entity) => entity.id === spec.id);
+        if (!bot || !bot.alive) this.spawnBot(spec);
+      }
     }
 
     // 9. A complete plane ends the match and offers a fresh restart.

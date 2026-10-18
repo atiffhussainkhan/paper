@@ -5,9 +5,11 @@ class_name InkCapture
 # TODO: port captureLoop. Do not invent a second fill rule.
 # Contract from the web module:
 # - No active trail returns 0.
-# - Owned cells plus the rasterized wet stroke are a barrier.
-# - The largest remaining component is the exterior; every smaller component
-#   inside the arena is enclosed and becomes owner_id.
+# - Owned cells plus the rasterized wet stroke are a barrier, bridged onto dry ink.
+# - The sealed polygon is the stroke plus the shortest path back through own ink.
+# - A component whose cell centers sit inside that polygon is claimed, even when
+#   it is larger than the leftover exterior. A missing path falls back to
+#   "largest component is exterior".
 # - Return the number of cells whose owner changed.
 # Swallow (a living rival left with zero cells) is decided by InkGame after
 # every capture has landed, not inside this function.

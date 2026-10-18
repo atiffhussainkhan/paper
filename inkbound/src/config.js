@@ -12,8 +12,11 @@ export const CONFIG = Object.freeze({
 
   playerSpeed: 195,
   botSpeed: 125,
-  // Soft turns help first claims; sharp pointer flicks are less suicidal.
-  steerRate: Math.PI * 1.45,
+  // Responsive 360° chase. A half-turn still fits inside self-trail grace,
+  // so a deliberate hook is not a suicide and a flick can still come home.
+  steerRate: Math.PI * 1.72,
+  // First return only: the bead seals when it overlaps ink, a little early.
+  firstClaimContactScale: 1.28,
   bodyRadius: 13,
 
   trailWidth: 11,
@@ -72,6 +75,14 @@ export const CONFIG = Object.freeze({
   cameraLookAhead: 120,
   cameraLookAheadFollow: 5.5,
   cameraFollow: 7.5,
+  // While a stroke is open, pull the view back so home and the head share
+  // the frame. At home the view stays on cameraViewHeight.
+  cameraTrailPadding: 280,
+  cameraTrailZoomMinSpan: 96,
+  cameraZoomFollow: 2.6,
+  cameraHomePull: 0.46,
+  cameraHomePullFollow: 3.4,
+  cameraHomePullMax: 640,
   planeGridSpacing: 120,
 
   winShare: 1,

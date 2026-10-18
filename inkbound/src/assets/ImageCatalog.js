@@ -3,6 +3,56 @@
 
 const INDEX_URL = new URL("../../assets/IMAGE_INDEX.json", import.meta.url).href;
 
+// Used when a match boots before the catalog finishes, and by headless smokes.
+// Keep these identical to bindings.characters in IMAGE_INDEX.json.
+export const BOT_BEAD_FALLBACK = Object.freeze({
+  2: "char-bead-blue",
+  3: "char-bead-blue-alt",
+  4: "char-shape-squircle",
+});
+
+export const BOT_PATTERN_FALLBACK = Object.freeze({
+  2: "skin-paint-circle",
+  3: "skin-paint-splat",
+  4: "skin-paint-drips",
+});
+
+// CSS custom properties fed by catalog ids. Paths are resolved to absolute
+// URLs so they stay correct when style.css lives in css/.
+export const CSS_IMAGE_VARS = Object.freeze({
+  "--art-brand-seal": ["ui", "brandSeal"],
+  "--art-restart": ["ui", "restart"],
+  "--art-hud-jewel": ["ui", "hudJewel"],
+  "--art-equipped": ["ui", "equippedCheck"],
+  "--art-leader-medal": ["ui", "leaderMedal"],
+  "--art-stage-medal": ["ui", "stageMedal"],
+  "--art-icon-circle": ["ui", "iconCircle"],
+  "--art-plane-grain": ["terrain", "planeGrain"],
+  "--art-floor": ["terrain", "floor"],
+});
+
+export function catalogAssetUrl(assetPath) {
+  if (!assetPath) return "none";
+  if (typeof window !== "undefined" && window.location) {
+    return `url("${new URL(assetPath, window.location.href).href}")`;
+  }
+  return `url("${assetPath}")`;
+}
+
+export function botBeadId(catalog, entityId) {
+  const bound = catalog?.binding?.("characters", "botBeads", String(entityId));
+  if (typeof bound === "string") return bound;
+  return BOT_BEAD_FALLBACK[entityId]
+    || catalog?.binding?.("characters", "botBead")
+    || "char-bead-blue";
+}
+
+export function botPatternId(catalog, entityId) {
+  const bound = catalog?.binding?.("characters", "botPatterns", String(entityId));
+  if (typeof bound === "string") return bound;
+  return BOT_PATTERN_FALLBACK[entityId] || null;
+}
+
 export class ImageCatalog {
   constructor() {
     this.index = null;
@@ -87,6 +137,53 @@ export class ImageCatalog {
       node = node[key];
     }
     return typeof node === "string" ? node : node ?? null;
+  }
+
+  boundImage(...path) {
+    const id = this.binding(...path);
+    return typeof id === "string" ? this.get(id) : null;
+  }
+
+  stageLayers(stageId) {
+    return {
+      background: this.binding("stages", stageId),
+      terrain: this.binding("stageTerrain", stageId),
+      accent: this.binding("stageAccent", stageId),
+      grain: this.binding("stageGrain", stageId) || this.binding("terrain", "planeGrain"),
+      fallbackBackground: this.binding("fallback", "background"),
+      fallbackTerrain: this.binding("fallback", "terrain"),
+    };
+  }
+
+  applyCssVars(root = typeof document !== "undefined" ? document.documentElement : null) {
+    if (!root?.style) return;
+    for (const [cssVar, path] of Object.entries(CSS_IMAGE_VARS)) {
+      const id = this.binding(...path);
+      const entry = typeof id === "string" ? this.getEntry(id) : null;
+      if (entry) root.style.setProperty(cssVar, catalogAssetUrl(entry.path));
+    }
+    root.dataset.imageCatalog = "ready";
+    root.dataset.imageCatalogCount = String(this.counts().total || 0);
+  }
+
+  // Every catalog id that a binding leaf points at, plus ids no binding names.
+  coverage() {
+    const referenced = new Set();
+    const walk = (node) => {
+      if (typeof node === "string") {
+        referenced.add(node);
+        return;
+      }
+      if (node && typeof node === "object") {
+        for (const value of Object.values(node)) walk(value);
+      }
+    };
+    walk(this.index?.bindings);
+    const unbound = [];
+    for (const id of this.byId.keys()) {
+      if (!referenced.has(id)) unbound.push(id);
+    }
+    return { referenced: referenced.size, unbound };
   }
 
   getBound(id) {

@@ -193,4 +193,30 @@ assert.equal(hudSrc.includes('"is-lead"'), true);
   assert.equal(vfx.floats.length, 0, "floats expire");
 }
 
+// drawCrown must not throw once a leader exists. Catalog spark art evaluates
+// crown.age on the first frames; a missing local used to kill the rAF loop.
+{
+  const vfx = new Vfx(colors, CONFIG, () => 0.5);
+  vfx.crown.entityId = 1;
+  vfx.crown.age = 0.12;
+  const game = {
+    entities: [{ id: 1, alive: true, radius: 13, wetColor: colors["--ink-player-wet"] }],
+  };
+  const ctx = {
+    save() {},
+    restore() {},
+    translate() {},
+    scale() {},
+    beginPath() {},
+    moveTo() {},
+    lineTo() {},
+    closePath() {},
+    arc() {},
+    stroke() {},
+    fill() {},
+    drawImage() {},
+  };
+  vfx.drawCrown(ctx, game, () => ({ x: 10, y: 20 }));
+}
+
 console.log("PASS: capture floats, death juice, crown");

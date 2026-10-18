@@ -20,7 +20,10 @@ async function boot() {
   const input = new Input(canvas);
   const profile = getProfile();
   syncUnlocks(profile);
-  const game = new Game(input, colors, CONFIG, Math.random, { playerSkin: equippedSkin(profile) });
+  const game = new Game(input, colors, CONFIG, Math.random, {
+    playerSkin: equippedSkin(profile),
+    catalog,
+  });
   game.arena.game = game;
   const renderer = new Renderer(canvas, colors, CONFIG, catalog);
   let accumulator = 0;
@@ -96,19 +99,7 @@ async function boot() {
 }
 
 function applyUiArt(catalog) {
-  const root = document.documentElement;
-  const map = {
-    "--art-brand-seal": catalog.binding("ui", "brandSeal"),
-    "--art-restart": catalog.binding("ui", "restart"),
-    "--art-hud-jewel": catalog.binding("ui", "hudJewel"),
-    "--art-equipped": catalog.binding("ui", "equippedCheck"),
-  };
-  for (const [cssVar, id] of Object.entries(map)) {
-    const entry = id ? catalog.getEntry(id) : null;
-    if (entry) root.style.setProperty(cssVar, `url("${entry.path}")`);
-  }
-  root.dataset.imageCatalog = "ready";
-  root.dataset.imageCatalogCount = String(catalog.counts().total || 0);
+  catalog.applyCssVars(document.documentElement);
 }
 
 boot().catch((err) => {

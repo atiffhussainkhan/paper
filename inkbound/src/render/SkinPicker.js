@@ -1,4 +1,5 @@
 import { SKINS, isSkinUnlocked } from "../meta/Skins.js";
+import { catalogAssetUrl } from "../assets/ImageCatalog.js";
 
 // Radio-group of ink swatches. Locked skins stay visible, disabled, and state
 // the best share that opens them.
@@ -23,7 +24,7 @@ export class SkinPicker {
       button.style.setProperty("--skin-core", skin.core);
       const pickerEntry = catalog?.getEntry?.(skin.pickerImageId || skin.patternImageId);
       if (pickerEntry) {
-        button.style.setProperty("--skin-art", `url("${pickerEntry.path}")`);
+        button.style.setProperty("--skin-art", catalogAssetUrl(pickerEntry.path));
         button.classList.add("has-art");
       }
       button.innerHTML = [

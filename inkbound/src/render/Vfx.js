@@ -445,6 +445,7 @@ export class Vfx {
         context.save();
         if (p.flash) context.globalCompositeOperation = "lighter";
         context.translate(p.x, p.y);
+        if (p.streak && (p.vx || p.vy)) context.rotate(Math.atan2(p.vy, p.vx));
         context.drawImage(sprite, -size * 0.5, -size * 0.5, size, size);
         context.restore();
         continue;
@@ -467,12 +468,13 @@ export class Vfx {
   }
 
   drawCrown(context, game, positionOf) {
-    if (this.crown.entityId === null) return;
-    const entity = game.entities.find((e) => e.id === this.crown.entityId && e.alive);
+    const crown = this.crown;
+    if (crown.entityId === null) return;
+    const entity = game.entities.find((e) => e.id === crown.entityId && e.alive);
     if (!entity) return;
     const position = positionOf(entity);
-    const pop = easeOutBack(clamp01(this.crown.age / VFX_TIMING.crownPopDuration));
-    const bob = Math.sin(this.crown.age * 3.2) * 1.4;
+    const pop = easeOutBack(clamp01(crown.age / VFX_TIMING.crownPopDuration));
+    const bob = Math.sin(crown.age * 3.2) * 1.4;
     const r = entity.radius;
     const w = 11;
     const h = 9;

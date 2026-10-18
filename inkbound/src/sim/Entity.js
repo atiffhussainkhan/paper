@@ -24,6 +24,7 @@ export class Entity {
     );
     this.alive = true;
     this.outsideOwnTerritory = false;
+    this.clearedHome = false;
     this.capturePending = false;
     this.deathReason = "";
     this.killedBy = null;

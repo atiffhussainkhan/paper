@@ -54,6 +54,60 @@ export class TerritoryGrid {
     return this.ownerAt(x, y) === ownerId;
   }
 
+  // True when the body disk overlaps a cell of dry ink. Reach covers the cell
+  // square, so a bead that visually touches ink counts as home.
+  bodyTouchesOwner(ownerId, x, y, radius) {
+    if (this.isOwnedBy(ownerId, x, y)) return true;
+    if (!(radius > 0)) return false;
+    const min = this.worldToCell(x - radius - this.cellSize, y - radius - this.cellSize)
+      ?? { col: 0, row: 0 };
+    const max = this.worldToCell(x + radius + this.cellSize, y + radius + this.cellSize)
+      ?? { col: this.size - 1, row: this.size - 1 };
+    const reach = radius + this.cellSize * 0.72;
+    const reachSq = reach * reach;
+    for (let row = Math.max(0, min.row); row <= Math.min(this.size - 1, max.row); row += 1) {
+      for (let col = Math.max(0, min.col); col <= Math.min(this.size - 1, max.col); col += 1) {
+        const index = this.index(col, row);
+        if (this.cells[index] !== ownerId) continue;
+        const center = this.cellCenter(col, row);
+        if ((center.x - x) ** 2 + (center.y - y) ** 2 <= reachSq) return true;
+      }
+    }
+    return false;
+  }
+
+  ownsReach(ownerId, x, y, radius) {
+    if (!(radius > 0)) return this.isOwnedBy(ownerId, x, y);
+    return this.bodyTouchesOwner(ownerId, x, y, radius);
+  }
+
+  // Point on the segment where ownership flips. `from` should be the home side.
+  inkBoundaryPoint(ownerId, from, to, radius = 0) {
+    let home = from;
+    let away = to;
+    if (!this.ownsReach(ownerId, home.x, home.y, radius)
+      && this.ownsReach(ownerId, away.x, away.y, radius)) {
+      home = to;
+      away = from;
+    }
+    let loX = home.x;
+    let loY = home.y;
+    let hiX = away.x;
+    let hiY = away.y;
+    for (let step = 0; step < 8; step += 1) {
+      const midX = (loX + hiX) * 0.5;
+      const midY = (loY + hiY) * 0.5;
+      if (this.ownsReach(ownerId, midX, midY, radius)) {
+        loX = midX;
+        loY = midY;
+      } else {
+        hiX = midX;
+        hiY = midY;
+      }
+    }
+    return { x: (loX + hiX) * 0.5, y: (loY + hiY) * 0.5 };
+  }
+
   setOwnerAtIndex(index, ownerId) {
     const previous = this.cells[index];
     if (previous < 0 || previous === ownerId) return false;
