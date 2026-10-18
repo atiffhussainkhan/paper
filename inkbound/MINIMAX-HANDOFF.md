@@ -31,6 +31,15 @@ Only if a clear bug blocks match start. No new features.
 - Brand **Inkbound**; no Paper.io IP
 - **Godot:** do not fill gameplay stubs
 
+## RULE master (Cursor)
+
+**Status:** `done`
+**Verdict:** **No** — must-haves and a full local life are in; the whole GDD is not.
+**Runnable URL:** `http://127.0.0.1:8765/`
+**Game bytes:** `21cf6b0`
+
+RULE1 match start is **PARTIAL**. RULE2 core rules **MATCH**. RULE3 earn is **PASS**. RULE4 must-haves are **12/12**, and the build is not a Paper.io 2 copy. RULE5 played cold start → 3.8% claim → self-trail death at 4.0% → Restart on that local URL. Report: `docs/RULE_AUDIT_MASTER.md`.
+
 ## RULE2 — core rules (Cursor)
 
 **Status:** `done`
