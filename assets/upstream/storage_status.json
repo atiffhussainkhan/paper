@@ -1,0 +1,387 @@
+{
+  "repository": "atiffhussainkhan/Image",
+  "rule": "A pack is usable from this repository only when status=stored and release_asset is populated.",
+  "stored": [
+    {
+      "id": "series-ai-jam-ready-assets",
+      "release": "mega-assets-v1",
+      "release_asset": "jam-ready-assets.zip",
+      "size_bytes": 1533150036,
+      "tags": [
+        "mixed",
+        "2d",
+        "3d",
+        "ui",
+        "icons",
+        "audio",
+        "mega-library"
+      ]
+    },
+    {
+      "id": "kaykit-adventurers",
+      "release": "mega-assets-v1",
+      "release_asset": "kaykit-adventurers.zip",
+      "size_bytes": 30504058,
+      "tags": [
+        "3d",
+        "characters",
+        "rigged",
+        "animated",
+        "rpg"
+      ]
+    },
+    {
+      "id": "kaykit-character-animations-1.2",
+      "release": "mega-assets-v1",
+      "release_asset": "kaykit-character-animations-1.2.zip",
+      "size_bytes": 7959257,
+      "tags": [
+        "3d",
+        "animation",
+        "humanoid"
+      ]
+    },
+    {
+      "id": "kaykit-skeletons",
+      "release": "mega-assets-v1",
+      "release_asset": "kaykit-skeletons.zip",
+      "size_bytes": 28735557,
+      "tags": [
+        "3d",
+        "characters",
+        "skeletons",
+        "rigged",
+        "animated"
+      ]
+    },
+    {
+      "id": "opengameart-knight-princess-dragon-2",
+      "release": "mega-assets-v1",
+      "release_asset": "opengameart-knight-princess-dragon-2.zip",
+      "size_bytes": 63827977,
+      "tags": [
+        "2d",
+        "characters",
+        "dragon",
+        "png",
+        "animation"
+      ]
+    },
+    {
+      "id": "opengameart-modular-vector-characters",
+      "release": "mega-assets-v1",
+      "release_asset": "opengameart-modular-vector-characters.zip",
+      "size_bytes": 71527593,
+      "tags": [
+        "2d",
+        "characters",
+        "vector",
+        "animated"
+      ]
+    },
+    {
+      "id": "cc0tree",
+      "release": "mega-assets-expansion-v1",
+      "release_asset": "cc0tree.zip",
+      "size_bytes": 11146504,
+      "tags": [
+        "3d",
+        "tree",
+        "environment",
+        "low-poly"
+      ]
+    },
+    {
+      "id": "fps-asset-kit",
+      "release": "mega-assets-expansion-v1",
+      "release_asset": "fps-asset-kit.zip",
+      "size_bytes": 763813421,
+      "tags": [
+        "fps",
+        "pbr",
+        "textures",
+        "weapons",
+        "sfx",
+        "hdri"
+      ]
+    },
+    {
+      "id": "fps-buildings-env-kit",
+      "release": "mega-assets-expansion-v1",
+      "release_asset": "fps-buildings-env-kit.zip",
+      "size_bytes": 319708164,
+      "tags": [
+        "3d",
+        "buildings",
+        "environment",
+        "vegetation",
+        "skybox",
+        "urban"
+      ]
+    },
+    {
+      "id": "holokat-game-assets",
+      "release": "mega-assets-expansion-v1",
+      "release_asset": "holokat-game-assets.zip",
+      "size_bytes": 65596546,
+      "tags": [
+        "3d",
+        "characters",
+        "buildings",
+        "creatures",
+        "vfx",
+        "animations"
+      ]
+    },
+    {
+      "id": "shorepine-kenney",
+      "release": "mega-assets-expansion-v1",
+      "release_asset": "shorepine-kenney.zip",
+      "size_bytes": 159448776,
+      "tags": [
+        "2d",
+        "3d",
+        "ui",
+        "icons",
+        "kenney"
+      ]
+    },
+    {
+      "id": "tiddybub-2d-assets",
+      "release": "mega-assets-expansion-v1",
+      "release_asset": "tiddybub-2d-assets.zip",
+      "size_bytes": 1192705116,
+      "tags": [
+        "2d",
+        "characters",
+        "sprites",
+        "backgrounds",
+        "ui",
+        "vehicles",
+        "effects"
+      ]
+    },
+    {
+      "id": "kaykit-city-builder",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "kaykit-city-builder.zip",
+      "size_bytes": 5771646,
+      "tags": [
+        "3d",
+        "city",
+        "buildings",
+        "house",
+        "urban"
+      ]
+    },
+    {
+      "id": "kaykit-dungeon-remastered",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "kaykit-dungeon-remastered.zip",
+      "size_bytes": 29808904,
+      "tags": [
+        "3d",
+        "dungeon",
+        "interior",
+        "walls",
+        "floors",
+        "doors",
+        "props"
+      ]
+    },
+    {
+      "id": "kaykit-furniture",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "kaykit-furniture.zip",
+      "size_bytes": 4241609,
+      "tags": [
+        "3d",
+        "furniture",
+        "interior",
+        "rooms",
+        "props"
+      ]
+    },
+    {
+      "id": "kaykit-halloween",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "kaykit-halloween.zip",
+      "size_bytes": 6486182,
+      "tags": [
+        "3d",
+        "graveyard",
+        "cemetery",
+        "props"
+      ]
+    },
+    {
+      "id": "kaykit-medieval-hexagon",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "kaykit-medieval-hexagon.zip",
+      "size_bytes": 36321425,
+      "tags": [
+        "3d",
+        "medieval",
+        "hex",
+        "buildings",
+        "roads",
+        "rivers",
+        "nature"
+      ]
+    },
+    {
+      "id": "kaykit-prototype-bits",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "kaykit-prototype-bits.zip",
+      "size_bytes": 5770284,
+      "tags": [
+        "3d",
+        "prototype",
+        "greybox",
+        "level-design"
+      ]
+    },
+    {
+      "id": "oga-3d-character-pack",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "oga-3d-character-pack.zip",
+      "size_bytes": 41743060,
+      "tags": [
+        "3d",
+        "characters",
+        "humanoid",
+        "rigged",
+        "animated"
+      ]
+    },
+    {
+      "id": "papyszoo-cc0-sprites",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "papyszoo-cc0-sprites.zip",
+      "size_bytes": 144498696,
+      "tags": [
+        "2d",
+        "sprites",
+        "characters",
+        "creatures",
+        "tilesets",
+        "backgrounds",
+        "ui"
+      ]
+    },
+    {
+      "id": "verified-source-catalog",
+      "release": "mega-assets-expansion-v2",
+      "release_asset": "verified-source-catalog.zip",
+      "size_bytes": 1501012,
+      "tags": [
+        "catalog",
+        "reference"
+      ]
+    },
+    {
+      "id": "avramania-nature-terrain",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "avramania-nature-terrain.zip",
+      "size_bytes": 3272164,
+      "sha256": "3f9936acf0e5832306f7661a6f1bdd3f01dee7f8a6370a8f306e89976956b72b",
+      "tags": [
+        "3d",
+        "nature",
+        "terrain",
+        "glb",
+        "fbx"
+      ]
+    },
+    {
+      "id": "barnabe-wild-rigged-character",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "barnabe-wild-rigged-character.zip",
+      "size_bytes": 7435043,
+      "sha256": "3302fbe02060b57961afcb2baf0f92a4479f85c3f085719adb80c54c55e6ac10",
+      "tags": [
+        "3d",
+        "character",
+        "rigged",
+        "mocap"
+      ]
+    },
+    {
+      "id": "jean-charpentier-lowpoly",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "jean-charpentier-lowpoly.zip",
+      "size_bytes": 1914379,
+      "sha256": "c1b96c550f0634ca7391590d5990f87d694696034f1b1797032e34a6f6044959",
+      "tags": [
+        "3d",
+        "lowpoly",
+        "fbx"
+      ]
+    },
+    {
+      "id": "kaykit-dungeon",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "kaykit-dungeon.zip",
+      "size_bytes": 32730796,
+      "sha256": "52cea49b449c4dbe45624234aced1da9f037a8dda7e50a9e0b76536e9dc2d1f8",
+      "tags": [
+        "3d",
+        "dungeon",
+        "environment"
+      ]
+    },
+    {
+      "id": "mastjie-household-goods",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "mastjie-household-goods.zip",
+      "size_bytes": 528931,
+      "sha256": "696339c836e035b80d8dd231c0a0e6b15b3155cc5ba53aebb4150371c98ef3b4",
+      "tags": [
+        "3d",
+        "props",
+        "interior",
+        "fbx",
+        "gltf"
+      ]
+    },
+    {
+      "id": "quaternius-animated-mech",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "quaternius-animated-mech.zip",
+      "size_bytes": 83598811,
+      "sha256": "994623a91caf62520add18bf67b7c38450f2500034b49c06b3723b56e1d85cc8",
+      "tags": [
+        "3d",
+        "mech",
+        "sci-fi",
+        "animated"
+      ]
+    },
+    {
+      "id": "quaternius-ultimate-animated-animals",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "quaternius-ultimate-animated-animals.zip",
+      "size_bytes": 40047112,
+      "sha256": "9904a30582ab736d3a56dbba6431812e9183505ddcbf6ce9c9132ecc14ed00d3",
+      "tags": [
+        "3d",
+        "animals",
+        "animated"
+      ]
+    },
+    {
+      "id": "quaternius-ultimate-animated-character",
+      "release": "catalog-completion-2026-10-06",
+      "release_asset": "quaternius-ultimate-animated-character.zip",
+      "size_bytes": 70848226,
+      "sha256": "a63ad121b36fb277342cf54b8d5e39be720b90b31acb77f835834ff5240a5c3e",
+      "tags": [
+        "3d",
+        "characters",
+        "rigged",
+        "animated"
+      ]
+    }
+  ],
+  "unresolved_catalogued": []
+}
