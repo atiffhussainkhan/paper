@@ -1,32 +1,34 @@
-# MINIMAX-HANDOFF — Inkbound Phase 0
+# MINIMAX-HANDOFF — Inkbound Phase 1 tracks
 
 ## Status
 `awaiting-minimax`
 
 ## Task
 
-Implement the **Inkbound** Phase 0 playable prototype under `/workspace/inkbound` as specified in:
+Continue **Inkbound** under `/workspace/inkbound` on branch `cursor/inkbound-phase0-prototype-c3dd`.
 
-- `DECISIONS.md` (LOCKED)
-- `docs/ARCHITECTURE.md`
-- `docs/PHASE0_ACCEPTANCE.md`
-- `docs/BRAND.md`
+Phase 0 core loop exists. Implement these **five system tracks** (parallel ownership):
 
-### Must ship
+### Track J — Juice
+Capture `%` floating text, death VFX (trail dissolve → burst → territory fade), crown on #1.
 
-1. ES-module Web Canvas game (no build step)
-2. 360° continuous steering, always moving
-3. Circular arena, non-lethal rim slide
-4. Territory grid + trail + loop-close flood fill
-5. Self-trail kill + enemy trail-cut kill (no body-vs-body kill)
-6. Exactly 3 bots
-7. % HUD + leaderboard + death overlay with Restart (no revive)
-8. Tick order exactly as `docs/ARCHITECTURE.md`
+### Track B — Bot difficulty curve
+Fade/remove teaching grace carefully; scale bot aggression with player `%` / match age. Keep early game learnable.
 
-### Out of scope
+### Track S — Skins + best %
+At least 5 cosmetic skins (Inkbound brand colors/patterns). Persist best `%` (localStorage). Skin select on home/restart UI.
 
-Shop, skins, powers, ads, events, stages, real multiplayer, Paper.io IP
+### Track M — Stages / meta
+Simple stage list + cumulative territory credit toward stage completion. No shop/ads/powers.
+
+### Track G — Godot 4 port scaffold
+Create `inkbound/godot/` Godot 4 project skeleton + PORT.md mapping web modules → Godot scenes/scripts. Do not require Godot binary if unavailable; ship valid project files.
+
+### Constraints
+- Keep brand **Inkbound** (no Paper.io IP)
+- No shop, ads, powers, real multiplayer
+- Prefer modular files; avoid rewriting unrelated systems
+- Update `docs/` as needed; keep smoke tests green (`node tools/smoke_*.mjs`)
 
 ### Done when
-
-`python3 -m http.server` from `/workspace/inkbound` serves a playable game that passes Phase 0 acceptance checks.
+Each track has working code or scaffold committed; web game still runs via `python3 -m http.server`.
