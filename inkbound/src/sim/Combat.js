@@ -60,6 +60,21 @@ export function playerSafeFromBots(matchAge, playerShare, config) {
   return matchAge < adaptiveGrace;
 }
 
+export function playerSelfForgivenessActive(matchAge, config) {
+  return matchAge < (config.playerSelfForgivenessSeconds ?? 0);
+}
+
+function trailArcLength(trail) {
+  if (!trail?.points || trail.points.length < 2) return 0;
+  let length = 0;
+  for (let i = 1; i < trail.points.length; i += 1) {
+    const a = trail.points[i - 1];
+    const b = trail.points[i];
+    length += Math.hypot(b.x - a.x, b.y - a.y);
+  }
+  return length;
+}
+
 export function resolveCombat(
   entities,
   config,
@@ -68,18 +83,31 @@ export function resolveCombat(
 ) {
   const living = entities.filter((entity) => entity.alive);
   const deaths = new Map();
-  const selfGrace = graceLength(config.selfGracePoints, config);
+  const baseSelfGrace = graceLength(config.selfGracePoints, config);
   const enemyGrace = graceLength(config.enemyHeadGracePoints, config);
   // Bots cannot cut the player during the guaranteed opening safety period.
   // Players below the configured share curve receive a small adaptive bonus.
   // Self-cuts and player-vs-bot cuts still resolve normally.
   const playerIsSafeFromBots = playerSafeFromBots(matchAge, playerShare, config);
+  const forgiveness = playerSelfForgivenessActive(matchAge, config);
 
   // Self-cut uses a tighter radius than enemy cuts so normal turning along a
-  // fresh stroke does not register as suicide. Grace is still arc-length based.
-  const selfRadiusScale = config.selfCollisionRadiusScale ?? 0.45;
+  // fresh stroke does not register as suicide. Early match gives the player
+  // extra arc grace and a smaller hit radius so the first claim is learnable.
+  const baseSelfRadiusScale = config.selfCollisionRadiusScale ?? 0.45;
   for (const entity of living) {
     const trail = entity.trail;
+    let selfGrace = baseSelfGrace;
+    let selfRadiusScale = baseSelfRadiusScale;
+    if (entity.isPlayer && forgiveness) {
+      selfGrace *= config.playerSelfForgivenessGraceScale ?? 1.75;
+      selfRadiusScale = Math.min(
+        selfRadiusScale,
+        config.playerSelfForgivenessRadiusScale ?? 0.2,
+      );
+      const minLen = config.playerSelfMinTrailLength ?? 0;
+      if (minLen > 0 && trailArcLength(trail) < minLen) continue;
+    }
     const endSegment = trail.olderSegmentCount(selfGrace, entity.position);
     if (endSegment > 0
       && trail.collidesSegment(

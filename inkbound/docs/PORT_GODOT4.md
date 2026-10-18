@@ -1,8 +1,13 @@
 # Inkbound — Godot 4 port map
 
-**Status:** scaffold. The playable sim is the web prototype under `src/`. This
-document maps those modules onto the Godot 4 project in `godot/`. Filling a stub
-means porting the named web file, not inventing a second ruleset.
+**Status:** scaffold only.  
+**Gate:** do **not** fill Godot stubs until the **web loop feels good** — specifically
+until a new player can complete a first claim without constant self-cuts, and Best /
+Stage HUD are readable at a glance. Until then, `src/` remains the only playable build.
+
+The playable sim is the web prototype under `src/`. This document maps those modules
+onto the Godot 4 project in `godot/`. Filling a stub means porting the named web file,
+not inventing a second ruleset.
 
 Godot is optional in CI. Nothing in the web smoke tests imports `godot/`. See
 [`godot/README.md`](../godot/README.md).

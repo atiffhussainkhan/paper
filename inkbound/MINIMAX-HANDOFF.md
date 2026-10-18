@@ -1,34 +1,20 @@
-# MINIMAX-HANDOFF — Inkbound Phase 1 tracks
+# MINIMAX-HANDOFF — Inkbound feel + HUD pass
 
 ## Status
 `awaiting-minimax`
 
 ## Task
 
-Continue **Inkbound** under `/workspace/inkbound` on branch `cursor/inkbound-phase0-prototype-c3dd`.
+On branch `cursor/inkbound-phase0-prototype-c3dd` under `/workspace/inkbound`:
 
-Phase 0 core loop exists. Implement these **five system tracks** (parallel ownership):
-
-### Track J — Juice
-Capture `%` floating text, death VFX (trail dissolve → burst → territory fade), crown on #1.
-
-### Track B — Bot difficulty curve
-Fade/remove teaching grace carefully; scale bot aggression with player `%` / match age. Keep early game learnable.
-
-### Track S — Skins + best %
-At least 5 cosmetic skins (Inkbound brand colors/patterns). Persist best `%` (localStorage). Skin select on home/restart UI.
-
-### Track M — Stages / meta
-Simple stage list + cumulative territory credit toward stage completion. No shop/ads/powers.
-
-### Track G — Godot 4 port scaffold
-Create `inkbound/godot/` Godot 4 project skeleton + PORT.md mapping web modules → Godot scenes/scripts. Do not require Godot binary if unavailable; ship valid project files.
+1. **Easier first claim** — softer steer, wider self-trail grace, early-match self-forgiveness (`playerSelfForgivenessSeconds`). Keep smokes green.
+2. **Best / Stage readability** — score panel contrast so Best % and Quiet Plane stage bar read at a glance.
+3. **Godot stubs** — **do not fill** until the web loop feels good. Document the gate only.
 
 ### Constraints
-- Keep brand **Inkbound** (no Paper.io IP)
+- Brand **Inkbound**; no Paper.io IP
 - No shop, ads, powers, real multiplayer
-- Prefer modular files; avoid rewriting unrelated systems
-- Update `docs/` as needed; keep smoke tests green (`node tools/smoke_*.mjs`)
+- Serve from `/workspace/inkbound` (not `/tmp/headtree`)
 
 ### Done when
-Each track has working code or scaffold committed; web game still runs via `python3 -m http.server`.
+Smokes pass; player can complete an early loop more reliably; Best/Stage HUD is clearly visible.

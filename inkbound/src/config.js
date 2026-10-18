@@ -10,17 +10,23 @@ export const CONFIG = Object.freeze({
   // ~1.0% start disk — enough room for a first teaching loop.
   startTerritoryRadius: 120,
 
-  playerSpeed: 200,
+  playerSpeed: 195,
   botSpeed: 125,
-  // Slightly softer turns reduce accidental self-cuts for pointer steering.
-  steerRate: Math.PI * 1.85,
+  // Soft turns help first claims; sharp pointer flicks are less suicidal.
+  steerRate: Math.PI * 1.45,
   bodyRadius: 13,
 
   trailWidth: 11,
   trailSampleSpacing: 8,
   maxTrailPoints: 5000,
-  selfGracePoints: 22,
-  selfCollisionRadiusScale: 0.45,
+  selfGracePoints: 30,
+  selfCollisionRadiusScale: 0.3,
+  // Early-match teaching: extra self-trail forgiveness until this age.
+  playerSelfForgivenessSeconds: 22,
+  playerSelfForgivenessGraceScale: 1.85,
+  playerSelfForgivenessRadiusScale: 0.18,
+  // Ignore tiny accidental loops until the wet stroke is this long (world units).
+  playerSelfMinTrailLength: 220,
   enemyHeadGracePoints: 4,
 
   botCount: 3,

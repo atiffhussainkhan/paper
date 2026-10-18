@@ -92,4 +92,24 @@ if (!p2.alive) {
   process.exit(1);
 }
 console.log("PASS: no false self-kill on straight trail");
+
+// During self-forgiveness, a short curved stroke must not suicide the player.
+const p3 = entity(1, "You", true, 40, 40);
+p3.trail.begin({ x: 0, y: 0 });
+for (let i = 1; i <= 12; i += 1) {
+  const t = i / 12;
+  p3.trail.add({
+    x: 60 * Math.sin(t * Math.PI),
+    y: 60 * (1 - Math.cos(t * Math.PI)),
+  }, true);
+}
+p3.previousPosition = { x: 55, y: 50 };
+p3.position = { x: 40, y: 40 };
+resolveCombat([p3], CONFIG, 2);
+if (!p3.alive) {
+  console.error("FAIL: self-forgiveness should protect early short curves:", p3.deathReason);
+  process.exit(1);
+}
+console.log("PASS: early self-forgiveness protects short curves");
+
 console.log("All smoke combat checks passed.");

@@ -1,8 +1,11 @@
 # Inkbound — Godot 4 scaffold
 
 This folder is a **Godot 4.3+** project skeleton for a later mobile port. It is not the
-playable build. The playable Phase 0 game is still the web prototype in the parent
+playable build. The playable game is still the web prototype in the parent
 directory (`python3 -m http.server` from `inkbound/`).
+
+**Do not fill stubs yet.** Wait until the web loop feels good (easy first claim +
+readable Best/Stage HUD). See the gate note in [`../docs/PORT_GODOT4.md`](../docs/PORT_GODOT4.md).
 
 The module map is [`../docs/PORT_GODOT4.md`](../docs/PORT_GODOT4.md). Simulation tick
 order is the locked list in [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
