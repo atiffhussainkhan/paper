@@ -1,11 +1,20 @@
 # MINIMAX-HANDOFF — Inkbound RULE1 match start
 
 ## Status
-`awaiting-cursor`
+`done`
 
 ## Task
 
 Add Paper.io-class home/start screen with Play gate; match must not run until Play.
+
+## Start flow (Cursor)
+
+**Status:** `done`
+**Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
+
+Cold load paints the title first. `game.state` is `title` until Play, and the frame loop does not tick while the screen is the title, so bots stay still and no wet trail is emitted. Play calls `reset()` and cold-spawns the disk, the three bots, and the HUD. Restart on the death card starts that match again. Home, on the death card and in the match, returns to the title. Figure plates live on the home screen; they do not cover the playfield. The steer line is on the title and in the match, including at 375px. Locked inks stay locked until best % earns them.
+
+Shots: `/opt/cursor/artifacts/home_title.png`, `home_play.png`, `home_claim.png`, `home_death.png`, `home_restart.png`, `home_menu.png`, `home_mobile_title.png`, `home_mobile.png`.
 
 ## RULE master (Cursor)
 

@@ -76,6 +76,7 @@ async function boot() {
     document.body.dataset.mode = "playing";
     hudRoot?.setAttribute("aria-hidden", "false");
     if (titleScreen) titleScreen.hidden = true;
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     restart();
   };
 
