@@ -4,6 +4,7 @@
 **Date:** 2026-10-18
 **Branch:** `cursor/inkbound-final-dev-c3dd`
 **Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`
+**Report commit:** `594ed16b37c7880253aec83012a5e9866cd3cd5b`
 **Parent while playing:** docs-only commits after `21cf6b0`. `src/`, `css/`, and `index.html` are that tree.
 **Server:** `python3 -m http.server 8774 --bind 127.0.0.1`, cwd `/workspace/inkbound`
 **Browser:** Chrome 154.0.8037.92, headless, 1280×800. Catalog `ready`. Zero console errors. Zero HTTP responses ≥ 400. No Paper.io string in the document.

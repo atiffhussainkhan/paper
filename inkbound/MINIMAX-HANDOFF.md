@@ -36,6 +36,7 @@ Only if a clear bug blocks match start. No new features.
 **Status:** `done`
 **Verdict:** **PASS**
 **Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`
+**Report commit:** `594ed16b37c7880253aec83012a5e9866cd3cd5b`
 
 Players earn characters by best % of the plane: Seal free, Tideglass 2, Emberline 5, Nightquarry 10, Bone 20. A real 6.8% death opened Tideglass and Emberline; locked chips stayed disabled; Emberline equipped and survived Restart and reload as the dragon. Stored best 19.9 keeps Bone locked; 20 opens Bone and the person plate persists. Shop and currency are **N/A-MVP**, not a gap. Report: `docs/RULE_AUDIT_3_EARN.md`. Shots: `/opt/cursor/artifacts/rule3_*.png`.
 
