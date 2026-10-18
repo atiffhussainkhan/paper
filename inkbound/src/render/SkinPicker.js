@@ -22,13 +22,25 @@ export class SkinPicker {
       button.style.setProperty("--skin-dry", skin.dry);
       button.style.setProperty("--skin-wet", skin.wet);
       button.style.setProperty("--skin-core", skin.core);
+      const beadEntry = catalog?.getEntry?.(skin.beadImageId);
       const pickerEntry = catalog?.getEntry?.(skin.pickerImageId || skin.patternImageId);
-      if (pickerEntry) {
-        button.style.setProperty("--skin-art", catalogAssetUrl(pickerEntry.path));
+      const orbEntry = catalog?.getEntry?.(skin.orbImageId);
+      if (beadEntry) {
+        button.style.setProperty("--skin-art", catalogAssetUrl(beadEntry.path));
         button.classList.add("has-art");
+      }
+      if (pickerEntry) {
+        button.style.setProperty("--skin-paint", catalogAssetUrl(pickerEntry.path));
+        button.classList.add("has-paint");
+      }
+      if (orbEntry) {
+        button.style.setProperty("--skin-orb", catalogAssetUrl(orbEntry.path));
+        button.classList.add("has-orb");
       }
       button.innerHTML = [
         '<span class="skin-chip__bead" aria-hidden="true"></span>',
+        '<span class="skin-chip__orb" aria-hidden="true"></span>',
+        '<span class="skin-chip__paint" aria-hidden="true"></span>',
         '<span class="skin-chip__name"></span>',
       ].join("");
       button.querySelector(".skin-chip__name").textContent = skin.name;

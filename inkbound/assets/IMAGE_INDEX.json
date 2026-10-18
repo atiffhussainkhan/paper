@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "name": "Inkbound IMAGE_INDEX",
-  "description": "Curated game images for Inkbound, mirrored from atiffhussainkhan/Image. Every stage background, terrain layer, character bead, skin pattern, UI seal, and VFX role resolves through bindings. Do not AI-generate bitmap art.",
+  "description": "Curated game images for Inkbound, mirrored from atiffhussainkhan/Image. Character plates are CC0 figure idles (knight, princess, dragon, Kenney toons) plus 1024+ sphere beads. Stage plates are 4096 sky fields or 1024 parchment. Do not AI-generate bitmap art.",
   "source_of_truth": {
     "repository": "https://github.com/atiffhussainkhan/Image",
     "canonical_index": "catalog/MASTER_ASSET_INDEX.json",
@@ -22,17 +22,19 @@
       "stored_metadata_bundles": 1
     },
     "upstream_item_count": 34,
-    "synced_at": "2026-10-18T12:29:06Z"
+    "synced_at": "2026-10-18T12:29:06Z",
+    "plate_policy": "Curated from shorepine-kenney high-resolution plates only: 4096 skyboxes, 1024 parchment and spheres, 512 splats, particles, and light masks. Pixel-platformer tiles are not used as stage or pattern art.",
+    "plates_extracted_at": "2026-10-18T14:13:39Z"
   },
   "counts": {
     "background": 7,
-    "character": 6,
+    "character": 15,
     "skin": 8,
     "ui": 7,
     "vfx": 7,
     "terrain": 14
   },
-  "total": 49,
+  "total": 58,
   "bindings": {
     "stages": {
       "quiet-plane": "bg-quiet-plane",
@@ -74,28 +76,33 @@
     "skins": {
       "seal": {
         "pattern": "skin-splat-01",
-        "bead": "char-bead-red",
-        "picker": "skin-paint-circle"
+        "bead": "char-plate-princess",
+        "picker": "skin-paint-circle",
+        "orb": "char-bead-red"
       },
       "tideglass": {
         "pattern": "skin-splat-05",
-        "bead": "char-bead-blue",
-        "picker": "skin-paint-circle"
+        "bead": "char-plate-knight",
+        "picker": "skin-paint-circle",
+        "orb": "char-bead-blue"
       },
       "emberline": {
         "pattern": "skin-splat-10",
-        "bead": "char-bead-red-alt",
-        "picker": "skin-paint-splat"
+        "bead": "char-plate-dragon",
+        "picker": "skin-paint-splat",
+        "orb": "char-bead-red-alt"
       },
       "nightquarry": {
         "pattern": "skin-splat-16",
-        "bead": "char-bead-blue-alt",
-        "picker": "skin-paint-circle"
+        "bead": "char-toon-robot",
+        "picker": "skin-paint-circle",
+        "orb": "char-bead-blue-alt"
       },
       "bone": {
         "pattern": "skin-splat-22",
-        "bead": "char-shape-circle",
-        "picker": "skin-paint-drips"
+        "bead": "char-toon-male-person",
+        "picker": "skin-paint-drips",
+        "orb": "char-shape-circle"
       }
     },
     "ui": {
@@ -121,18 +128,28 @@
       "floor": "terrain-grass"
     },
     "characters": {
-      "defaultBead": "char-bead-red",
-      "botBead": "char-bead-blue",
+      "defaultBead": "char-plate-princess",
+      "botBead": "char-plate-knight",
       "shapeAccent": "char-shape-squircle",
       "botBeads": {
-        "2": "char-bead-blue",
-        "3": "char-bead-blue-alt",
-        "4": "char-shape-squircle"
+        "2": "char-plate-knight",
+        "3": "char-toon-female-adventurer",
+        "4": "char-toon-zombie"
       },
       "botPatterns": {
         "2": "skin-paint-circle",
         "3": "skin-paint-splat",
         "4": "skin-paint-drips"
+      },
+      "playerOrb": "char-bead-red",
+      "botOrbs": {
+        "2": "char-bead-blue",
+        "3": "char-bead-blue-alt",
+        "4": "char-shape-squircle"
+      },
+      "roster": {
+        "ranger": "char-toon-male-adventurer",
+        "walker": "char-toon-female-person"
       }
     }
   },
@@ -145,19 +162,20 @@
       "tags": [
         "stage",
         "quiet-plane",
-        "land"
+        "parchment",
+        "paper"
       ],
-      "recommended_usage": "Stage background for Quiet Plane",
+      "recommended_usage": "Stage plate for Quiet Plane \u2014 1024 cartography parchment",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Platformer Pack Remastered/Backgrounds/blue_land.png",
+        "source_path": "2d/Cartography Pack/Textures/parchmentBasic.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "f82c2021ba8eb9d8"
+      "sha256_16": "2e2f1c91cf18de7c"
     },
     {
       "id": "bg-rimward-marsh",
@@ -167,19 +185,19 @@
       "tags": [
         "stage",
         "rimward-marsh",
-        "grass"
+        "sky"
       ],
-      "recommended_usage": "Stage background for Rimward Marsh",
+      "recommended_usage": "Stage plate for Rimward Marsh \u2014 4096 day sky field",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Platformer Pack Remastered/Backgrounds/colored_grass.png",
+        "source_path": "2d/Skyboxes/Skyboxes/skybox-day.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "dafb9175c654eadc"
+      "sha256_16": "b7d98fe95157e74b"
     },
     {
       "id": "bg-sumi-basin",
@@ -189,19 +207,20 @@
       "tags": [
         "stage",
         "sumi-basin",
-        "dark"
+        "sky",
+        "night"
       ],
-      "recommended_usage": "Stage background for Sumi Basin",
+      "recommended_usage": "Stage plate for Sumi Basin \u2014 4096 night sky field",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Space Shooter Remastered/Backgrounds/black.png",
+        "source_path": "2d/Skyboxes/Skyboxes/skybox-night.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "f747af202c288f31"
+      "sha256_16": "2276d9e1adee0db8"
     },
     {
       "id": "bg-cinnabar-reach",
@@ -211,19 +230,19 @@
       "tags": [
         "stage",
         "cinnabar-reach",
-        "desert"
+        "sky"
       ],
-      "recommended_usage": "Stage background for Cinnabar Reach",
+      "recommended_usage": "Stage plate for Cinnabar Reach \u2014 4096 warm sky field",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Platformer Pack Remastered/Backgrounds/colored_desert.png",
+        "source_path": "2d/Skyboxes/Skyboxes/skybox-alien.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "0cc81926973ec612"
+      "sha256_16": "b8c549d169f99a23"
     },
     {
       "id": "bg-obsidian-shallows",
@@ -233,19 +252,19 @@
       "tags": [
         "stage",
         "obsidian-shallows",
-        "water"
+        "sky"
       ],
-      "recommended_usage": "Stage background for Obsidian Shallows",
+      "recommended_usage": "Stage plate for Obsidian Shallows \u2014 4096 deep sky field",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Space Shooter Remastered/Backgrounds/blue.png",
+        "source_path": "2d/Skyboxes/Skyboxes/skybox-space.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "4bbd3ad9235d2e80"
+      "sha256_16": "fc95dd68fa348e7e"
     },
     {
       "id": "bg-unsealed-horizon",
@@ -255,19 +274,19 @@
       "tags": [
         "stage",
         "unsealed-horizon",
-        "horizon"
+        "sky"
       ],
-      "recommended_usage": "Stage background for Unsealed Horizon",
+      "recommended_usage": "Stage plate for Unsealed Horizon \u2014 4096 dawn sky field",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Platformer Pack Remastered/Backgrounds/colored_land.png",
+        "source_path": "2d/Skyboxes/Skyboxes/skybox-morning.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "e3e69428683aef9b"
+      "sha256_16": "7b445e959e7e65c2"
     },
     {
       "id": "bg-plane-fallback",
@@ -276,19 +295,20 @@
       "category": "background",
       "tags": [
         "fallback",
-        "plane"
+        "parchment",
+        "paper"
       ],
-      "recommended_usage": "Default arena plane fill when stage art missing",
+      "recommended_usage": "Fallback arena plate \u2014 1024 ancient parchment",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Platformer Pack Remastered/Backgrounds/blue_grass.png",
+        "source_path": "2d/Cartography Pack/Textures/parchmentAncient.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "37e97ae89f6ce221"
+      "sha256_16": "feeeb4f01661ec67"
     },
     {
       "id": "char-bead-red",
@@ -298,19 +318,20 @@
       "tags": [
         "bead",
         "player",
-        "circle"
+        "sphere"
       ],
-      "recommended_usage": "Player / rival ink-bead body",
+      "recommended_usage": "Player ink bead \u2014 1024 shaded sphere",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Rolling Ball Assets/Retina/ball_red_large.png",
+        "source_path": "2d/Planets/Parts/sphere0.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "84e69392ba8196ce"
+      "sha256_16": "956e4688775a9e5d",
+      "label": "Seal orb"
     },
     {
       "id": "char-bead-blue",
@@ -320,19 +341,20 @@
       "tags": [
         "bead",
         "bot",
-        "circle"
+        "sphere"
       ],
-      "recommended_usage": "Alternate bead body for bots",
+      "recommended_usage": "Bot ink bead \u2014 1024 shaded sphere",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Rolling Ball Assets/Retina/ball_blue_large.png",
+        "source_path": "2d/Planets/Parts/sphere1.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "90932db3c754ee65"
+      "sha256_16": "b1d6e3414762406a",
+      "label": "Tide orb"
     },
     {
       "id": "char-bead-red-alt",
@@ -341,19 +363,21 @@
       "category": "character",
       "tags": [
         "bead",
-        "alt"
+        "alt",
+        "sphere"
       ],
-      "recommended_usage": "Alternate player bead",
+      "recommended_usage": "Alternate player bead \u2014 1024 shaded sphere",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Rolling Ball Assets/Retina/ball_red_large_alt.png",
+        "source_path": "2d/Planets/Parts/sphere2.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "9056441a820403c1"
+      "sha256_16": "fa83c72353d4cddf",
+      "label": "Ember orb"
     },
     {
       "id": "char-bead-blue-alt",
@@ -362,19 +386,21 @@
       "category": "character",
       "tags": [
         "bead",
-        "alt"
+        "alt",
+        "marble"
       ],
-      "recommended_usage": "Alternate bot bead",
+      "recommended_usage": "Alternate bot bead \u2014 1280 marble sphere",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Rolling Ball Assets/Retina/ball_blue_large_alt.png",
+        "source_path": "2d/Planets/Planets/planet05.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "5155e1b4a75f8915"
+      "sha256_16": "ef1db10b33393b57",
+      "label": "Quarry orb"
     },
     {
       "id": "char-shape-circle",
@@ -383,19 +409,21 @@
       "category": "character",
       "tags": [
         "shape",
-        "circle"
+        "circle",
+        "marble"
       ],
-      "recommended_usage": "Circular shape character accent",
+      "recommended_usage": "Circular bead \u2014 1280 marble sphere",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Shape Characters/pink_body_circle.png",
+        "source_path": "2d/Planets/Planets/planet02.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "cdd8d072b66a3e3f"
+      "sha256_16": "bf4aa3926912f268",
+      "label": "Bone orb"
     },
     {
       "id": "char-shape-squircle",
@@ -404,19 +432,21 @@
       "category": "character",
       "tags": [
         "shape",
-        "squircle"
+        "squircle",
+        "marble"
       ],
-      "recommended_usage": "Soft squircle character accent",
+      "recommended_usage": "Soft bead accent \u2014 1280 marble sphere",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Shape Characters/purple_body_squircle.png",
+        "source_path": "2d/Planets/Planets/planet07.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "46d6cea970f83f09"
+      "sha256_16": "ffd85aa57cda3bf8",
+      "label": "Moss orb"
     },
     {
       "id": "skin-splat-01",
@@ -428,17 +458,17 @@
         "seal",
         "pattern"
       ],
-      "recommended_usage": "Territory fill pattern \u2014 Seal",
+      "recommended_usage": "Territory fill pattern \u2014 Seal, 512px",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Splat Pack/Default (256px)/splat01.png",
+        "source_path": "2d/Splat Pack/Double (512px)/splat01.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "fc8405c557e843ca"
+      "sha256_16": "632a6feca5bef4b4"
     },
     {
       "id": "skin-splat-05",
@@ -450,17 +480,17 @@
         "tideglass",
         "pattern"
       ],
-      "recommended_usage": "Territory fill pattern \u2014 Tideglass",
+      "recommended_usage": "Territory fill pattern \u2014 Tideglass, 512px",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Splat Pack/Default (256px)/splat05.png",
+        "source_path": "2d/Splat Pack/Double (512px)/splat05.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "f3d45d79e3158740"
+      "sha256_16": "73f82c9367268f35"
     },
     {
       "id": "skin-splat-10",
@@ -472,17 +502,17 @@
         "emberline",
         "pattern"
       ],
-      "recommended_usage": "Territory fill pattern \u2014 Emberline",
+      "recommended_usage": "Territory fill pattern \u2014 Emberline, 512px",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Splat Pack/Default (256px)/splat10.png",
+        "source_path": "2d/Splat Pack/Double (512px)/splat10.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "f54712422fe02640"
+      "sha256_16": "c9300607c18a73c4"
     },
     {
       "id": "skin-splat-16",
@@ -494,17 +524,17 @@
         "nightquarry",
         "pattern"
       ],
-      "recommended_usage": "Territory fill pattern \u2014 Nightquarry",
+      "recommended_usage": "Territory fill pattern \u2014 Nightquarry, 512px",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Splat Pack/Default (256px)/splat16.png",
+        "source_path": "2d/Splat Pack/Double (512px)/splat16.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "682048b383ff06bc"
+      "sha256_16": "74439e8e16904235"
     },
     {
       "id": "skin-splat-22",
@@ -516,17 +546,17 @@
         "bone",
         "pattern"
       ],
-      "recommended_usage": "Territory fill pattern \u2014 Bone",
+      "recommended_usage": "Territory fill pattern \u2014 Bone, 512px",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Splat Pack/Default (256px)/splat22.png",
+        "source_path": "2d/Splat Pack/Double (512px)/splat22.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "293603e508333a81"
+      "sha256_16": "1b17dd792ff12649"
     },
     {
       "id": "skin-paint-circle",
@@ -538,17 +568,17 @@
         "circle",
         "picker"
       ],
-      "recommended_usage": "Ink picker bead overlay",
+      "recommended_usage": "Ink picker bead overlay \u2014 double paint",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Yellow Paint Pack/paint_circle_a.png",
+        "source_path": "2d/Yellow Paint Pack/Double/paint_circle_a_double.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "3756ec403fd29485"
+      "sha256_16": "6b9639fdcc1330ad"
     },
     {
       "id": "skin-paint-splat",
@@ -559,17 +589,17 @@
         "paint",
         "splat"
       ],
-      "recommended_usage": "Wet-ink accent splat",
+      "recommended_usage": "Wet-ink accent splat \u2014 double paint",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Yellow Paint Pack/paint_splat_a.png",
+        "source_path": "2d/Yellow Paint Pack/Double/paint_splat_a_double.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "b5b05dd176237db8"
+      "sha256_16": "9bf8e388322c51e2"
     },
     {
       "id": "skin-paint-drips",
@@ -581,17 +611,17 @@
         "drips",
         "trail"
       ],
-      "recommended_usage": "Trail drip accent",
+      "recommended_usage": "Trail drip accent \u2014 double paint",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Yellow Paint Pack/paint_drips_a.png",
+        "source_path": "2d/Yellow Paint Pack/Double/paint_drips_a_double.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "01fd0e780c554b2d"
+      "sha256_16": "5109f58cdf0c0e36"
     },
     {
       "id": "ui-brand-seal",
@@ -603,17 +633,17 @@
         "seal",
         "button"
       ],
-      "recommended_usage": "Inkbound brand seal in HUD",
+      "recommended_usage": "Inkbound brand seal \u2014 double round button",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "ui/UI Pack/Red/button_round_depth_flat.png",
+        "source_path": "ui/UI Pack/Red/Double/button_round_depth_flat.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "b4eb26b0a0618db5"
+      "sha256_16": "4d48cf31171bf1f9"
     },
     {
       "id": "ui-restart",
@@ -624,17 +654,17 @@
         "restart",
         "button"
       ],
-      "recommended_usage": "Restart button face",
+      "recommended_usage": "Restart button face \u2014 double rectangle",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "ui/UI Pack/Red/button_rectangle_depth_flat.png",
+        "source_path": "ui/UI Pack/Red/Double/button_rectangle_depth_flat.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "8dd648ea9b80a780"
+      "sha256_16": "9a81bc718ef32925"
     },
     {
       "id": "ui-icon-circle",
@@ -643,19 +673,20 @@
       "category": "ui",
       "tags": [
         "icon",
+        "ring",
         "circle"
       ],
-      "recommended_usage": "Neutral circular UI icon",
+      "recommended_usage": "Circular UI ring \u2014 256 adventure minimap",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "ui/UI Pack/Grey/icon_circle.png",
+        "source_path": "ui/UI Pack - Adventure/Double/minimap_ring_brown_detail.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "a690348d4dc19d93"
+      "sha256_16": "58ddfe66bb631763"
     },
     {
       "id": "ui-medal-lead",
@@ -667,17 +698,17 @@
         "leader",
         "crown"
       ],
-      "recommended_usage": "Leaderboard / crown mark",
+      "recommended_usage": "Leader mark \u2014 shaded medal (densest plate in the pack)",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Medals/flat_medal1.png",
+        "source_path": "2d/Medals/shaded_medal9.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "d7c532551469259d"
+      "sha256_16": "06e80050748ae830"
     },
     {
       "id": "ui-medal-alt",
@@ -688,17 +719,17 @@
         "medal",
         "award"
       ],
-      "recommended_usage": "Stage clear / award mark",
+      "recommended_usage": "Stage clear mark \u2014 shaded medal",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Medals/shaded_medal3.png",
+        "source_path": "2d/Medals/shaded_medal5.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "f5df4ff4c67a3ff8"
+      "sha256_16": "fde873ba975d7834"
     },
     {
       "id": "ui-hud-jewel",
@@ -730,17 +761,17 @@
         "check",
         "confirm"
       ],
-      "recommended_usage": "Confirm / equipped mark",
+      "recommended_usage": "Equipped mark \u2014 double round check",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "ui/UI Pack/Red/check_round_round_circle.png",
+        "source_path": "ui/UI Pack/Red/Double/check_round_round_circle.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "49146706654545ab"
+      "sha256_16": "bccbe8db5a62d29b"
     },
     {
       "id": "vfx-smoke-01",
@@ -817,17 +848,17 @@
         "spark",
         "claim"
       ],
-      "recommended_usage": "Claim sparkle",
+      "recommended_usage": "Claim sparkle \u2014 512 magic particle",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Particle Pack/PNG (Transparent)/magic_01.png",
+        "source_path": "2d/Particle Pack/PNG (Transparent)/magic_02.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "398479ea280c8161"
+      "sha256_16": "6443e90834abcae4"
     },
     {
       "id": "vfx-star-05",
@@ -860,17 +891,17 @@
         "death",
         "burst"
       ],
-      "recommended_usage": "Death burst flash",
+      "recommended_usage": "Death burst \u2014 large smoke explosion",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Explosion Pack/Regular explosion/regularExplosion03.png",
+        "source_path": "2d/Smoke Particles/Explosion/explosion00.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "9154ad211be95365"
+      "sha256_16": "bfd931b030a6ac46"
     },
     {
       "id": "vfx-slash-04",
@@ -899,21 +930,21 @@
       "url": "assets/catalog/terrain/terrain-abstract-01.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "abstract",
-        "grain"
+        "parchment",
+        "grain",
+        "paper"
       ],
-      "recommended_usage": "Plane grain tile",
+      "recommended_usage": "Sumi / plane grain \u2014 1024 crinkled parchment",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Isometric Blocks/Abstract tiles/abstractTile_01.png",
+        "source_path": "2d/Cartography Pack/Textures/parchmentCrinkled.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "80df0554051f4d07"
+      "sha256_16": "33b6bc947277a119"
     },
     {
       "id": "terrain-grass",
@@ -921,20 +952,21 @@
       "url": "assets/catalog/terrain/terrain-grass.png",
       "category": "terrain",
       "tags": [
-        "grass",
-        "floor"
+        "parchment",
+        "floor",
+        "paper"
       ],
-      "recommended_usage": "Soft grass floor grain",
+      "recommended_usage": "Quiet Plane floor \u2014 1024 folded parchment",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Shape Characters/tile_background_grass.png",
+        "source_path": "2d/Cartography Pack/Textures/parchmentFolded.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "5a18f4617aa32898"
+      "sha256_16": "bf0bc0b0a8d69539"
     },
     {
       "id": "terrain-pixel-bg-1",
@@ -942,21 +974,21 @@
       "url": "assets/catalog/terrain/terrain-pixel-bg-1.png",
       "category": "terrain",
       "tags": [
-        "pixel",
-        "background",
-        "tile"
+        "foliage",
+        "canopy",
+        "mask"
       ],
-      "recommended_usage": "Pixel platformer background tile",
+      "recommended_usage": "Cinnabar grain \u2014 512 canopy light mask",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0000.png",
+        "source_path": "2d/Light Masks/Transparent/foliage_canopy_d.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "cd50302f080010ee"
+      "sha256_16": "a8d591e5ecc71b34"
     },
     {
       "id": "terrain-abstract-02",
@@ -964,20 +996,21 @@
       "url": "assets/catalog/terrain/terrain-abstract-02.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "abstract"
+        "water",
+        "caustics",
+        "mask"
       ],
-      "recommended_usage": "Arena plane grain tile",
+      "recommended_usage": "Shallows floor \u2014 512 water caustics",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Isometric Blocks/Abstract tiles/abstractTile_02.png",
+        "source_path": "2d/Light Masks/Transparent/water_caustics_b.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "430af18fb6ef445e"
+      "sha256_16": "aaf8b9c086fda4f4"
     },
     {
       "id": "terrain-abstract-03",
@@ -985,20 +1018,21 @@
       "url": "assets/catalog/terrain/terrain-abstract-03.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "abstract"
+        "foliage",
+        "canopy",
+        "mask"
       ],
-      "recommended_usage": "Arena plane grain tile",
+      "recommended_usage": "Sumi accent \u2014 512 canopy light mask",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Isometric Blocks/Abstract tiles/abstractTile_03.png",
+        "source_path": "2d/Light Masks/Transparent/foliage_canopy_a_blur.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "db47e0ca1c9094cf"
+      "sha256_16": "10c3e00d6fd526e9"
     },
     {
       "id": "terrain-abstract-04",
@@ -1006,20 +1040,21 @@
       "url": "assets/catalog/terrain/terrain-abstract-04.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "abstract"
+        "foliage",
+        "canopy",
+        "mask"
       ],
-      "recommended_usage": "Arena plane grain tile",
+      "recommended_usage": "Cinnabar accent \u2014 512 canopy light mask",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Isometric Blocks/Abstract tiles/abstractTile_04.png",
+        "source_path": "2d/Light Masks/Transparent/foliage_canopy_b_blur.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "9a9a16021345f5c4"
+      "sha256_16": "85285b2ae7005a56"
     },
     {
       "id": "terrain-pixel-01",
@@ -1027,21 +1062,21 @@
       "url": "assets/catalog/terrain/terrain-pixel-01.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "pixel",
-        "background"
+        "parchment",
+        "floor",
+        "paper"
       ],
-      "recommended_usage": "Stage floor accent tile",
+      "recommended_usage": "Cinnabar floor \u2014 1024 folded crinkle parchment",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0000.png",
+        "source_path": "2d/Cartography Pack/Textures/parchmentFoldedCrinkled.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "cd50302f080010ee"
+      "sha256_16": "306e7292ec26e947"
     },
     {
       "id": "terrain-pixel-02",
@@ -1049,22 +1084,21 @@
       "url": "assets/catalog/terrain/terrain-pixel-02.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "pixel",
-        "grass",
-        "horizon"
+        "water",
+        "caustics",
+        "mask"
       ],
-      "recommended_usage": "Grass pixel floor \u2014 Unsealed Horizon",
+      "recommended_usage": "Horizon floor \u2014 512 water caustics",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0014.png",
+        "source_path": "2d/Light Masks/Transparent/water_caustics_d.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "51f776f5bb658976"
+      "sha256_16": "5ad46cfa7b9ae89e"
     },
     {
       "id": "terrain-pixel-03",
@@ -1072,22 +1106,21 @@
       "url": "assets/catalog/terrain/terrain-pixel-03.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "pixel",
-        "stars",
-        "night"
+        "water",
+        "caustics",
+        "mask"
       ],
-      "recommended_usage": "Star-field pixel grain \u2014 Sumi Basin",
+      "recommended_usage": "Sumi grain \u2014 512 water caustics",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0011.png",
+        "source_path": "2d/Light Masks/Transparent/water_caustics_c.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "5d4bcec86326f8c2"
+      "sha256_16": "1f5f0ae5f74adfd0"
     },
     {
       "id": "terrain-pixel-04",
@@ -1095,22 +1128,20 @@
       "url": "assets/catalog/terrain/terrain-pixel-04.png",
       "category": "terrain",
       "tags": [
-        "tile",
-        "pixel",
-        "cloud",
-        "horizon"
+        "foliage",
+        "stamp"
       ],
-      "recommended_usage": "Cloud pixel accent \u2014 horizon rim",
+      "recommended_usage": "Horizon rim stamp \u2014 1024 shaded foliage",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Pixel Platformer/Tiles/Backgrounds/tile_0009.png",
+        "source_path": "2d/Foliage Sprites/Shaded/sprite_0094.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "f44de8d504f662a9"
+      "sha256_16": "f7c5ac247d60c28a"
     },
     {
       "id": "terrain-foliage-01",
@@ -1119,19 +1150,20 @@
       "category": "terrain",
       "tags": [
         "foliage",
-        "nature"
+        "canopy",
+        "mask"
       ],
-      "recommended_usage": "Rim / marsh foliage accent",
+      "recommended_usage": "Marsh floor \u2014 512 canopy light mask",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Foliage Pack/Leaves/foliagePack_leaves_001.png",
+        "source_path": "2d/Light Masks/Transparent/foliage_canopy_c_blur.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "8df7a8d6ce4be1ad"
+      "sha256_16": "1cc15cf4839df6bf"
     },
     {
       "id": "terrain-foliage-02",
@@ -1140,19 +1172,19 @@
       "category": "terrain",
       "tags": [
         "foliage",
-        "nature"
+        "stamp"
       ],
-      "recommended_usage": "Rim / marsh foliage accent",
+      "recommended_usage": "Quiet Plane rim stamp \u2014 1024 shaded foliage",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Foliage Pack/Leaves/foliagePack_leaves_002.png",
+        "source_path": "2d/Foliage Sprites/Shaded/sprite_0097.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "3db1555fbf58698b"
+      "sha256_16": "f279b2c8b8c4e847"
     },
     {
       "id": "terrain-foliage-03",
@@ -1161,19 +1193,19 @@
       "category": "terrain",
       "tags": [
         "foliage",
-        "nature"
+        "stamp"
       ],
-      "recommended_usage": "Rim / marsh foliage accent",
+      "recommended_usage": "Marsh rim stamp \u2014 1024 shaded foliage",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Foliage Pack/Leaves/foliagePack_leaves_003.png",
+        "source_path": "2d/Foliage Sprites/Shaded/sprite_0096.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "368414eecdd985e1"
+      "sha256_16": "16ef1daae40c2783"
     },
     {
       "id": "terrain-foliage-04",
@@ -1182,19 +1214,229 @@
       "category": "terrain",
       "tags": [
         "foliage",
-        "nature"
+        "stamp"
       ],
-      "recommended_usage": "Rim / marsh foliage accent",
+      "recommended_usage": "Shallows rim stamp \u2014 1024 shaded foliage",
       "upstream": {
         "repository": "https://github.com/atiffhussainkhan/Image",
         "pack_id": "shorepine-kenney",
         "release_tag": "mega-assets-expansion-v1",
         "release_asset": "shorepine-kenney.zip",
         "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
-        "source_path": "2d/Foliage Pack/Leaves/foliagePack_leaves_004.png",
+        "source_path": "2d/Foliage Sprites/Shaded/sprite_0098.png",
         "license": "CC0-1.0"
       },
-      "sha256_16": "897fee5ea39dbafc"
+      "sha256_16": "d63362147c56ff39"
+    },
+    {
+      "id": "char-plate-princess",
+      "path": "assets/catalog/character/char-plate-princess.png",
+      "url": "assets/catalog/character/char-plate-princess.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "player",
+        "seal",
+        "princess"
+      ],
+      "label": "Princess",
+      "recommended_usage": "Player figure \u2014 Princess idle plate (Seal / You)",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "opengameart-knight-princess-dragon-2",
+        "release_tag": "mega-assets-v1",
+        "release_asset": "opengameart-knight-princess-dragon-2.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-v1/opengameart-knight-princess-dragon-2.zip",
+        "license": "CC0-1.0",
+        "source_path": "BoundsOfAnimation/Princess/Princess-Idle_00.png"
+      },
+      "sha256_16": "5413fd01890141bf"
+    },
+    {
+      "id": "char-plate-knight",
+      "path": "assets/catalog/character/char-plate-knight.png",
+      "url": "assets/catalog/character/char-plate-knight.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "bot",
+        "tide",
+        "knight"
+      ],
+      "label": "Knight",
+      "recommended_usage": "Tide figure \u2014 Knight idle plate (Tideglass skin and Tide bot)",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "opengameart-knight-princess-dragon-2",
+        "release_tag": "mega-assets-v1",
+        "release_asset": "opengameart-knight-princess-dragon-2.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-v1/opengameart-knight-princess-dragon-2.zip",
+        "license": "CC0-1.0",
+        "source_path": "BoundsOfAnimation/Knight/Knight-Idle_00.png"
+      },
+      "sha256_16": "f9e4249eb90ffa17"
+    },
+    {
+      "id": "char-plate-dragon",
+      "path": "assets/catalog/character/char-plate-dragon.png",
+      "url": "assets/catalog/character/char-plate-dragon.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "skin",
+        "ember",
+        "dragon"
+      ],
+      "label": "Dragon",
+      "recommended_usage": "Emberline figure \u2014 Dragon idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "opengameart-knight-princess-dragon-2",
+        "release_tag": "mega-assets-v1",
+        "release_asset": "opengameart-knight-princess-dragon-2.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-v1/opengameart-knight-princess-dragon-2.zip",
+        "license": "CC0-1.0",
+        "source_path": "BoundsOfAnimation/Dragon/Dragon-Idle_00.png"
+      },
+      "sha256_16": "10e2beb63fdd4e95"
+    },
+    {
+      "id": "char-toon-female-adventurer",
+      "path": "assets/catalog/character/char-toon-female-adventurer.png",
+      "url": "assets/catalog/character/char-toon-female-adventurer.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "bot",
+        "ochre"
+      ],
+      "label": "Ochre",
+      "recommended_usage": "Ochre figure \u2014 female adventurer idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "shorepine-kenney",
+        "release_tag": "mega-assets-expansion-v1",
+        "release_asset": "shorepine-kenney.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
+        "license": "CC0-1.0",
+        "source_path": "2d/Toon Characters/Female adventurer/Poses HD/character_femaleAdventurer_idle.png"
+      },
+      "sha256_16": "ea2d020b168a5d6d"
+    },
+    {
+      "id": "char-toon-male-adventurer",
+      "path": "assets/catalog/character/char-toon-male-adventurer.png",
+      "url": "assets/catalog/character/char-toon-male-adventurer.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "roster",
+        "ranger"
+      ],
+      "label": "Ranger",
+      "recommended_usage": "Roster figure \u2014 male adventurer idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "shorepine-kenney",
+        "release_tag": "mega-assets-expansion-v1",
+        "release_asset": "shorepine-kenney.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
+        "license": "CC0-1.0",
+        "source_path": "2d/Toon Characters/Male adventurer/Poses HD/character_maleAdventurer_idle.png"
+      },
+      "sha256_16": "b89c1b41ec1fd043"
+    },
+    {
+      "id": "char-toon-female-person",
+      "path": "assets/catalog/character/char-toon-female-person.png",
+      "url": "assets/catalog/character/char-toon-female-person.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "roster",
+        "walker"
+      ],
+      "label": "Walker",
+      "recommended_usage": "Roster figure \u2014 female person idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "shorepine-kenney",
+        "release_tag": "mega-assets-expansion-v1",
+        "release_asset": "shorepine-kenney.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
+        "license": "CC0-1.0",
+        "source_path": "2d/Toon Characters/Female person/Poses HD/character_femalePerson_idle.png"
+      },
+      "sha256_16": "9d730e78cfd4a065"
+    },
+    {
+      "id": "char-toon-male-person",
+      "path": "assets/catalog/character/char-toon-male-person.png",
+      "url": "assets/catalog/character/char-toon-male-person.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "skin",
+        "bone"
+      ],
+      "label": "Bone",
+      "recommended_usage": "Bone figure \u2014 male person idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "shorepine-kenney",
+        "release_tag": "mega-assets-expansion-v1",
+        "release_asset": "shorepine-kenney.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
+        "license": "CC0-1.0",
+        "source_path": "2d/Toon Characters/Male person/Poses HD/character_malePerson_idle.png"
+      },
+      "sha256_16": "291c5c37e85491e5"
+    },
+    {
+      "id": "char-toon-robot",
+      "path": "assets/catalog/character/char-toon-robot.png",
+      "url": "assets/catalog/character/char-toon-robot.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "skin",
+        "nightquarry"
+      ],
+      "label": "Robot",
+      "recommended_usage": "Nightquarry figure \u2014 robot idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "shorepine-kenney",
+        "release_tag": "mega-assets-expansion-v1",
+        "release_asset": "shorepine-kenney.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
+        "license": "CC0-1.0",
+        "source_path": "2d/Toon Characters/Robot/Poses HD/character_robot_idle.png"
+      },
+      "sha256_16": "7858549240f335a7"
+    },
+    {
+      "id": "char-toon-zombie",
+      "path": "assets/catalog/character/char-toon-zombie.png",
+      "url": "assets/catalog/character/char-toon-zombie.png",
+      "category": "character",
+      "tags": [
+        "figure",
+        "bot",
+        "moss"
+      ],
+      "label": "Moss",
+      "recommended_usage": "Moss figure \u2014 zombie idle plate",
+      "upstream": {
+        "repository": "https://github.com/atiffhussainkhan/Image",
+        "pack_id": "shorepine-kenney",
+        "release_tag": "mega-assets-expansion-v1",
+        "release_asset": "shorepine-kenney.zip",
+        "release_url": "https://github.com/atiffhussainkhan/Image/releases/download/mega-assets-expansion-v1/shorepine-kenney.zip",
+        "license": "CC0-1.0",
+        "source_path": "2d/Toon Characters/Zombie/Poses HD/character_zombie_idle.png"
+      },
+      "sha256_16": "67e6fb5780f7ec47"
     }
   ]
 }

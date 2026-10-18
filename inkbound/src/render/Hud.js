@@ -22,6 +22,7 @@ export class Hud {
     this.stageBar = root.querySelector('[data-hud="stage-bar"]');
     this.stageFill = root.querySelector('[data-hud="stage-fill"]');
     this.overlayStage = root.querySelector('[data-hud="overlay-stage"]');
+    this.cast = root.querySelector('[data-hud="cast"]');
     this.lastBestText = "";
     this.runSummary = null;
     this.stageSummary = null;
@@ -70,6 +71,31 @@ export class Hud {
       this.restart.addEventListener("touchend", this.handleRestartEvent, { passive: false });
     }
     window.addEventListener("keydown", this.handleOverlayKeyDown);
+    this.mountCast();
+  }
+
+  mountCast() {
+    const root = this.cast;
+    if (!root || !this.catalog) return;
+    const plates = [...this.catalog.category("character")].sort((a, b) => {
+      const af = a.tags?.includes("figure") ? 0 : 1;
+      const bf = b.tags?.includes("figure") ? 0 : 1;
+      return af - bf || a.id.localeCompare(b.id);
+    });
+    root.replaceChildren();
+    for (const entry of plates) {
+      const item = document.createElement("figure");
+      item.className = "hud-cast__plate";
+      if (entry.tags?.includes("figure")) item.classList.add("is-figure");
+      item.dataset.image = entry.id;
+      const img = document.createElement("img");
+      img.alt = "";
+      img.src = new URL(entry.path, window.location.href).href;
+      const caption = document.createElement("figcaption");
+      caption.textContent = entry.label || entry.id;
+      item.append(img, caption);
+      root.appendChild(item);
+    }
   }
 
   bindProfile(profile) {
@@ -230,6 +256,7 @@ export class Hud {
         cached.nameEl.textContent = entity.name;
         cached.name = entity.name;
       }
+      this.applyRowArt(cached, entity);
       return cached;
     }
 
@@ -254,9 +281,25 @@ export class Hud {
       name: entity.name,
       tokenValue,
       lastPct: "",
+      artId: "",
     };
+    this.applyRowArt(entry, entity);
     this.rows.set(entity.id, entry);
     return entry;
+  }
+
+  applyRowArt(entry, entity) {
+    const beadId = entity.beadImageId || "";
+    if (entry.artId === beadId) return;
+    entry.artId = beadId;
+    const image = this.catalog?.getEntry?.(beadId);
+    if (image) {
+      entry.row.style.setProperty("--row-art", catalogAssetUrl(image.path));
+      entry.row.classList.add("has-bead");
+    } else {
+      entry.row.style.removeProperty("--row-art");
+      entry.row.classList.remove("has-bead");
+    }
   }
 
   render(game) {

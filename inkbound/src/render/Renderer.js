@@ -714,9 +714,66 @@ export class Renderer {
     context.restore();
   }
 
+  drawFigure(context, entity, bead, r) {
+    const orb = this.catalogImage(entity.orbImageId);
+    const iw = bead.naturalWidth || bead.width || 1;
+    const ih = bead.naturalHeight || bead.height || 1;
+    const height = r * 8.2;
+    const width = height * (iw / ih);
+    const foot = height * 0.42;
+
+    context.beginPath();
+    context.ellipse(0, foot, Math.max(r * 1.35, width * 0.22), r * 0.55, 0, 0, Math.PI * 2);
+    context.fillStyle = this.colors["--sumi-950"];
+    context.globalAlpha = 0.45;
+    context.fill();
+    context.globalAlpha = 1;
+
+    if (orb) {
+      const orbR = r * 1.7;
+      const orbY = foot - orbR * 0.2;
+      context.save();
+      context.beginPath();
+      context.arc(0, orbY, orbR, 0, Math.PI * 2);
+      context.clip();
+      context.drawImage(orb, -orbR, orbY - orbR, orbR * 2, orbR * 2);
+      context.restore();
+      context.beginPath();
+      context.arc(0, orbY, orbR, 0, Math.PI * 2);
+      context.strokeStyle = entity.wetColor;
+      context.lineWidth = 3;
+      context.stroke();
+    }
+
+    context.save();
+    context.rotate(entity.heading);
+    context.beginPath();
+    context.moveTo(r * 0.15, -r * 0.42);
+    context.lineTo(r * 1.35, 0);
+    context.lineTo(r * 0.15, r * 0.42);
+    context.closePath();
+    context.fillStyle = entity.wetColor;
+    context.fill();
+    context.strokeStyle = this.colors["--sumi-950"];
+    context.lineWidth = 1.6;
+    context.stroke();
+    context.restore();
+
+    context.drawImage(bead, -width * 0.5, foot - height, width, height);
+  }
+
   drawEntity(context, entity, alpha) {
     const position = this.interpolatedPosition(entity, alpha);
     const r = entity.radius;
+    const bead = this.catalogImage(entity.beadImageId);
+    const entry = this.catalog?.getEntry?.(entity.beadImageId);
+    if (bead && entry?.tags?.includes("figure")) {
+      context.save();
+      context.translate(position.x, position.y);
+      this.drawFigure(context, entity, bead, r);
+      context.restore();
+      return;
+    }
 
     context.save();
     context.translate(position.x, position.y);
@@ -750,8 +807,7 @@ export class Renderer {
     context.lineWidth = 2.2;
     context.stroke();
 
-    // Main ink bead body — indexed character art when available, else fill.
-    const bead = this.catalogImage(entity.beadImageId);
+    // Sphere / marble fallback when the bead is not a standing figure.
     if (bead) {
       context.save();
       context.beginPath();

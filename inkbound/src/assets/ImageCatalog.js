@@ -6,6 +6,12 @@ const INDEX_URL = new URL("../../assets/IMAGE_INDEX.json", import.meta.url).href
 // Used when a match boots before the catalog finishes, and by headless smokes.
 // Keep these identical to bindings.characters in IMAGE_INDEX.json.
 export const BOT_BEAD_FALLBACK = Object.freeze({
+  2: "char-plate-knight",
+  3: "char-toon-female-adventurer",
+  4: "char-toon-zombie",
+});
+
+export const BOT_ORB_FALLBACK = Object.freeze({
   2: "char-bead-blue",
   3: "char-bead-blue-alt",
   4: "char-shape-squircle",
@@ -33,6 +39,29 @@ export const CSS_IMAGE_VARS = Object.freeze({
   "--art-floor": ["terrain", "floor"],
 });
 
+// How a catalog plate should sit in the arena.
+// Equirectangular skyboxes are about 2:1. Their lower band is a smooth color
+// field and the middle band is cloud rim, so a top-down disc does not get a
+// horizon cut through the ink. Square plates (parchment) cover the whole disc.
+// `wash` is the sumi multiply that keeps wet ink louder than the plate.
+export function plateFrames(image) {
+  const iw = image?.naturalWidth || image?.width || 0;
+  const ih = image?.naturalHeight || image?.height || 0;
+  if (iw < 2 || ih < 2) return null;
+  if (iw / ih >= 1.7) {
+    return {
+      field: { sx: 0, sy: Math.round(ih * 0.55), sw: iw, sh: Math.max(1, Math.round(ih * 0.45)) },
+      rim: { sx: 0, sy: Math.round(ih * 0.30), sw: iw, sh: Math.max(1, Math.round(ih * 0.24)) },
+      wash: 0.34,
+    };
+  }
+  return {
+    field: { sx: 0, sy: 0, sw: iw, sh: ih },
+    rim: null,
+    wash: 0.46,
+  };
+}
+
 export function catalogAssetUrl(assetPath) {
   if (!assetPath) return "none";
   if (typeof window !== "undefined" && window.location) {
@@ -53,6 +82,17 @@ export function botPatternId(catalog, entityId) {
   const bound = catalog?.binding?.("characters", "botPatterns", String(entityId));
   if (typeof bound === "string") return bound;
   return BOT_PATTERN_FALLBACK[entityId] || null;
+}
+
+export function botOrbId(catalog, entityId) {
+  const bound = catalog?.binding?.("characters", "botOrbs", String(entityId));
+  if (typeof bound === "string") return bound;
+  return BOT_ORB_FALLBACK[entityId] || null;
+}
+
+export function playerOrbId(catalog) {
+  const bound = catalog?.binding?.("characters", "playerOrb");
+  return typeof bound === "string" ? bound : "char-bead-red";
 }
 
 export class ImageCatalog {

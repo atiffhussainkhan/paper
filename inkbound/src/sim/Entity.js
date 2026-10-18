@@ -10,6 +10,7 @@ export class Entity {
     this.coreColor = spec.coreColor ?? spec.color;
     this.patternImageId = spec.patternImageId ?? null;
     this.beadImageId = spec.beadImageId ?? null;
+    this.orbImageId = spec.orbImageId ?? null;
     this.position = { ...position };
     this.previousPosition = { ...position };
     this.heading = heading;

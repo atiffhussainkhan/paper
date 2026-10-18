@@ -72,6 +72,7 @@ pack index is mirrored at `assets/upstream/MASTER_ASSET_INDEX.json`. Re-sync wit
 ```bash
 python3 tools/sync_image_catalog.py --fetch
 # or, with a local clone: python3 tools/sync_image_catalog.py --image-repo /path/to/Image
+python3 tools/sync_image_catalog.py --extract-plates
 node tools/smoke_images.mjs
 ```
 

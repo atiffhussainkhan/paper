@@ -10,6 +10,7 @@
         style="--row-ink: var(--ink-bot-1)"   per-row ink color
         .is-self / .is-dead / .is-lead          row states (lead wears the crown)
         > .hud-board__swatch  .hud-board__name  .hud-board__pct
+     .hud-cast                     every catalog character plate
      .hud-hint                     add .is-faded to dismiss
      .hud-overlay[hidden]          death / win card; remove [hidden] to show
         .hud-overlay--win          win variant
@@ -114,17 +115,18 @@ body {
   touch-action: none;
 }
 
-/* Catalog grain under a vignette. Both layers sit under the HUD and never take input.
-   Bitmaps come from --art-* (IMAGE_INDEX), not generated textures. */
+/* Catalog parchment under a vignette. Both layers sit under the HUD and never take input.
+   Bitmaps come from --art-* (IMAGE_INDEX), not generated textures.
+   Tiles are large so 1024 paper fiber reads as a sheet, not a muddy repeat. */
 .stage::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.07;
+  opacity: 0.11;
   background-image: var(--art-floor, none), var(--art-plane-grain, none);
-  background-size: 160px 160px, 280px 280px;
+  background-size: 520px 520px, 760px 760px;
   background-repeat: repeat, repeat;
   mix-blend-mode: soft-light;
 }
@@ -172,11 +174,11 @@ body {
 }
 
 .brand__seal {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   background-color: transparent;
   background-image: var(--art-brand-seal, none), var(--art-icon-circle, none);
-  background-size: 78% 78%, cover;
+  background-size: 100% 100%, 124% 124%;
   background-repeat: no-repeat;
   background-position: center;
   border-radius: 50%;
@@ -352,7 +354,7 @@ body {
 .hud-board__row {
   --row-ink: var(--bone-500);
   display: grid;
-  grid-template-columns: 10px 1fr auto;
+  grid-template-columns: 28px 1fr auto;
   align-items: center;
   gap: 10px;
   padding: 5px 14px;
@@ -362,10 +364,18 @@ body {
 }
 
 .hud-board__swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--row-ink);
+  width: 28px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--row-ink) center / contain no-repeat;
+}
+
+.hud-board__row.has-bead .hud-board__swatch {
+  background-color: rgb(11 12 14 / 0.35);
+  background-image: var(--row-art);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
 }
 
 .hud-board__name {
@@ -444,7 +454,7 @@ body {
 }
 
 .hud-overlay__card {
-  width: min(380px, 100%);
+  width: min(640px, 100%);
   padding: 28px 28px 24px;
   background: var(--sumi-800);
   border: var(--hairline);
@@ -690,23 +700,93 @@ body {
 
 .skin-chip__bead {
   flex: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+  width: 44px;
+  height: 52px;
+  border-radius: 6px;
   background: radial-gradient(circle at 42% 50%, var(--skin-core) 0 28%, var(--skin-wet) 30% 100%);
   box-shadow: 0 0 0 2px var(--skin-dry);
 }
 
 .skin-chip.has-art .skin-chip__bead {
-  background-color: var(--skin-wet);
+  background-color: rgb(11 12 14 / 0.45);
   background-image: var(--skin-art);
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+
+.skin-chip__orb,
+.skin-chip__paint {
+  display: none;
+  flex: none;
+  width: 22px;
+  height: 22px;
   background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.skin-chip.has-orb .skin-chip__orb {
+  display: block;
+  border-radius: 50%;
+  background-image: var(--skin-orb);
+  box-shadow: 0 0 0 2px var(--skin-dry);
+}
+
+.skin-chip.has-paint .skin-chip__paint {
+  display: block;
+  background-image: var(--skin-paint);
 }
 
 .skin-chip.is-locked .skin-chip__bead {
-  background: var(--sumi-700);
-  box-shadow: 0 0 0 2px var(--sumi-600);
+  filter: saturate(0.7);
+}
+
+.hud-cast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--hud-pad) + var(--safe-b));
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: min(1100px, calc(100% - 24px));
+  margin: 0;
+  padding: 8px;
+  background: rgb(11 12 14 / 0.78);
+  border: var(--hairline);
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+
+.hud-cast__plate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  margin: 0;
+  gap: 2px;
+}
+
+.hud-cast__plate img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  object-position: center bottom;
+  background: rgb(35 39 44 / 0.65);
+  border-radius: 4px;
+}
+
+.hud-cast__plate figcaption {
+  max-width: 64px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  color: var(--bone-300);
 }
 
 .btn-restart {
@@ -825,6 +905,40 @@ body {
   }
 
   .hud-hint {
+    display: none;
+  }
+
+  .hud-percent,
+  .hud-board,
+  .brand {
+    position: relative;
+    z-index: 4;
+  }
+
+  .hud-cast {
+    top: 118px;
+    bottom: auto;
+    left: 8px;
+    right: 8px;
+    transform: none;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    max-width: none;
+    width: auto;
+  }
+
+  .hud-cast__plate {
+    flex: none;
+    width: 52px;
+  }
+
+  .hud-cast__plate img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .hud-cast__plate:not(.is-figure) {
     display: none;
   }
 }
