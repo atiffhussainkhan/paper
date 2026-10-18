@@ -47,3 +47,12 @@ Only if persistence or the HUD is broken. No new meta systems.
 **Audited runtime:** `efbf5f5ff88c9d99a6ac88e5686dbbd6ae97a810`
 
 Core loop meets the locked Paper.io-class rules (360° steer, constant move, non-lethal rim, trail outside own ink, loop claim, self-cut, enemy cut, non-lethal bodies, bot roles and opening curve, 100% seal, death → Restart, first-claim forgiveness). Report: `docs/ACCEPTANCE_REQ1_CORE.md`. No gameplay bugfix.
+
+## REQ2 — graphics (Cursor)
+
+**Status:** `done`
+**Verdict:** **PASS**
+**Binding completeness:** 100% (58/58). Missing: none.
+**Audited runtime:** `41f27cc5f914026a1011ecf0b5fff5d420e7ad15`
+
+Every catalog bitmap is bound and drawn from the Image repo mirror. No binding fix. Report: `docs/ACCEPTANCE_REQ2_GRAPHICS.md`.
