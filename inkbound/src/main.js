@@ -6,6 +6,7 @@ import { Hud } from "./render/Hud.js";
 import { SkinPicker } from "./render/SkinPicker.js";
 import { getProfile } from "./meta/Profile.js";
 import { equippedSkin, equipSkin, recordRun, syncUnlocks } from "./meta/Skins.js";
+import { getStageStatus, recordStageRun, resolveRunShare } from "./meta/Stages.js";
 
 const canvas = document.querySelector("#game");
 const hudRoot = document.querySelector("#hud");
@@ -29,6 +30,7 @@ const restart = () => {
   game.arena.game = game;
   renderer.resetCamera(game.player.position, game.player.heading);
   hud.reset();
+  hud.setStage(getStageStatus(profile));
   hud.render(game);
   accumulator = 0;
   previousTime = performance.now();
@@ -36,6 +38,7 @@ const restart = () => {
 
 const hud = new Hud(hudRoot, restart);
 hud.setBest(profile.get("bestPct", 0));
+hud.setStage(getStageStatus(profile));
 const skinPicker = hud.skinsRoot
   ? new SkinPicker(hud.skinsRoot, (id) => {
     if (equipSkin(profile, id)) skinPicker.update(profile);
@@ -46,8 +49,11 @@ skinPicker?.update(profile);
 function finishRun() {
   runRecorded = true;
   const summary = recordRun(profile, game.finalShare);
+  const stageResult = recordStageRun(profile, resolveRunShare(game));
   hud.setBest(summary.bestPct);
   hud.setRunSummary(summary);
+  hud.setStage(stageResult);
+  hud.setStageSummary(stageResult);
   skinPicker?.update(profile);
 }
 renderer.resetCamera(game.player.position, game.player.heading);

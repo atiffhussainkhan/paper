@@ -12,8 +12,14 @@ export class Hud {
     this.best = root.querySelector('[data-hud="best"]');
     this.overlayBest = root.querySelector('[data-hud="overlay-best"]');
     this.skinsRoot = root.querySelector('[data-hud="skins"]');
+    this.stageName = root.querySelector('[data-hud="stage-name"]');
+    this.stagePct = root.querySelector('[data-hud="stage-pct"]');
+    this.stageBar = root.querySelector('[data-hud="stage-bar"]');
+    this.stageFill = root.querySelector('[data-hud="stage-fill"]');
+    this.overlayStage = root.querySelector('[data-hud="overlay-stage"]');
     this.lastBestText = "";
     this.runSummary = null;
+    this.stageSummary = null;
 
     this.rows = new Map();
     this.lastPercentText = "";
@@ -87,9 +93,37 @@ export class Hud {
     this.overlayBest.textContent = parts.join(" ");
   }
 
+  setStage(stageStatus) {
+    if (!stageStatus) return;
+    const label = `Stage ${stageStatus.stageNumber ?? (stageStatus.stageIndex ?? 0) + 1} · ${stageStatus.stageName ?? stageStatus.stage?.name ?? ""}`;
+    if (this.stageName) this.stageName.textContent = label;
+    const pct = Math.max(0, Math.min(100, Math.round(stageStatus.progressPct ?? (stageStatus.progress ?? 0) * 100)));
+    if (this.stagePct) this.stagePct.textContent = `${pct}%`;
+    if (this.stageBar) this.stageBar.setAttribute("aria-valuenow", String(pct));
+    if (this.stageFill) this.stageFill.style.width = `${pct}%`;
+  }
+
+  setStageSummary(stageResult) {
+    this.stageSummary = stageResult;
+    this.renderStageSummary();
+  }
+
+  renderStageSummary() {
+    if (!this.overlayStage) return;
+    if (!this.stageSummary) {
+      this.overlayStage.textContent = "";
+      this.overlayStage.classList.remove("is-cleared");
+      return;
+    }
+    this.overlayStage.textContent = this.stageSummary.message || "";
+    this.overlayStage.classList.toggle("is-cleared", Boolean(this.stageSummary.cleared));
+  }
+
   reset() {
     this.runSummary = null;
+    this.stageSummary = null;
     this.renderRunSummary();
+    this.renderStageSummary();
     this.lastPercentText = "";
     this.lastOrderKey = "";
     this.initialPlayerCells = null;
@@ -214,6 +248,7 @@ export class Hud {
           this.overlayStats.textContent = `${(Math.max(0, game.finalShare || 0) * 100).toFixed(1)}% of the plane.`;
         }
         this.renderRunSummary();
+        this.renderStageSummary();
         if (this.restart && typeof this.restart.focus === "function") {
           this.restart.focus({ preventScroll: true });
         }

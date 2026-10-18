@@ -37,6 +37,15 @@
         <span class="hud-percent__value" data-hud="percent">0.0<small>%</small></span>
         <span class="hud-percent__label">of the plane</span>
         <span class="hud-percent__best">Best <span data-hud="best">0.0%</span></span>
+        <div class="hud-stage" data-hud="stage">
+          <div class="hud-stage__meta">
+            <span class="hud-stage__name" data-hud="stage-name">Stage 1 · Quiet Plane</span>
+            <span class="hud-stage__pct" data-hud="stage-pct">0%</span>
+          </div>
+          <div class="hud-stage__track" role="progressbar" aria-label="Stage completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-hud="stage-bar">
+            <span class="hud-stage__fill" data-hud="stage-fill"></span>
+          </div>
+        </div>
       </section>
 
       <ol class="hud-board" data-hud="board" aria-label="Leaderboard"></ol>
@@ -48,6 +57,7 @@
           <h2 class="hud-overlay__title" id="hud-overlay-title" data-hud="overlay-title"></h2>
           <p class="hud-overlay__stats" data-hud="overlay-stats"></p>
           <p class="hud-overlay__best" data-hud="overlay-best"></p>
+          <p class="hud-overlay__stage" data-hud="overlay-stage"></p>
           <div class="hud-overlay__ink">
             <span class="hud-overlay__ink-label">Ink</span>
             <div class="skin-picker" data-hud="skins"></div>

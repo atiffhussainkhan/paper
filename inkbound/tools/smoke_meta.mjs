@@ -3,6 +3,9 @@ import { Profile } from "../src/meta/Profile.js";
 import {
   SKINS, equippedSkin, equipSkin, recordRun, syncUnlocks,
 } from "../src/meta/Skins.js";
+import {
+  STAGES, getStageStatus, recordStageRun, resolveRunShare,
+} from "../src/meta/Stages.js";
 import { CONFIG } from "../src/config.js";
 import { Game } from "../src/sim/Game.js";
 
@@ -62,5 +65,19 @@ assert.equal(game.player.color, SKINS[0].dry);
 const corrupt = memoryStorage();
 corrupt.setItem("inkbound.profile.v1", "{not json");
 assert.equal(new Profile(corrupt).get("bestPct"), 0);
+
+assert.ok(STAGES.length >= 4 && STAGES.length <= 6, "4-6 stages defined");
+const stageProfile = new Profile(memoryStorage());
+assert.equal(getStageStatus(stageProfile).stageName, "Quiet Plane");
+assert.equal(resolveRunShare({ runPeakShare: 0.35, finalShare: 0.12 }), 0.35);
+const s1 = recordStageRun(stageProfile, 0.3);
+assert.equal(s1.cleared, false);
+assert.equal(s1.stageIndex, 0);
+assert.ok(Math.abs(s1.stageCredit - 0.3) < 1e-6);
+const s2 = recordStageRun(stageProfile, 0.25);
+assert.equal(s2.cleared, true);
+assert.equal(s2.stageIndex, 1);
+assert.equal(s2.stageName, "Rimward Marsh");
+assert.equal(s2.stageCredit, 0);
 
 console.log("smoke_meta ok");

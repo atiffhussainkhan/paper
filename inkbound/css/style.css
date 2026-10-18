@@ -227,6 +227,57 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.hud-stage {
+  margin-top: 6px;
+  padding-left: 2px;
+  width: min(220px, 68vw);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hud-stage__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hud-stage__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--bone-300);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hud-stage__pct {
+  font-family: var(--font-num);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone-500);
+}
+
+.hud-stage__track {
+  position: relative;
+  height: 4px;
+  width: 100%;
+  background: rgb(35 39 44 / 0.85);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hud-stage__fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--ink-player);
+  border-radius: 2px;
+  transition: width 260ms var(--ease-out);
+}
+
 /* ---------- Leaderboard ---------- */
 
 .hud-board {
@@ -380,6 +431,24 @@ body {
 }
 
 .hud-overlay__best:empty {
+  display: none;
+}
+
+.hud-overlay__stage {
+  margin: -12px 0 20px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  color: var(--bone-300);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-overlay__stage.is-cleared {
+  color: var(--ink-player-wet);
+  font-weight: 600;
+}
+
+.hud-overlay__stage:empty {
   display: none;
 }
 

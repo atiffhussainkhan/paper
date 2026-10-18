@@ -30,3 +30,22 @@
 
 - Wiring: `main.js` passes `playerSkin` to `Game` (boot and every restart); `Game.createEntity` applies it to the player only. Run end calls `recordRun` once. Picker lives on the death/win overlay (`src/render/SkinPicker.js`); best % sits under the live % readout.
 - Test: `node tools/smoke_meta.mjs`.
+
+## Track M — stages / meta (landed)
+
+- `src/meta/Stages.js`: six Inkbound zones with cumulative `completionTarget` (territory-share credit, not plane %).
+- `src/meta/Profile.js`: `stageIndex`, `stageCredit` (defaults 0); skin fields unchanged.
+- **Credit rule:** on run end (death or win), add `Math.max(game.runPeakShare, game.finalShare)` to the active stage’s `stageCredit` (peak share during the run, not final-only). When credit ≥ target, stage clears: index +1, credit reset to 0.
+- HUD: stage name + progress bar under live %; overlay line on run end (`cleared` styling when a stage seals).
+- Wiring: `main.js` → `getStageStatus` on boot/restart; `recordStageRun(profile, resolveRunShare(game))` in `finishRun` alongside `recordRun`.
+- No shop, ads, or powers.
+- Test: stage assertions in `node tools/smoke_meta.mjs`.
+
+| # | Zone | Credit target |
+|---|------|----------------|
+| 1 | Quiet Plane | 0.50 |
+| 2 | Rimward Marsh | 0.75 |
+| 3 | Sumi Basin | 1.00 |
+| 4 | Cinnabar Reach | 1.25 |
+| 5 | Obsidian Shallows | 1.50 |
+| 6 | Unsealed Horizon | 2.00 |
