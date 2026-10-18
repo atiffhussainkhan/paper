@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "release_tag": "game-art-search-v2-2026-10-05",
+  "release_url": "https://github.com/atiffhussainkhan/Image/releases/tag/game-art-search-v2-2026-10-05",
+  "index": "catalog/game-art-search-v2-2026-10-05/assets.jsonl.gz",
+  "gallery": "catalog/game-art-search-v2-2026-10-05/index.html",
+  "status": "cleaned-active-library",
+  "license_status": "unverified",
+  "historical_release": "workplace-art-unverified-2026-10-05",
+  "removed_entries_report": "catalog/game-art-search-v2-2026-10-05/quality-report.json",
+  "engine_formats": [
+    "png",
+    "jpg"
+  ]
+}

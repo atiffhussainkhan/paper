@@ -3,9 +3,10 @@ import { SKINS, isSkinUnlocked } from "../meta/Skins.js";
 // Radio-group of ink swatches. Locked skins stay visible, disabled, and state
 // the best share that opens them.
 export class SkinPicker {
-  constructor(root, onSelect) {
+  constructor(root, onSelect, catalog = null) {
     this.root = root;
     this.onSelect = onSelect;
+    this.catalog = catalog;
     this.buttons = new Map();
     this.selectedId = null;
 
@@ -20,6 +21,11 @@ export class SkinPicker {
       button.style.setProperty("--skin-dry", skin.dry);
       button.style.setProperty("--skin-wet", skin.wet);
       button.style.setProperty("--skin-core", skin.core);
+      const pickerEntry = catalog?.getEntry?.(skin.pickerImageId || skin.patternImageId);
+      if (pickerEntry) {
+        button.style.setProperty("--skin-art", `url("${pickerEntry.path}")`);
+        button.classList.add("has-art");
+      }
       button.innerHTML = [
         '<span class="skin-chip__bead" aria-hidden="true"></span>',
         '<span class="skin-chip__name"></span>',

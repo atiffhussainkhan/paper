@@ -159,10 +159,13 @@ body {
 }
 
 .brand__seal {
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   background: var(--ink-player);
-  border-radius: 2px;
+  background-image: var(--art-brand-seal, none);
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.25);
   transform: rotate(-4deg);
 }
@@ -571,6 +574,13 @@ body {
   box-shadow: 0 0 0 2px var(--skin-dry);
 }
 
+.skin-chip.has-art .skin-chip__bead {
+  background-color: var(--skin-wet);
+  background-image: var(--skin-art);
+  background-size: cover;
+  background-position: center;
+}
+
 .skin-chip.is-locked .skin-chip__bead {
   background: var(--sumi-700);
   box-shadow: 0 0 0 2px var(--sumi-600);
@@ -586,7 +596,11 @@ body {
   padding: 0 22px;
   border: 0;
   border-radius: var(--radius);
-  background: var(--ink-player);
+  background-color: var(--ink-player);
+  background-image: var(--art-restart, none);
+  background-size: 100% 100%;
+  background-position: center;
+  background-blend-mode: soft-light;
   color: var(--bone-100);
   font-family: var(--font-ui);
   font-size: 15px;

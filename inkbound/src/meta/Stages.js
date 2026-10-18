@@ -8,42 +8,56 @@
 //   exceeds the stage's `completionTarget`, the stage clears: `stageIndex`
 //   advances by 1 and `stageCredit` resets to 0.
 
+// `backgroundImageId` resolves through assets/IMAGE_INDEX.json
+// (sourced from github.com/atiffhussainkhan/Image).
 export const STAGES = Object.freeze([
   Object.freeze({
     index: 0,
     id: "quiet-plane",
     name: "Quiet Plane",
     completionTarget: 0.5,
+    backgroundImageId: "bg-quiet-plane",
+    terrainImageId: "terrain-grass",
   }),
   Object.freeze({
     index: 1,
     id: "rimward-marsh",
     name: "Rimward Marsh",
     completionTarget: 0.75,
+    backgroundImageId: "bg-rimward-marsh",
+    terrainImageId: "terrain-foliage-01",
   }),
   Object.freeze({
     index: 2,
     id: "sumi-basin",
     name: "Sumi Basin",
     completionTarget: 1.0,
+    backgroundImageId: "bg-sumi-basin",
+    terrainImageId: "terrain-abstract-01",
   }),
   Object.freeze({
     index: 3,
     id: "cinnabar-reach",
     name: "Cinnabar Reach",
     completionTarget: 1.25,
+    backgroundImageId: "bg-cinnabar-reach",
+    terrainImageId: "terrain-pixel-01",
   }),
   Object.freeze({
     index: 4,
     id: "obsidian-shallows",
     name: "Obsidian Shallows",
     completionTarget: 1.5,
+    backgroundImageId: "bg-obsidian-shallows",
+    terrainImageId: "terrain-abstract-02",
   }),
   Object.freeze({
     index: 5,
     id: "unsealed-horizon",
     name: "Unsealed Horizon",
     completionTarget: 2.0,
+    backgroundImageId: "bg-unsealed-horizon",
+    terrainImageId: "terrain-pixel-02",
   }),
 ]);
 

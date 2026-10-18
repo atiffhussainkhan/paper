@@ -7,79 +7,110 @@ import { SkinPicker } from "./render/SkinPicker.js";
 import { getProfile } from "./meta/Profile.js";
 import { equippedSkin, equipSkin, recordRun, syncUnlocks } from "./meta/Skins.js";
 import { getStageStatus, recordStageRun, resolveRunShare } from "./meta/Stages.js";
+import { loadImageCatalog } from "./assets/ImageCatalog.js";
 
 const canvas = document.querySelector("#game");
 const hudRoot = document.querySelector("#hud");
 const colors = readBrandTokens(document.documentElement);
 
-const input = new Input(canvas);
-const profile = getProfile();
-syncUnlocks(profile);
-const game = new Game(input, colors, CONFIG, Math.random, { playerSkin: equippedSkin(profile) });
-game.arena.game = game;
-const renderer = new Renderer(canvas, colors, CONFIG);
-let accumulator = 0;
-let previousTime = performance.now();
-let runRecorded = false;
+async function boot() {
+  const catalog = await loadImageCatalog();
+  applyUiArt(catalog);
 
-const restart = () => {
-  input.reset();
-  game.playerSkin = equippedSkin(profile);
-  runRecorded = false;
-  game.reset();
+  const input = new Input(canvas);
+  const profile = getProfile();
+  syncUnlocks(profile);
+  const game = new Game(input, colors, CONFIG, Math.random, { playerSkin: equippedSkin(profile) });
   game.arena.game = game;
-  renderer.resetCamera(game.player.position, game.player.heading);
-  hud.reset();
-  hud.setStage(getStageStatus(profile));
-  hud.render(game);
-  accumulator = 0;
-  previousTime = performance.now();
-};
+  const renderer = new Renderer(canvas, colors, CONFIG, catalog);
+  let accumulator = 0;
+  let previousTime = performance.now();
+  let runRecorded = false;
 
-const hud = new Hud(hudRoot, restart);
-hud.setBest(profile.get("bestPct", 0));
-hud.setStage(getStageStatus(profile));
-const skinPicker = hud.skinsRoot
-  ? new SkinPicker(hud.skinsRoot, (id) => {
-    if (equipSkin(profile, id)) skinPicker.update(profile);
-  })
-  : null;
-skinPicker?.update(profile);
+  const restart = () => {
+    input.reset();
+    game.playerSkin = equippedSkin(profile);
+    runRecorded = false;
+    game.reset();
+    game.arena.game = game;
+    const stage = getStageStatus(profile);
+    renderer.setStageArt(stage.stage);
+    renderer.resetCamera(game.player.position, game.player.heading);
+    hud.reset();
+    hud.setStage(stage);
+    hud.render(game);
+    accumulator = 0;
+    previousTime = performance.now();
+  };
 
-function finishRun() {
-  runRecorded = true;
-  const summary = recordRun(profile, game.finalShare);
-  const stageResult = recordStageRun(profile, resolveRunShare(game));
-  hud.setBest(summary.bestPct);
-  hud.setRunSummary(summary);
-  hud.setStage(stageResult);
-  hud.setStageSummary(stageResult);
+  const hud = new Hud(hudRoot, restart);
+  hud.setBest(profile.get("bestPct", 0));
+  const stageStatus = getStageStatus(profile);
+  hud.setStage(stageStatus);
+  renderer.setStageArt(stageStatus.stage);
+  const skinPicker = hud.skinsRoot
+    ? new SkinPicker(hud.skinsRoot, (id) => {
+      if (equipSkin(profile, id)) skinPicker.update(profile);
+    }, catalog)
+    : null;
   skinPicker?.update(profile);
-}
-renderer.resetCamera(game.player.position, game.player.heading);
-hud.render(game);
 
-const fixedStep = 1 / CONFIG.simHz;
-function frame(now) {
-  const frameTime = Math.min(CONFIG.maxFrameTime, Math.max(0, (now - previousTime) / 1000));
-  previousTime = now;
-  accumulator += frameTime;
-
-  game.arena.game = game;
-  let steps = 0;
-  while (accumulator >= fixedStep && steps < CONFIG.maxStepsPerFrame) {
-    game.tick(fixedStep);
-    accumulator -= fixedStep;
-    steps += 1;
+  function finishRun() {
+    runRecorded = true;
+    const summary = recordRun(profile, game.finalShare);
+    const stageResult = recordStageRun(profile, resolveRunShare(game));
+    hud.setBest(summary.bestPct);
+    hud.setRunSummary(summary);
+    hud.setStage(stageResult);
+    hud.setStageSummary(stageResult);
+    skinPicker?.update(profile);
   }
-  if (steps === CONFIG.maxStepsPerFrame) accumulator = Math.min(accumulator, fixedStep);
-
-  if (game.state === "over" && !runRecorded) finishRun();
-
-  const playerScreen = renderer.render(game, accumulator / fixedStep, frameTime);
-  input.setSteeringOrigin(playerScreen.x, playerScreen.y);
+  renderer.resetCamera(game.player.position, game.player.heading);
   hud.render(game);
+
+  const fixedStep = 1 / CONFIG.simHz;
+  function frame(now) {
+    const frameTime = Math.min(CONFIG.maxFrameTime, Math.max(0, (now - previousTime) / 1000));
+    previousTime = now;
+    accumulator += frameTime;
+
+    game.arena.game = game;
+    let steps = 0;
+    while (accumulator >= fixedStep && steps < CONFIG.maxStepsPerFrame) {
+      game.tick(fixedStep);
+      accumulator -= fixedStep;
+      steps += 1;
+    }
+    if (steps === CONFIG.maxStepsPerFrame) accumulator = Math.min(accumulator, fixedStep);
+
+    if (game.state === "over" && !runRecorded) finishRun();
+
+    const playerScreen = renderer.render(game, accumulator / fixedStep, frameTime);
+    input.setSteeringOrigin(playerScreen.x, playerScreen.y);
+    hud.render(game);
+    requestAnimationFrame(frame);
+  }
+
   requestAnimationFrame(frame);
 }
 
-requestAnimationFrame(frame);
+function applyUiArt(catalog) {
+  const root = document.documentElement;
+  const map = {
+    "--art-brand-seal": catalog.binding("ui", "brandSeal"),
+    "--art-restart": catalog.binding("ui", "restart"),
+    "--art-hud-jewel": catalog.binding("ui", "hudJewel"),
+    "--art-equipped": catalog.binding("ui", "equippedCheck"),
+  };
+  for (const [cssVar, id] of Object.entries(map)) {
+    const entry = id ? catalog.getEntry(id) : null;
+    if (entry) root.style.setProperty(cssVar, `url("${entry.path}")`);
+  }
+  root.dataset.imageCatalog = "ready";
+  root.dataset.imageCatalogCount = String(catalog.counts().total || 0);
+}
+
+boot().catch((err) => {
+  console.error("Inkbound failed to load image catalog", err);
+  document.documentElement.dataset.imageCatalog = "failed";
+});

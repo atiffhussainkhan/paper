@@ -6,12 +6,14 @@
 // the plane reaches its `unlockPct`. Unlocks are persisted and never revoked.
 //   dry  = owned territory    wet  = open trail / bead body    core = bead centre
 
+// `patternImageId` / `beadImageId` resolve through assets/IMAGE_INDEX.json
+// (sourced from github.com/atiffhussainkhan/Image). Colors remain the tint.
 export const SKINS = Object.freeze([
-  { id: "seal", name: "Seal", blurb: "The stamped vermilion.", dry: "#d9452b", wet: "#ff6a4a", core: "#d9452b", unlockPct: 0 },
-  { id: "tideglass", name: "Tideglass", blurb: "Cold blue, clear as a lens.", dry: "#4a7fb5", wet: "#86b9ea", core: "#2f5c8a", unlockPct: 2 },
-  { id: "emberline", name: "Emberline", blurb: "Coal-rose, still hot at the edge.", dry: "#c2506a", wet: "#f58ca2", core: "#8f2f47", unlockPct: 5 },
-  { id: "nightquarry", name: "Nightquarry", blurb: "Cut slate, pale where struck.", dry: "#6c7684", wet: "#b8c3d0", core: "#3c444f", unlockPct: 10 },
-  { id: "bone", name: "Bone", blurb: "Dry, quiet, hard to cut from the dark.", dry: "#cfc6b0", wet: "#f2ead6", core: "#8f897c", unlockPct: 20 },
+  { id: "seal", name: "Seal", blurb: "The stamped vermilion.", dry: "#d9452b", wet: "#ff6a4a", core: "#d9452b", unlockPct: 0, patternImageId: "skin-splat-01", beadImageId: "char-bead-red", pickerImageId: "skin-paint-circle" },
+  { id: "tideglass", name: "Tideglass", blurb: "Cold blue, clear as a lens.", dry: "#4a7fb5", wet: "#86b9ea", core: "#2f5c8a", unlockPct: 2, patternImageId: "skin-splat-05", beadImageId: "char-bead-blue", pickerImageId: "skin-paint-circle" },
+  { id: "emberline", name: "Emberline", blurb: "Coal-rose, still hot at the edge.", dry: "#c2506a", wet: "#f58ca2", core: "#8f2f47", unlockPct: 5, patternImageId: "skin-splat-10", beadImageId: "char-bead-red-alt", pickerImageId: "skin-paint-splat" },
+  { id: "nightquarry", name: "Nightquarry", blurb: "Cut slate, pale where struck.", dry: "#6c7684", wet: "#b8c3d0", core: "#3c444f", unlockPct: 10, patternImageId: "skin-splat-16", beadImageId: "char-bead-blue-alt", pickerImageId: "skin-paint-circle" },
+  { id: "bone", name: "Bone", blurb: "Dry, quiet, hard to cut from the dark.", dry: "#cfc6b0", wet: "#f2ead6", core: "#8f897c", unlockPct: 20, patternImageId: "skin-splat-22", beadImageId: "char-shape-circle", pickerImageId: "skin-paint-drips" },
 ]);
 
 export const DEFAULT_SKIN_ID = SKINS[0].id;

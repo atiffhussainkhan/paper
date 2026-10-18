@@ -33,11 +33,12 @@ export function readBrandTokens(root = document.documentElement) {
 }
 
 export class Renderer {
-  constructor(canvas, colors, config) {
+  constructor(canvas, colors, config, catalog = null) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d", { alpha: false });
     this.colors = { ...readBrandTokens(), ...colors };
     this.config = config;
+    this.catalog = catalog;
     this.width = 1;
     this.height = 1;
     this.dpr = 1;
@@ -48,8 +49,53 @@ export class Renderer {
     this.territoryScale = 4;
     this.cachedGrid = null;
     this.cachedVersion = -1;
-    this.vfx = new Vfx(this.colors, config);
+    this.patternCache = new Map();
+    this.stageImageId = null;
+    this.terrainImageId = null;
+    this.vfx = new Vfx(this.colors, config, Math.random, catalog);
     this.resize();
+  }
+
+  setCatalog(catalog) {
+    this.catalog = catalog;
+    this.vfx.setCatalog?.(catalog);
+    this.patternCache.clear();
+    this.cachedVersion = -1;
+  }
+
+  setStageArt(stage) {
+    this.stageImageId = stage?.backgroundImageId || null;
+    this.terrainImageId = stage?.terrainImageId || null;
+    this.cachedVersion = -1;
+  }
+
+  catalogImage(id) {
+    return id && this.catalog ? this.catalog.get(id) : null;
+  }
+
+  patternFor(entity) {
+    const id = entity.patternImageId;
+    if (!id || !this.catalog) return null;
+    const key = `${id}|${entity.color}`;
+    if (this.patternCache.has(key)) return this.patternCache.get(key);
+    const img = this.catalog.get(id);
+    if (!img) return null;
+    const tile = document.createElement("canvas");
+    const size = 64;
+    tile.width = size;
+    tile.height = size;
+    const tctx = tile.getContext("2d");
+    tctx.fillStyle = entity.color;
+    tctx.fillRect(0, 0, size, size);
+    tctx.globalCompositeOperation = "destination-in";
+    tctx.drawImage(img, 0, 0, size, size);
+    tctx.globalCompositeOperation = "source-atop";
+    tctx.globalAlpha = 0.55;
+    tctx.fillStyle = entity.color;
+    tctx.fillRect(0, 0, size, size);
+    const pattern = this.territoryCanvas.getContext("2d").createPattern(tile, "repeat");
+    this.patternCache.set(key, pattern);
+    return pattern;
   }
 
   resize() {
@@ -134,8 +180,10 @@ export class Renderer {
       context.fill();
       context.restore();
 
-      // 2. Matte dry ink fill (scanline runs + rounded boundary seals)
-      context.fillStyle = entity.color;
+      // 2. Matte dry ink fill (scanline runs + rounded boundary seals).
+      // Prefer indexed skin pattern when the catalog has one.
+      const pattern = this.patternFor(entity);
+      context.fillStyle = pattern || entity.color;
       context.beginPath();
       const sealR = scale * 0.66;
       for (let row = 0; row < size; row += 1) {
@@ -230,6 +278,7 @@ export class Renderer {
     context.save();
     context.clip();
 
+    this.drawStageBackground(context, radius);
     this.drawPlaneGrid(context, radius);
 
     context.imageSmoothingEnabled = true;
@@ -256,6 +305,38 @@ export class Renderer {
     context.restore();
 
     return this.worldToScreen(playerPosition, scale);
+  }
+
+  drawStageBackground(context, radius) {
+    const bg = this.catalogImage(this.stageImageId)
+      || this.catalogImage("bg-plane-fallback");
+    const terrain = this.catalogImage(this.terrainImageId);
+    const diameter = radius * 2;
+    if (bg) {
+      context.save();
+      context.globalAlpha = 0.92;
+      context.drawImage(bg, -radius, -radius, diameter, diameter);
+      context.restore();
+    }
+    if (terrain) {
+      context.save();
+      context.globalAlpha = 0.18;
+      const tile = Math.max(96, radius * 0.22);
+      for (let y = -radius; y < radius; y += tile) {
+        for (let x = -radius; x < radius; x += tile) {
+          context.drawImage(terrain, x, y, tile, tile);
+        }
+      }
+      context.restore();
+    }
+    // Keep sumi wash so brand contrast holds over bright stage art.
+    context.save();
+    context.globalAlpha = bg ? 0.28 : 0;
+    context.fillStyle = this.colors["--sumi-950"];
+    context.beginPath();
+    context.arc(0, 0, radius, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
   }
 
   drawPlaneGrid(context, radius) {
@@ -438,14 +519,33 @@ export class Renderer {
     context.lineWidth = 2.2;
     context.stroke();
 
-    // Main ink bead body
-    context.beginPath();
-    context.arc(0, 0, r, 0, Math.PI * 2);
-    context.fillStyle = entity.wetColor;
-    context.fill();
-    context.strokeStyle = this.colors["--sumi-950"];
-    context.lineWidth = 3;
-    context.stroke();
+    // Main ink bead body — indexed character art when available, else fill.
+    const bead = this.catalogImage(entity.beadImageId);
+    if (bead) {
+      context.save();
+      context.beginPath();
+      context.arc(0, 0, r, 0, Math.PI * 2);
+      context.clip();
+      context.drawImage(bead, -r, -r, r * 2, r * 2);
+      context.globalCompositeOperation = "source-atop";
+      context.globalAlpha = 0.55;
+      context.fillStyle = entity.wetColor;
+      context.fillRect(-r, -r, r * 2, r * 2);
+      context.restore();
+      context.beginPath();
+      context.arc(0, 0, r, 0, Math.PI * 2);
+      context.strokeStyle = this.colors["--sumi-950"];
+      context.lineWidth = 3;
+      context.stroke();
+    } else {
+      context.beginPath();
+      context.arc(0, 0, r, 0, Math.PI * 2);
+      context.fillStyle = entity.wetColor;
+      context.fill();
+      context.strokeStyle = this.colors["--sumi-950"];
+      context.lineWidth = 3;
+      context.stroke();
+    }
 
     // Inner core (dry tone ring inside wet bead)
     context.beginPath();

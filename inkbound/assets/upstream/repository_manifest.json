@@ -1,0 +1,79 @@
+{
+  "repository": "atiffhussainkhan/Image",
+  "purpose": "Master reusable game asset library optimized for human and AI discovery",
+  "releases": {
+    "core": {
+      "tag": "mega-assets-v1",
+      "url": "https://github.com/atiffhussainkhan/Image/releases/tag/mega-assets-v1"
+    },
+    "expansion_v1": {
+      "tag": "mega-assets-expansion-v1",
+      "url": "https://github.com/atiffhussainkhan/Image/releases/tag/mega-assets-expansion-v1"
+    },
+    "expansion_v2": {
+      "tag": "mega-assets-expansion-v2",
+      "url": "https://github.com/atiffhussainkhan/Image/releases/tag/mega-assets-expansion-v2"
+    },
+    "catalog_completion": {
+      "tag": "catalog-completion-2026-10-06",
+      "url": "https://github.com/atiffhussainkhan/Image/releases/tag/catalog-completion-2026-10-06",
+      "validation_report": "catalog/catalog-completion-2026-10-06/REPORT.md"
+    }
+  },
+  "policy": {
+    "asset_location": "Use stored release assets, not external source links, whenever a stored copy exists.",
+    "provenance": "Keep original source and licence metadata.",
+    "discovery": "Search by tags, category, format, theme and gameplay role."
+  },
+  "categories": [
+    "3D characters",
+    "2D characters",
+    "animations",
+    "buildings",
+    "houses",
+    "city",
+    "dungeons",
+    "interiors",
+    "furniture",
+    "props",
+    "backgrounds",
+    "sprites",
+    "UI",
+    "VFX",
+    "textures",
+    "PBR",
+    "HDRI",
+    "audio",
+    "environment",
+    "vegetation",
+    "medieval",
+    "FPS",
+    "prototype"
+  ],
+  "user_artwork_active_library": {
+    "schema_version": 2,
+    "release_tag": "game-art-search-v2-2026-10-05",
+    "release_url": "https://github.com/atiffhussainkhan/Image/releases/tag/game-art-search-v2-2026-10-05",
+    "index": "catalog/game-art-search-v2-2026-10-05/assets.jsonl.gz",
+    "gallery": "catalog/game-art-search-v2-2026-10-05/index.html",
+    "status": "cleaned-active-library",
+    "license_status": "unverified",
+    "historical_release": "workplace-art-unverified-2026-10-05",
+    "removed_entries_report": "catalog/game-art-search-v2-2026-10-05/quality-report.json",
+    "engine_formats": [
+      "png",
+      "jpg"
+    ]
+  },
+  "latest_content_audit": {
+    "date": "2026-10-06",
+    "repositories": [
+      "atiffhussainkhan/Image",
+      "atiffhussainkhan/animation"
+    ],
+    "report": "catalog/audits/2026-10-06/REPORT.md",
+    "summary": "catalog/audits/2026-10-06/audit-summary.json",
+    "safe_import_policy": "catalog/audits/2026-10-06/safe-import-policy.json",
+    "format_overrides": "catalog/audits/2026-10-06/format-overrides.json"
+  }
+}

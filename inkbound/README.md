@@ -63,6 +63,17 @@ doesn't hurt you: run into it and you slide along the edge.
 
 **Out of scope for Phase 0:** revive, shop, skins, powers, ads, events, stages, and real PvP.
 
+## Image catalog
+
+All bitmap art comes from [`atiffhussainkhan/Image`](https://github.com/atiffhussainkhan/Image)
+(never AI-generated). Runtime lookup is `assets/IMAGE_INDEX.json`; the upstream
+pack index is mirrored at `assets/upstream/MASTER_ASSET_INDEX.json`. Re-sync with:
+
+```bash
+python3 tools/sync_image_catalog.py --image-repo /path/to/Image
+node tools/smoke_images.mjs
+```
+
 The acceptance checklist is in [`docs/PHASE0_ACCEPTANCE.md`](docs/PHASE0_ACCEPTANCE.md).
 
 ## Project layout
@@ -77,7 +88,10 @@ inkbound/
 │   ├── sim/              Arena, territory, trail, capture, combat, bots, game state
 │   ├── render/           Canvas renderer + DOM HUD
 │   └── input/            Pointer / keyboard → heading
-├── assets/               Static assets
+├── assets/
+│   ├── IMAGE_INDEX.json  Runtime art catalog (from Image repo)
+│   ├── catalog/          Local mirrored bitmaps by category
+│   └── upstream/         Mirrored MASTER_ASSET_INDEX + provenance
 ├── docs/
 │   ├── ARCHITECTURE.md   Module ownership + locked tick order
 │   ├── PORT_GODOT4.md    Web module → Godot 4 scene/script map

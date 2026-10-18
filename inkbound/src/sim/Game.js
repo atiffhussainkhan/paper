@@ -50,11 +50,16 @@ export class Game {
 
   createEntity(spec, position, heading) {
     const skin = spec.role === "player" ? this.playerSkin : null;
+    const botBead = spec.role === "bot"
+      ? (spec.id === 2 ? "char-bead-blue" : spec.id === 3 ? "char-bead-blue-alt" : "char-shape-squircle")
+      : null;
     const entitySpec = {
       ...spec,
       color: skin?.dry ?? this.colors[spec.dryToken],
       wetColor: skin?.wet ?? this.colors[spec.wetToken],
       coreColor: skin?.core,
+      patternImageId: skin?.patternImageId ?? null,
+      beadImageId: skin?.beadImageId ?? botBead,
     };
     return new Entity(
       entitySpec,

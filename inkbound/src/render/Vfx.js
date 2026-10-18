@@ -57,11 +57,21 @@ export function retainUnownedCells(cells, owners) {
 }
 
 export class Vfx {
-  constructor(colors, config, random = Math.random) {
+  constructor(colors, config, random = Math.random, catalog = null) {
     this.colors = colors;
     this.config = config;
     this.random = random;
+    this.catalog = catalog;
     this.reset();
+  }
+
+  setCatalog(catalog) {
+    this.catalog = catalog;
+  }
+
+  art(role) {
+    const id = this.catalog?.binding?.("vfx", role);
+    return id && this.catalog ? this.catalog.get(id) : null;
   }
 
   reset() {
@@ -121,6 +131,20 @@ export class Vfx {
       stack: this.floats.length,
       age: 0,
     });
+    // Indexed claim spark at the seal point.
+    this.spawnParticle({
+      x: event.position.x,
+      y: event.position.y,
+      vx: 0,
+      vy: -12,
+      radius: 22,
+      life: 0.7,
+      delay: 0,
+      drag: 2,
+      color: this.colors["--bone-100"],
+      sprite: "claimSpark",
+      flash: true,
+    });
   }
 
   onDeath(event, grid) {
@@ -151,6 +175,7 @@ export class Vfx {
           delay: (i / beadCount) * 0.12,
           drag: 3.5,
           color: wetColor,
+          sprite: "dissolve",
         });
       }
     }
@@ -169,6 +194,21 @@ export class Vfx {
       duration: VFX_TIMING.burstDelay + VFX_TIMING.burstRingDuration,
       age: 0,
       splat: event.color,
+      sprite: "burstRing",
+    });
+    // One indexed death-burst flash when available.
+    this.spawnParticle({
+      x: position.x,
+      y: position.y,
+      vx: 0,
+      vy: 0,
+      radius: bodyR * (event.isPlayer ? 3.2 : 2.4),
+      life: 0.45,
+      delay: VFX_TIMING.burstDelay,
+      drag: 8,
+      color: ringColor,
+      sprite: "deathBurst",
+      flash: true,
     });
     const dropCount = event.isPlayer ? 30 : 20;
     for (let i = 0; i < dropCount; i += 1) {
@@ -185,6 +225,7 @@ export class Vfx {
         drag: 5.2,
         color: this.random() < 0.7 ? wetColor : event.color,
         streak: true,
+        sprite: "cutSlash",
       });
     }
 
@@ -354,6 +395,16 @@ export class Vfx {
       const t = clamp01(p.age / p.life);
       const radius = p.radius * (1 - t * 0.7);
       context.globalAlpha = 1 - t * t;
+      const sprite = p.sprite ? this.art(p.sprite) : null;
+      if (sprite) {
+        const size = p.flash ? radius * 2.4 : radius * 2;
+        context.save();
+        if (p.flash) context.globalCompositeOperation = "lighter";
+        context.translate(p.x, p.y);
+        context.drawImage(sprite, -size * 0.5, -size * 0.5, size, size);
+        context.restore();
+        continue;
+      }
       if (p.streak) {
         context.beginPath();
         context.moveTo(p.x, p.y);
@@ -386,28 +437,34 @@ export class Vfx {
     context.translate(position.x, position.y - r - 15 + bob);
     context.scale(pop, pop);
 
-    // Three-point seal crown: base band plus peaks, outlined so it reads on
-    // any ink or on the bare plane.
-    context.beginPath();
-    context.moveTo(-w, 3);
-    context.lineTo(-w, -h * 0.35);
-    context.lineTo(-w * 0.5, -h * 0.05);
-    context.lineTo(0, -h);
-    context.lineTo(w * 0.5, -h * 0.05);
-    context.lineTo(w, -h * 0.35);
-    context.lineTo(w, 3);
-    context.closePath();
-    context.lineJoin = "round";
-    context.lineWidth = 3.2;
-    context.strokeStyle = this.colors["--sumi-950"];
-    context.stroke();
-    context.fillStyle = this.colors["--bone-100"];
-    context.fill();
+    const medalId = this.catalog?.binding?.("ui", "leaderMedal");
+    const medal = medalId && this.catalog ? this.catalog.get(medalId) : null;
+    if (medal) {
+      const size = 22;
+      context.drawImage(medal, -size * 0.5, -size * 0.65, size, size);
+    } else {
+      // Three-point seal crown fallback when catalog art is unavailable.
+      context.beginPath();
+      context.moveTo(-w, 3);
+      context.lineTo(-w, -h * 0.35);
+      context.lineTo(-w * 0.5, -h * 0.05);
+      context.lineTo(0, -h);
+      context.lineTo(w * 0.5, -h * 0.05);
+      context.lineTo(w, -h * 0.35);
+      context.lineTo(w, 3);
+      context.closePath();
+      context.lineJoin = "round";
+      context.lineWidth = 3.2;
+      context.strokeStyle = this.colors["--sumi-950"];
+      context.stroke();
+      context.fillStyle = this.colors["--bone-100"];
+      context.fill();
 
-    context.beginPath();
-    context.arc(0, -0.6, 2.4, 0, Math.PI * 2);
-    context.fillStyle = entity.wetColor;
-    context.fill();
+      context.beginPath();
+      context.arc(0, -0.6, 2.4, 0, Math.PI * 2);
+      context.fillStyle = entity.wetColor;
+      context.fill();
+    }
 
     context.restore();
   }
