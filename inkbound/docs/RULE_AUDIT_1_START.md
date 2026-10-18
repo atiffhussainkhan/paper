@@ -4,6 +4,7 @@
 **Date:** 2026-10-18  
 **Branch:** `cursor/inkbound-final-dev-c3dd`  
 **Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`  
+**Report commit:** `b77c16d2be84c82ae4cf307c11c476800d254ee1`  
 **Parent at audit:** `18f1bb1` (docs only; sim, HUD, and catalog are the `21cf6b0` tree)  
 **Browser:** Chrome 154.0.8037.92, headless, fresh profile, cache bypassed. Served from `/workspace/inkbound` at `http://127.0.0.1:8765/`.  
 **Sources:** `TerritoryIO_Professional_Requirements_GDD.md` v1.0 (§1, §3, FR-MOVE-06, FR-TERR-02, FR-AI-01/02, §12, §13, §17), read with `inkbound/DECISIONS.md`. Paper.io-class reference is the Poki session shot (own %, Best, named board, soft steer line, camera on the avatar, rivals only at the edge of view).

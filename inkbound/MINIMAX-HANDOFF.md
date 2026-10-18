@@ -35,7 +35,8 @@ Only if a clear bug blocks match start. No new features.
 
 **Status:** `done`
 **Verdict:** **PARTIAL** (5 PASS, 2 PARTIAL, 0 FAIL)
-**Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`
+**Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`  
+**Report commit:** `b77c16d2be84c82ae4cf307c11c476800d254ee1`
 
 First painted frame (animation frame 2) is already the match: vermilion spawn disk, camera on the bead, three named bots, 1.0% and the board, steering live. Arena chrome is partial because a 15-plate catalog strip covers the lower playfield. The FTUE line shows on desktop and is `display: none` at ≤640px. Nothing blocked start, so no gameplay change. Report: `docs/RULE_AUDIT_1_START.md`. Shots: `/opt/cursor/artifacts/rule1_start_*.png`.
 
