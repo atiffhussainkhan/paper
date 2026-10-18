@@ -1,7 +1,7 @@
 # MINIMAX-HANDOFF — Inkbound REQ3 meta / economy / progression
 
 ## Status
-`awaiting-cursor`
+`done`
 
 ## Task
 
@@ -31,6 +31,14 @@ Only if persistence or the HUD is broken. No new meta systems.
 ### Constraints
 - Brand **Inkbound**; no Paper.io IP
 - **Godot:** do not fill gameplay stubs
+
+## REQ3 — meta (Cursor)
+
+**Status:** `done`
+**Verdict:** **PASS**
+**Audited runtime:** `4e2c89657840dc0267f877d10b603a49d2cae0cc`
+
+Best %, five skins (unlock by best, equip, locked stay locked), stage credit, FTUE, and `inkbound.profile.v1` all hold across Restart and a full reload. Shop, real multiplayer, and revive are **N/A-MVP**. One HUD fix: Restart was clearing the saved claim-hint fade. Report: `docs/ACCEPTANCE_REQ3_META.md`.
 
 ## REQ5 — deploy (Cursor)
 
