@@ -38,11 +38,11 @@ Exact clicks and commands: [GITHUB_PAGES_USER_STEPS.md](GITHUB_PAGES_USER_STEPS.
 
 Cursor Origin already has the game. Do not push local `main` when it is `d6a49f2f8a5611e414b9afcf16266973b585bc9c` (no `inkbound/` folder).
 
-| Ref | Tip when this page was written | Push to GitHub as |
+| Ref | Tip | Push to GitHub as |
 | --- | --- | --- |
 | `origin/main` | `50c809f6dffa36417da4913b439800fc0cbfd540` | `main` (game + `.github/workflows/pages.yml`) |
-| `origin/cursor/github-pages-user-steps-0043` | this file's branch; `git rev-parse` after `git fetch origin` | `main` (same game, plus these instructions) |
-| `origin/gh-pages` | `git rev-parse origin/gh-pages` after fetch | `gh-pages` (`inkbound/` contents at the branch root) |
+| `origin/cursor/github-pages-user-steps-0043` | tip of that branch after `git fetch origin` (steps added in `efa18191f0d6443b3d0dd1dd607bc7a5a538daa3`) | `main` (same game, plus these instructions) |
+| `origin/gh-pages` | `912904e1f90dccd035f87f1d60645217e38b93d0` | `gh-pages` (`inkbound/` contents at the branch root) |
 
 ## The one Settings click
 

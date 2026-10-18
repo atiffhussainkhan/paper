@@ -20,3 +20,4 @@ node_modules/
 # Generated at runtime
 _render.html
 *.log
+dist/

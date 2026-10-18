@@ -34,8 +34,10 @@ Choose **GitHub.com**, **HTTPS**, and account **atiffhussainkhan**.
 git fetch origin
 git remote add github https://github.com/atiffhussainkhan/paper.git
 git push github origin/cursor/github-pages-user-steps-0043:main
-git push github origin/gh-pages:gh-pages
+git push github 912904e1f90dccd035f87f1d60645217e38b93d0:gh-pages
 ```
+
+`912904e1f90dccd035f87f1d60645217e38b93d0` is `origin/gh-pages`: the playable site root (`index.html` beside `css/`, `src/`, and `assets/`). Push that commit. It already contains the Pages steps. Later edits on the instructions branch do not need a new `gh-pages` commit for the game to load.
 
 If a remote named `github` already exists:
 
