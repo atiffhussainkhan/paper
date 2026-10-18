@@ -52,12 +52,25 @@ export function botDifficultyCurve(matchAge, playerShare, config) {
   };
 }
 
-export function playerSafeFromBots(matchAge, playerShare, config) {
+export function adaptiveOpeningGraceSeconds(playerShare, config) {
   const openingSafety = config.botOpeningSafetySeconds ?? 10;
   const lowShareBonus = config.botLowShareSafetyBonusSeconds ?? 0;
-  const adaptiveGrace = openingSafety
+  return openingSafety
     + lowShareBonus * (1 - shareProgress(playerShare, config));
-  return matchAge < adaptiveGrace;
+}
+
+export function playerSafeFromBots(matchAge, playerShare, config) {
+  return matchAge < adaptiveOpeningGraceSeconds(playerShare, config);
+}
+
+// 0.68 → 1.0 smoothstep across the teaching window; bots take smaller loops
+// and keep more distance until the player has had room for a first claim.
+export function openingFairnessScale(matchAge, playerShare, config) {
+  const grace = adaptiveOpeningGraceSeconds(playerShare, config);
+  if (matchAge >= grace) return 1;
+  const t = clamp01(matchAge / Math.max(1, grace));
+  const smooth = t * t * (3 - 2 * t);
+  return 0.68 + 0.32 * smooth;
 }
 
 export function playerSelfForgivenessActive(matchAge, config) {

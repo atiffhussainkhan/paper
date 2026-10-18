@@ -145,6 +145,24 @@ export class Vfx {
       sprite: "claimSpark",
       flash: true,
     });
+    const sparkCount = 4;
+    for (let i = 0; i < sparkCount; i += 1) {
+      const angle = (i / sparkCount) * Math.PI * 2 + this.random() * 0.4;
+      const speed = 28 + this.random() * 42;
+      this.spawnParticle({
+        x: event.position.x,
+        y: event.position.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 18,
+        radius: 10 + this.random() * 8,
+        life: 0.55 + this.random() * 0.35,
+        delay: 0.02 * i,
+        drag: 2.8,
+        color: this.colors["--bone-100"],
+        sprite: "floatSpark",
+        flash: true,
+      });
+    }
   }
 
   onDeath(event, grid) {
@@ -233,6 +251,23 @@ export class Vfx {
     if (grid && event.cells && event.cells.length > 0) {
       const ghost = this.buildGhost(grid, event.cells, event.color);
       if (ghost) this.ghosts.push(ghost);
+      const puffCount = event.isPlayer ? 6 : 4;
+      for (let i = 0; i < puffCount; i += 1) {
+        const angle = (i / puffCount) * Math.PI * 2 + this.random() * 0.35;
+        const dist = bodyR * (1.4 + this.random() * 2.2);
+        this.spawnParticle({
+          x: position.x + Math.cos(angle) * dist,
+          y: position.y + Math.sin(angle) * dist,
+          vx: Math.cos(angle) * (12 + this.random() * 18),
+          vy: Math.sin(angle) * (12 + this.random() * 18) - 22,
+          radius: bodyR * (1.1 + this.random() * 0.9),
+          life: VFX_TIMING.territoryFadeDuration * 0.95,
+          delay: VFX_TIMING.territoryFadeDelay + i * 0.05,
+          drag: 1.4,
+          color: event.color,
+          sprite: "fade",
+        });
+      }
     }
   }
 
@@ -370,6 +405,8 @@ export class Vfx {
     if (local < 0) return;
     const t = clamp01(local / (ring.duration - ring.delay));
     const eased = easeOutCubic(t);
+    const radius = ring.from + (ring.to - ring.from) * eased;
+    const ringSprite = ring.sprite ? this.art(ring.sprite) : null;
     context.save();
     if (t < 0.4) {
       context.beginPath();
@@ -378,9 +415,16 @@ export class Vfx {
       context.fillStyle = ring.splat;
       context.fill();
     }
+    if (ringSprite) {
+      const size = radius * 2.15;
+      context.globalAlpha = 0.82 * (1 - t * t);
+      context.globalCompositeOperation = "lighter";
+      context.drawImage(ringSprite, ring.x - size * 0.5, ring.y - size * 0.5, size, size);
+      context.globalCompositeOperation = "source-over";
+    }
     context.beginPath();
-    context.arc(ring.x, ring.y, ring.from + (ring.to - ring.from) * eased, 0, Math.PI * 2);
-    context.globalAlpha = 0.9 * (1 - t);
+    context.arc(ring.x, ring.y, radius, 0, Math.PI * 2);
+    context.globalAlpha = ringSprite ? 0.55 * (1 - t) : 0.9 * (1 - t);
     context.strokeStyle = ring.color;
     context.lineWidth = ring.width * (1 - t) + 0.8;
     context.stroke();
@@ -439,6 +483,27 @@ export class Vfx {
 
     const medalId = this.catalog?.binding?.("ui", "leaderMedal");
     const medal = medalId && this.catalog ? this.catalog.get(medalId) : null;
+    const crownSpark = this.art("floatSpark");
+    if (crown.age < 0.38 && crownSpark) {
+      const burstT = clamp01(crown.age / 0.38);
+      const burstEase = easeOutCubic(burstT);
+      for (let i = 0; i < 6; i += 1) {
+        const angle = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        const dist = 8 + burstEase * 22;
+        const size = 14 * (1 - burstT * 0.55);
+        context.save();
+        context.globalAlpha = (1 - burstT) * 0.9;
+        context.globalCompositeOperation = "lighter";
+        context.drawImage(
+          crownSpark,
+          Math.cos(angle) * dist - size * 0.5,
+          Math.sin(angle) * dist - size * 0.5,
+          size,
+          size,
+        );
+        context.restore();
+      }
+    }
     if (medal) {
       const size = 22;
       context.drawImage(medal, -size * 0.5, -size * 0.65, size, size);
@@ -493,10 +558,21 @@ export class Vfx {
         || this.colors["--ink-player-wet"]
         || this.colors["--bone-100"];
 
+      const floatSpark = this.art("floatSpark");
+      const sparkPop = easeOutBack(clamp01(item.age / 0.22));
+
       context.save();
       context.translate(x, y);
       context.scale(scale, scale);
       context.globalAlpha = fadeIn * fadeOut;
+      if (floatSpark && isLeadFloat && sparkPop > 0.05) {
+        const sparkSize = 26 + sparkPop * 18;
+        context.save();
+        context.globalAlpha = fadeIn * (1 - t * 0.35) * 0.85;
+        context.globalCompositeOperation = "lighter";
+        context.drawImage(floatSpark, -sparkSize * 0.5, -sparkSize * 0.55, sparkSize, sparkSize);
+        context.restore();
+      }
       // Thick sumi halo then wet fill — claim +% must pop off any plane ink.
       context.lineWidth = isLeadFloat ? 9 : 7;
       context.strokeStyle = this.colors["--sumi-950"];

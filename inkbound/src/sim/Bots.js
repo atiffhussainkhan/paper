@@ -1,4 +1,9 @@
-import { botDifficultyCurve, playerSafeFromBots } from "./Combat.js";
+import {
+  adaptiveOpeningGraceSeconds,
+  botDifficultyCurve,
+  openingFairnessScale,
+  playerSafeFromBots,
+} from "./Combat.js";
 
 const ROLES = ["edge-farmer", "small-looper", "opportunistic-cutter"];
 
@@ -44,11 +49,11 @@ function doesSegmentThreatenOwnTrail(bot, from, to, clearance, endSegment) {
   return false;
 }
 
-function isNearPlayerTerritory(point, arena, config) {
+function isNearPlayerTerritory(point, arena, config, cushion = 1) {
   const game = arena?.game;
   const grid = game?.grid;
   const player = game?.player;
-  const pad = config.startTerritoryRadius + config.bodyRadius * 2.5;
+  const pad = (config.startTerritoryRadius + config.bodyRadius * 2.5) * cushion;
 
   if (grid) {
     const cellRadius = Math.ceil(pad / grid.cellSize);
@@ -157,9 +162,14 @@ function findNearestOwnedPoint(grid, ownerId, fromPoint, fallback) {
   return bestPoint;
 }
 
+function loopDistanceScale(brain) {
+  return brain.openingScale ?? 1;
+}
+
 function makeEdgeFarmerLoop(brain, arena, config) {
   const random = brain.random;
   const anchor = brain.safeAnchor;
+  const scale = loopDistanceScale(brain);
   const rimMargin = config.botEdgeRimMargin ?? config.bodyRadius * 3.4;
   const maxRing = arena.radius - rimMargin;
   const distFromCenter = Math.hypot(anchor.x, anchor.y);
@@ -167,8 +177,8 @@ function makeEdgeFarmerLoop(brain, arena, config) {
     ? Math.atan2(anchor.y, anchor.x)
     : brain.orbitAngle;
 
-  const outStep = (config.botEdgeOutDistance ?? config.botLoopOutDistance) * (0.88 + random() * 0.24);
-  const sweepDist = (config.botEdgeSweepDistance ?? config.botLoopSideDistance * 1.45) * (0.85 + random() * 0.3);
+  const outStep = (config.botEdgeOutDistance ?? config.botLoopOutDistance) * scale * (0.88 + random() * 0.24);
+  const sweepDist = (config.botEdgeSweepDistance ?? config.botLoopSideDistance * 1.45) * scale * (0.85 + random() * 0.3);
   const outerRadius = Math.min(maxRing, Math.max(distFromCenter + outStep * 0.82, arena.radius * 0.72));
   const rimDir = brain.turnSign;
   const sweepAngle = sweepDist / Math.max(380, outerRadius);
@@ -201,9 +211,10 @@ function makeEdgeFarmerLoop(brain, arena, config) {
 function makeSmallLooperLoop(brain, arena, config) {
   const random = brain.random;
   const anchor = brain.safeAnchor;
+  const scale = loopDistanceScale(brain);
   const margin = config.bodyRadius * 3.2;
-  const outDist = (config.botSmallLoopOutDistance ?? config.botLoopOutDistance * 0.72) * (0.88 + random() * 0.22);
-  const sideDist = (config.botSmallLoopSideDistance ?? config.botLoopSideDistance * 0.74) * (0.88 + random() * 0.22);
+  const outDist = (config.botSmallLoopOutDistance ?? config.botLoopOutDistance * 0.72) * scale * (0.88 + random() * 0.22);
+  const sideDist = (config.botSmallLoopSideDistance ?? config.botLoopSideDistance * 0.74) * scale * (0.88 + random() * 0.22);
 
   brain.orbitAngle = wrapAngle(brain.orbitAngle + brain.turnSign * (0.82 + random() * 0.38));
   let baseAngle = brain.orbitAngle;
@@ -212,7 +223,8 @@ function makeSmallLooperLoop(brain, arena, config) {
     x: anchor.x + Math.cos(baseAngle) * (outDist + margin),
     y: anchor.y + Math.sin(baseAngle) * (outDist + margin),
   };
-  if (!arena.contains(testOut.x, testOut.y, margin) || isNearPlayerTerritory(testOut, arena, config)) {
+  const playerCushion = 1 + (1 - scale) * 0.5;
+  if (!arena.contains(testOut.x, testOut.y, margin) || isNearPlayerTerritory(testOut, arena, config, playerCushion)) {
     const inwardAngle = Math.atan2(-anchor.y, -anchor.x);
     baseAngle = wrapAngle(inwardAngle + (random() - 0.5) * 1.1);
     brain.orbitAngle = baseAngle;
@@ -242,9 +254,10 @@ function makeSmallLooperLoop(brain, arena, config) {
 function makeOpportunisticCutterLoop(brain, arena, config) {
   const random = brain.random;
   const anchor = brain.safeAnchor;
+  const scale = loopDistanceScale(brain);
   const margin = config.bodyRadius * 3.2;
-  const outDist = (config.botCutterOutDistance ?? config.botLoopOutDistance * 0.94) * (0.86 + random() * 0.26);
-  const sideDist = (config.botCutterSideDistance ?? config.botLoopSideDistance * 0.96) * (0.86 + random() * 0.26);
+  const outDist = (config.botCutterOutDistance ?? config.botLoopOutDistance * 0.94) * scale * (0.86 + random() * 0.26);
+  const sideDist = (config.botCutterSideDistance ?? config.botLoopSideDistance * 0.96) * scale * (0.86 + random() * 0.26);
 
   brain.orbitAngle = wrapAngle(brain.orbitAngle + brain.turnSign * (0.95 + random() * 0.45));
   let baseAngle = brain.orbitAngle;
@@ -253,7 +266,8 @@ function makeOpportunisticCutterLoop(brain, arena, config) {
     x: anchor.x + Math.cos(baseAngle) * (outDist + margin),
     y: anchor.y + Math.sin(baseAngle) * (outDist + margin),
   };
-  if (!arena.contains(probe.x, probe.y, margin) || isNearPlayerTerritory(probe, arena, config)) {
+  const playerCushion = 1 + (1 - scale) * 0.5;
+  if (!arena.contains(probe.x, probe.y, margin) || isNearPlayerTerritory(probe, arena, config, playerCushion)) {
     baseAngle = wrapAngle(Math.atan2(-anchor.y, -anchor.x) + (random() - 0.5) * 1.2);
     brain.orbitAngle = baseAngle;
   }
@@ -332,6 +346,8 @@ function findOpportunisticCutTarget(bot, rivals, arena, config, cutterRange) {
 
 function selectSafeHeading(bot, nominalHeading, rivals, arena, config) {
   const brain = bot.brain;
+  const player = arena?.game?.player;
+  const openingScale = brain.openingScale ?? 1;
   const endSeg = olderTrailEndSegment(bot, config);
   const lookAhead = config.botLookAheadDistance ?? 115;
   const nearDist = lookAhead * 0.45;
@@ -413,6 +429,14 @@ function selectSafeHeading(bot, nominalHeading, rivals, arena, config) {
       }
     }
 
+    if (player?.alive && player.isPlayer && openingScale < 1) {
+      const avoid = config.startTerritoryRadius * (2.4 + (1 - openingScale) * 1.6);
+      for (const sample of [p1, p2, p3]) {
+        const dist = Math.hypot(sample.x - player.position.x, sample.y - player.position.y);
+        if (dist < avoid) score -= (avoid - dist) * (18 + (1 - openingScale) * 22);
+      }
+    }
+
     if (score > bestScore) {
       bestScore = score;
       bestAngle = angle;
@@ -451,6 +475,7 @@ export function attachBotBrain(entity, arena, config, random = Math.random) {
     wasOutside: false,
     mode: "looping",
     cutTarget: null,
+    openingScale: openingFairnessScale(0, 0, config),
     random,
   };
 
@@ -468,13 +493,16 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
   const huntAllowed = difficulty.aggression > 0
     && !playerSafeFromBots(matchAge, playerShare, config);
   const outTimeBonus = difficulty.maxOutTime - (config.botMaxOutTime ?? 3.1);
+  const openingScale = openingFairnessScale(matchAge, playerShare, config);
+  const openingGrace = adaptiveOpeningGraceSeconds(playerShare, config);
 
   for (const bot of bots) {
     if (!bot.alive) continue;
     if (!bot.brain) attachBotBrain(bot, arena, config);
-    bot.speed = difficulty.speed;
+    bot.speed = difficulty.speed * (0.86 + 0.14 * openingScale);
 
     const brain = bot.brain;
+    brain.openingScale = openingScale;
     brain.age += dt;
 
     if (!bot.outsideOwnTerritory) {
@@ -512,11 +540,12 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
       }
     }
 
+    const openingOutBonus = matchAge < openingGrace ? (1 - openingScale) * 0.85 : 0;
     const maxOutTime = brain.role === "small-looper"
-      ? 2.25 + outTimeBonus * 0.35
+      ? 2.25 + outTimeBonus * 0.35 + openingOutBonus
       : brain.role === "edge-farmer"
-        ? difficulty.maxOutTime + 0.35
-        : difficulty.maxOutTime;
+        ? difficulty.maxOutTime + 0.35 + openingOutBonus * 0.5
+        : difficulty.maxOutTime + openingOutBonus * 0.35;
     const maxTrailPts = brain.role === "small-looper"
       ? 28
       : brain.role === "edge-farmer"
