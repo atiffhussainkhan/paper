@@ -48,7 +48,7 @@ Expect `200` on each.
 
 ## GitHub Pages
 
-The public project-site URL pattern is:
+The one-time github.com push (this workspace has no GitHub login) is [GITHUB_PAGES_USER_STEPS.md](GITHUB_PAGES_USER_STEPS.md). Until that push, there is no live `github.io` URL. The public project-site URL pattern is:
 
 ```text
 https://<user>.github.io/<repo>/
