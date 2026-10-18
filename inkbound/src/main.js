@@ -63,6 +63,7 @@ async function boot() {
     hud.setRunSummary(summary);
     hud.setStage(stageResult);
     hud.setStageSummary(stageResult);
+    renderer.setStageArt(stageResult.stage);
     skinPicker?.update(profile);
   }
   renderer.resetCamera(game.player.position, game.player.heading);
