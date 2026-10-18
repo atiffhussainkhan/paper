@@ -219,4 +219,24 @@ assert.equal(hudSrc.includes('"is-lead"'), true);
   vfx.drawCrown(ctx, game, () => ({ x: 10, y: 20 }));
 }
 
-console.log("PASS: capture floats, death juice, crown");
+// Player kill feedback: catalog slashes + kill pop label.
+{
+  const vfx = new Vfx(colors, CONFIG, () => 0.33, null);
+  vfx.onDeath({
+    entityId: 2,
+    isPlayer: false,
+    victimName: "Tide",
+    killedByIsPlayer: true,
+    killerPosition: { x: 120, y: -40 },
+    position: { x: 130, y: -35 },
+    trail: [{ x: 100, y: -30 }, { x: 125, y: -32 }],
+    trailWidth: CONFIG.trailWidth,
+    color: colors["--ink-bot-1"],
+    wetColor: colors["--ink-bot-1-wet"],
+    cells: [],
+  }, null);
+  assert.ok(vfx.killPops.some((pop) => pop.text.includes("Tide")));
+  assert.ok(vfx.particles.some((p) => p.sprite === "cutSlash"));
+}
+
+console.log("PASS: capture floats, death juice, crown, kill feedback");

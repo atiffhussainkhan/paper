@@ -265,7 +265,12 @@ export class Game {
       this.emit("death", {
         entityId: entity.id,
         isPlayer: entity.isPlayer,
+        victimName: entity.name,
         killedById: entity.killedBy?.id ?? null,
+        killedByIsPlayer: Boolean(entity.killedBy?.isPlayer),
+        killerPosition: entity.killedBy
+          ? { ...entity.killedBy.position }
+          : null,
         position: { ...entity.position },
         trail: entity.trail.points.map((point) => ({ x: point.x, y: point.y })),
         trailWidth: entity.trail.width,

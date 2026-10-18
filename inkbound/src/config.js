@@ -61,6 +61,11 @@ export const CONFIG = Object.freeze({
   botCutterMinRange: 90,
   botCutterRange: 200,
   botCutterMaxSelfTrail: 18,
+  // Late match: Moss biases toward cutting the player once aggression crosses this.
+  botCutterPlayerHuntThreshold: 0.42,
+  botCutterPlayerScoreBias: 0.68,
+  // Edge / looper loops grow slightly with aggression so late-game stays lively.
+  botLateLoopBoost: 0.18,
   botMaxOutTime: 3.1,
   botMaxOutTimeBonus: 0.45,
   botSpeedBonus: 12,

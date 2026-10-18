@@ -134,6 +134,16 @@ export class Input {
     this.onBlur = () => {
       this.keys.clear();
       this.pointer.down = false;
+      this.pointer.active = false;
+      this.latchedHeading = null;
+    };
+
+    this.onVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        this.keys.clear();
+        this.pointer.down = false;
+        this.latchedHeading = null;
+      }
     };
 
     window.addEventListener("keydown", this.onKeyDown, { passive: false });
@@ -147,6 +157,7 @@ export class Input {
     window.addEventListener("touchend", this.onTouchEnd, { passive: true });
     window.addEventListener("touchcancel", this.onTouchEnd, { passive: true });
     window.addEventListener("blur", this.onBlur);
+    document.addEventListener("visibilitychange", this.onVisibility);
   }
 
   directionForEvent(event) {
@@ -194,12 +205,13 @@ export class Input {
     const dx = this.pointer.x - origin.x;
     const dy = this.pointer.y - origin.y;
     const dist = Math.hypot(dx, dy);
-    if (dist > 8) return Math.atan2(dy, dx);
+    const minRadius = this.pointer.type === "touch" ? 11 : 8;
+    if (dist > minRadius) return Math.atan2(dy, dx);
 
     if (this.pointer.type === "touch" && this.touchStart) {
       const dragX = this.pointer.x - this.touchStart.x;
       const dragY = this.pointer.y - this.touchStart.y;
-      if (Math.hypot(dragX, dragY) > 10) return Math.atan2(dragY, dragX);
+      if (Math.hypot(dragX, dragY) > 12) return Math.atan2(dragY, dragX);
     }
     return null;
   }
@@ -226,8 +238,9 @@ export class Input {
       if (pointerFresh) {
         const px = Math.cos(pointerAngle);
         const py = Math.sin(pointerAngle);
-        const bx = px * 0.42 + nkx * 0.88;
-        const by = py * 0.42 + nky * 0.88;
+        const pointerWeight = this.pointer.type === "touch" ? 0.56 : 0.42;
+        const bx = px * pointerWeight + nkx * (1.12 - pointerWeight * 0.5);
+        const by = py * pointerWeight + nky * (1.12 - pointerWeight * 0.5);
         if (Math.hypot(bx, by) > 0.05) {
           this.latchedHeading = null;
           return Math.atan2(by, bx);
@@ -264,5 +277,6 @@ export class Input {
     window.removeEventListener("touchend", this.onTouchEnd);
     window.removeEventListener("touchcancel", this.onTouchEnd);
     window.removeEventListener("blur", this.onBlur);
+    document.removeEventListener("visibilitychange", this.onVisibility);
   }
 }

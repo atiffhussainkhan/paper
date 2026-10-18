@@ -1,3 +1,5 @@
+import { Sfx } from "./Sfx.js";
+
 // Presentation-only juice. Consumes Game events (capture, death) and draws in
 // world space; it never mutates the simulation.
 //
@@ -22,6 +24,9 @@ export const VFX_TIMING = Object.freeze({
   crownPopDuration: 0.3,
   // A challenger must lead by this much share before the crown moves.
   crownSwitchMargin: 0.002,
+
+  killPopDuration: 1.35,
+  killPopRise: 62,
 });
 
 const MAX_PARTICLES = 700;
@@ -57,11 +62,12 @@ export function retainUnownedCells(cells, owners) {
 }
 
 export class Vfx {
-  constructor(colors, config, random = Math.random, catalog = null) {
+  constructor(colors, config, random = Math.random, catalog = null, sfx = null) {
     this.colors = colors;
     this.config = config;
     this.random = random;
     this.catalog = catalog;
+    this.sfx = sfx ?? (typeof window !== "undefined" ? new Sfx() : null);
     this.reset();
   }
 
@@ -79,6 +85,7 @@ export class Vfx {
     this.grid = null;
     this.particles = [];
     this.floats = [];
+    this.killPops = [];
     this.dissolves = [];
     this.rings = [];
     this.ghosts = [];
@@ -100,6 +107,7 @@ export class Vfx {
     this.updateCrown(game, dt);
 
     for (const item of this.floats) item.age += dt;
+    for (const item of this.killPops) item.age += dt;
     for (const item of this.dissolves) item.age += dt;
     for (const item of this.rings) item.age += dt;
     for (const item of this.ghosts) item.age += dt;
@@ -114,6 +122,7 @@ export class Vfx {
     }
 
     this.floats = this.floats.filter((f) => f.age < VFX_TIMING.floatDuration);
+    this.killPops = this.killPops.filter((k) => k.age < VFX_TIMING.killPopDuration);
     this.dissolves = this.dissolves.filter((d) => d.age < VFX_TIMING.dissolveDuration);
     this.rings = this.rings.filter((r) => r.age < r.duration);
     this.ghosts = this.ghosts.filter((g) => (
@@ -132,6 +141,7 @@ export class Vfx {
       age: 0,
     });
     // Indexed claim spark at the seal point.
+    this.sfx?.playCapture?.();
     this.spawnParticle({
       x: event.position.x,
       y: event.position.y,
@@ -167,6 +177,8 @@ export class Vfx {
 
   onDeath(event, grid) {
     const { position, wetColor } = event;
+    if (event.isPlayer) this.sfx?.playDeath?.();
+    else if (event.killedByIsPlayer) this.onPlayerKill(event);
 
     // Phase 1 — trail dissolve.
     if (event.trail.length > 1) {
@@ -271,6 +283,49 @@ export class Vfx {
     }
   }
 
+  onPlayerKill(event) {
+    this.sfx?.playKill?.();
+    const anchor = event.killerPosition ?? event.position;
+    const label = event.victimName ? `${event.victimName} cut` : "Cut";
+    this.killPops.push({
+      text: label,
+      anchor: { ...anchor },
+      age: 0,
+    });
+    const slashCount = 5;
+    for (let i = 0; i < slashCount; i += 1) {
+      const angle = (i / slashCount) * Math.PI * 2 + this.random() * 0.35;
+      const speed = 95 + this.random() * 120;
+      this.spawnParticle({
+        x: anchor.x,
+        y: anchor.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: 16 + this.random() * 10,
+        life: 0.38 + this.random() * 0.28,
+        delay: i * 0.018,
+        drag: 4.2,
+        color: this.colors["--state-cut"] ?? event.wetColor,
+        streak: true,
+        sprite: "cutSlash",
+        flash: true,
+      });
+    }
+    this.spawnParticle({
+      x: anchor.x,
+      y: anchor.y,
+      vx: 0,
+      vy: 0,
+      radius: 28,
+      life: 0.42,
+      delay: 0,
+      drag: 6,
+      color: this.colors["--bone-100"],
+      sprite: "deathBurst",
+      flash: true,
+    });
+  }
+
   spawnParticle({ delay = 0, ...rest }) {
     if (this.particles.length >= MAX_PARTICLES) this.particles.shift();
     this.particles.push({ ...rest, age: -delay });
@@ -359,6 +414,7 @@ export class Vfx {
     for (const ring of this.rings) this.drawRing(context, ring);
     this.drawParticles(context);
     this.drawCrown(context, game, positionOf);
+    this.drawKillPops(context);
     this.drawFloats(context, game, positionOf);
   }
 
@@ -533,6 +589,47 @@ export class Vfx {
       context.fill();
     }
 
+    context.restore();
+  }
+
+  drawKillPops(context) {
+    if (!this.killPops.length) return;
+    context.save();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.font = "bold 28px 'Instrument Sans', system-ui, sans-serif";
+    context.lineJoin = "round";
+    const cutColor = this.colors["--state-cut"] ?? "#ff6a4a";
+    const slashArt = this.art("cutSlash");
+    for (const item of this.killPops) {
+      const t = clamp01(item.age / VFX_TIMING.killPopDuration);
+      const rise = easeOutCubic(t) * VFX_TIMING.killPopRise;
+      const fadeIn = clamp01(item.age / 0.08);
+      const fadeOut = 1 - clamp01((t - 0.5) / 0.5);
+      const pop = easeOutBack(clamp01(item.age / 0.22));
+      const scale = 0.82 + 0.28 * pop;
+      const x = item.anchor.x;
+      const y = item.anchor.y - 28 - rise;
+      context.save();
+      context.translate(x, y);
+      context.scale(scale, scale);
+      context.globalAlpha = fadeIn * fadeOut;
+      if (slashArt && item.age < 0.35) {
+        const burstT = clamp01(item.age / 0.35);
+        const size = 34 * (1 - burstT * 0.4);
+        context.save();
+        context.globalAlpha = (1 - burstT) * 0.85;
+        context.globalCompositeOperation = "lighter";
+        context.drawImage(slashArt, -size * 0.5, -size * 0.55, size, size);
+        context.restore();
+      }
+      context.lineWidth = 6;
+      context.strokeStyle = this.colors["--sumi-950"];
+      context.strokeText(item.text, 0, 0);
+      context.fillStyle = cutColor;
+      context.fillText(item.text, 0, 0);
+      context.restore();
+    }
     context.restore();
   }
 

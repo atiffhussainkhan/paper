@@ -162,14 +162,17 @@ function findNearestOwnedPoint(grid, ownerId, fromPoint, fallback) {
   return bestPoint;
 }
 
-function loopDistanceScale(brain) {
-  return brain.openingScale ?? 1;
+function loopDistanceScale(brain, config) {
+  const opening = brain.openingScale ?? 1;
+  const aggression = brain.aggression ?? 0;
+  const lateBoost = 1 + Math.max(0, aggression - 0.5) * (config.botLateLoopBoost ?? 0.18);
+  return opening * lateBoost;
 }
 
 function makeEdgeFarmerLoop(brain, arena, config) {
   const random = brain.random;
   const anchor = brain.safeAnchor;
-  const scale = loopDistanceScale(brain);
+  const scale = loopDistanceScale(brain, config);
   const rimMargin = config.botEdgeRimMargin ?? config.bodyRadius * 3.4;
   const maxRing = arena.radius - rimMargin;
   const distFromCenter = Math.hypot(anchor.x, anchor.y);
@@ -211,7 +214,7 @@ function makeEdgeFarmerLoop(brain, arena, config) {
 function makeSmallLooperLoop(brain, arena, config) {
   const random = brain.random;
   const anchor = brain.safeAnchor;
-  const scale = loopDistanceScale(brain);
+  const scale = loopDistanceScale(brain, config);
   const margin = config.bodyRadius * 3.2;
   const outDist = (config.botSmallLoopOutDistance ?? config.botLoopOutDistance * 0.72) * scale * (0.88 + random() * 0.22);
   const sideDist = (config.botSmallLoopSideDistance ?? config.botLoopSideDistance * 0.74) * scale * (0.88 + random() * 0.22);
@@ -254,7 +257,7 @@ function makeSmallLooperLoop(brain, arena, config) {
 function makeOpportunisticCutterLoop(brain, arena, config) {
   const random = brain.random;
   const anchor = brain.safeAnchor;
-  const scale = loopDistanceScale(brain);
+  const scale = loopDistanceScale(brain, config);
   const margin = config.bodyRadius * 3.2;
   const outDist = (config.botCutterOutDistance ?? config.botLoopOutDistance * 0.94) * scale * (0.86 + random() * 0.26);
   const sideDist = (config.botCutterSideDistance ?? config.botLoopSideDistance * 0.96) * scale * (0.86 + random() * 0.26);
@@ -299,7 +302,7 @@ function makeLoopForRole(brain, arena, config) {
   return makeOpportunisticCutterLoop(brain, arena, config);
 }
 
-function findOpportunisticCutTarget(bot, rivals, arena, config, cutterRange) {
+function findOpportunisticCutTarget(bot, rivals, arena, config, cutterRange, hunt = null) {
   const maxSelfTrail = config.botCutterMaxSelfTrail ?? 26;
   if (bot.trail.points.length > maxSelfTrail) return null;
 
@@ -309,6 +312,12 @@ function findOpportunisticCutTarget(bot, rivals, arena, config, cutterRange) {
   const ownEndSeg = olderTrailEndSegment(bot, config);
   const ownClearance = config.bodyRadius + config.trailWidth * 0.5 + 18;
   const headGrace = (config.enemyHeadGracePoints ?? 4) + 3;
+  const aggression = hunt?.aggression ?? 0;
+  const huntPlayer = Boolean(
+    hunt?.huntPlayer
+    && aggression >= (config.botCutterPlayerHuntThreshold ?? 0.42),
+  );
+  const playerBias = config.botCutterPlayerScoreBias ?? 0.68;
 
   let bestTarget = null;
   let bestScore = Infinity;
@@ -333,7 +342,12 @@ function findOpportunisticCutTarget(bot, rivals, arena, config, cutterRange) {
       }
 
       const distFromAnchor = Math.hypot(pt.x - bot.brain.safeAnchor.x, pt.y - bot.brain.safeAnchor.y);
-      const score = Math.sqrt(distSq) + distFromAnchor * 0.28;
+      let score = Math.sqrt(distSq) + distFromAnchor * 0.28;
+      if (huntPlayer && rival.isPlayer) {
+        score *= playerBias;
+      } else if (!rival.isPlayer && huntPlayer) {
+        score *= 1.08;
+      }
       if (score < bestScore) {
         bestScore = score;
         bestTarget = { x: pt.x, y: pt.y, rivalId: rival.id };
@@ -503,6 +517,7 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
 
     const brain = bot.brain;
     brain.openingScale = openingScale;
+    brain.aggression = difficulty.aggression;
     brain.age += dt;
 
     if (!bot.outsideOwnTerritory) {
@@ -541,8 +556,11 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
     }
 
     const openingOutBonus = matchAge < openingGrace ? (1 - openingScale) * 0.85 : 0;
+    const looperUrgency = brain.role === "small-looper" && difficulty.aggression > 0.62
+      ? 0.22 * (difficulty.aggression - 0.62)
+      : 0;
     const maxOutTime = brain.role === "small-looper"
-      ? 2.25 + outTimeBonus * 0.35 + openingOutBonus
+      ? 2.25 + outTimeBonus * 0.35 + openingOutBonus - looperUrgency
       : brain.role === "edge-farmer"
         ? difficulty.maxOutTime + 0.35 + openingOutBonus * 0.5
         : difficulty.maxOutTime + openingOutBonus * 0.35;
@@ -584,6 +602,7 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
         arena,
         config,
         difficulty.cutterRange,
+        { aggression: difficulty.aggression, huntPlayer: huntAllowed },
       );
       if (cutTarget) {
         brain.mode = "cutting";
