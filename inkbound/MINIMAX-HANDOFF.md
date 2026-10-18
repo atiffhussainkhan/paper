@@ -5,6 +5,8 @@
 
 ## Task
 
+Embed world map meta like Paper.io-class country/world map; wire to stages/best progress.
+
 SYS5 — System Analyst: integrate SYS2–SYS4, verify, and ship on `cursor/inkbound-final-dev-c3dd`.
 
 1. Wait for SYS2 (world map), SYS3 (flow screens), and SYS4 (gameplay parity) commits. SYS3's report is `docs/SYS_AUDIT_3_FLOW.md` (not `SYS_AUDIT_3.md`). SYS2 and SYS4 reports, if named `docs/SYS_AUDIT_2.md` and `docs/SYS_AUDIT_4.md`, still belong in the rollup.
@@ -13,6 +15,15 @@ SYS5 — System Analyst: integrate SYS2–SYS4, verify, and ship on `cursor/inkb
 4. Browser proof on `http://127.0.0.1:8765/`: title → world map → select region → home → Play → claim → death → Home. The world map must be embedded in the game, not a separate page.
 5. Write `docs/SYS_AUDIT_MASTER.md`: does the build fulfill every user requirement (YES/NO table). Exact Paper.io 2 copy is NO, with what is still absent (online multiplayer and the rest). World map status.
 6. Update PR #3. The local server must serve the latest tree.
+
+## SYS2 — world map (Cursor)
+
+**Status:** `done`
+**Task:** Embed world map meta like Paper.io-class country/world map; wire to stages/best progress.
+**Report:** `docs/SYS_AUDIT_2_WORLDMAP.md` (also `docs/SYS_AUDIT_2.md`)
+**Runnable URL:** `http://127.0.0.1:8765/`
+
+The atlas was missing. Home → World map draws six shores from catalog parchment, skies, terrain, and the minimap ring. Stage credit locks and fills them. Best % is the claim line. Choosing an open shore sets the next arena. Play still starts the match. Map is also on the result card.
 
 ## SYS3 — flow screens (Cursor)
 

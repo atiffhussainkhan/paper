@@ -1655,7 +1655,16 @@ body[data-mode="ink"] #hud {
 .shore.is-locked .shore__plate,
 .shore.is-locked .shore__terrain,
 .shore.is-locked .shore__accent {
-  filter: grayscale(0.95) brightness(0.52);
+  filter: grayscale(0.25) brightness(0.82);
+}
+
+.shore.is-locked::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  background: rgb(11 12 14 / 0.38);
+  pointer-events: none;
 }
 
 .shore__plate,
@@ -1691,8 +1700,8 @@ body[data-mode="ink"] #hud {
 
 .shore__ink {
   top: auto;
-  height: var(--shore-fill, 0%);
-  background: linear-gradient(to top, rgb(217 69 43 / 0.82), rgb(217 69 43 / 0.18));
+  height: min(var(--shore-fill, 0%), 78%);
+  background: linear-gradient(to top, rgb(217 69 43 / 0.78), rgb(217 69 43 / 0.12));
 }
 
 .shore__medal {
@@ -2047,18 +2056,16 @@ body[data-mode="ink"] #hud {
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     aspect-ratio: auto;
+    width: 100%;
+    height: auto;
+    max-height: none;
     min-height: 0;
     padding: 8px;
     overflow: visible;
   }
 
   .map-compass {
-    position: absolute;
-    left: auto;
-    top: 8px;
-    right: 8px;
-    width: 46px;
-    transform: none;
+    display: none;
   }
 
   .shore,
@@ -2072,7 +2079,7 @@ body[data-mode="ink"] #hud {
     left: auto;
     top: auto;
     width: auto;
-    height: 128px;
+    height: 156px;
     clip-path: none;
     border-radius: 16px;
   }
