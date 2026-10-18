@@ -242,6 +242,9 @@ export class Hud {
       this.overlayUnlocks.hidden = true;
       this.overlayUnlocks.replaceChildren();
     }
+    // Restart clears the live hint, then the saved flag puts it back if the
+    // player has already closed a loop. A reload was already doing this.
+    this.applyFtueState();
   }
 
   ensureRow(entity) {

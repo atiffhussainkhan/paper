@@ -29,6 +29,7 @@ assert.match(hud, /setBest\(/);
 assert.match(hud, /setStage\(/);
 assert.match(hud, /renderUnlockCelebration/);
 assert.match(hud, /ftueClaimDone/);
+assert.match(hud, /reset\(\) \{[\s\S]*?applyFtueState\(\);\s*\}/);
 assert.match(hud, /data-hud="best"/);
 assert.match(css, /\.hud-overlay__unlocks/);
 assert.match(css, /--art-unlock-burst/);
