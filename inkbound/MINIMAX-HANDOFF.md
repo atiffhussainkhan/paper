@@ -1,7 +1,7 @@
 # MINIMAX-HANDOFF — Inkbound RULE1 match start
 
 ## Status
-`awaiting-cursor`
+`done`
 
 ## Task
 
@@ -30,6 +30,14 @@ Only if a clear bug blocks match start. No new features.
 ### Constraints
 - Brand **Inkbound**; no Paper.io IP
 - **Godot:** do not fill gameplay stubs
+
+## RULE1 — match start (Cursor)
+
+**Status:** `done`
+**Verdict:** **PARTIAL** (5 PASS, 2 PARTIAL, 0 FAIL)
+**Audited game bytes:** `21cf6b0867c1dcb08bd1131313719bc1198d2614`
+
+First painted frame (animation frame 2) is already the match: vermilion spawn disk, camera on the bead, three named bots, 1.0% and the board, steering live. Arena chrome is partial because a 15-plate catalog strip covers the lower playfield. The FTUE line shows on desktop and is `display: none` at ≤640px. Nothing blocked start, so no gameplay change. Report: `docs/RULE_AUDIT_1_START.md`. Shots: `/opt/cursor/artifacts/rule1_start_*.png`.
 
 ## RULE5 — runnable link + full session (Cursor)
 
