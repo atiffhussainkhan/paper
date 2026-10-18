@@ -115,11 +115,26 @@ export function recordStageRun(profile, runShare) {
     stageCredit = 0;
   }
 
+  const patch = { stageIndex, stageCredit };
+  if (cleared) {
+    const selectedRaw = Number(
+      profile?.get?.("selectedStageIndex", before.stageIndex)
+      ?? profile?.selectedStageIndex
+      ?? before.stageIndex,
+    );
+    const selected = Number.isFinite(selectedRaw) ? Math.floor(selectedRaw) : before.stageIndex;
+    // Follow the campaign when the next arena was the shore that just sealed.
+    if (selected === before.stageIndex) {
+      patch.selectedStageIndex = Math.min(stageIndex, STAGES.length - 1);
+    }
+  }
+
   if (typeof profile?.update === "function") {
-    profile.update({ stageIndex, stageCredit });
+    profile.update(patch);
   } else if (profile && typeof profile === "object") {
     profile.stageIndex = stageIndex;
     profile.stageCredit = stageCredit;
+    if (patch.selectedStageIndex != null) profile.selectedStageIndex = patch.selectedStageIndex;
   }
 
   const after = getStageStatus(profile);
@@ -140,5 +155,89 @@ export function recordStageRun(profile, runShare) {
     progress: after.progress,
     progressPct: after.progressPct,
     message,
+  };
+}
+
+export function isStageUnlocked(profile, index) {
+  const i = Math.floor(Number(index));
+  if (!Number.isFinite(i) || i < 0 || i >= STAGES.length) return false;
+  return i <= getStageStatus(profile).stageIndex;
+}
+
+// Conquest for one shore. Sealed shores are full. The frontier fills from
+// stage credit. bestPct is the player's record, shown beside that fill.
+export function regionConquest(profile, index) {
+  const i = Math.floor(Number(index));
+  const stage = STAGES[i];
+  if (!stage) return null;
+  const status = getStageStatus(profile);
+  const bestRaw = Number(profile?.get?.("bestPct", 0) ?? profile?.bestPct ?? 0);
+  const bestPct = Number.isFinite(bestRaw) ? Math.min(100, Math.max(0, bestRaw)) : 0;
+  const frontier = status.stageIndex;
+  const unlocked = i <= frontier;
+  const sealed = unlocked && (i < frontier || frontier >= STAGES.length);
+  const active = unlocked && !sealed && i === frontier;
+  const fill = sealed ? 1 : active ? status.progress : 0;
+  return {
+    index: i,
+    stage,
+    unlocked,
+    sealed,
+    active,
+    locked: !unlocked,
+    fill,
+    fillPct: Math.round(fill * 100),
+    stageCredit: active ? status.stageCredit : sealed ? stage.completionTarget : 0,
+    completionTarget: stage.completionTarget,
+    bestPct,
+    frontier,
+  };
+}
+
+export function getSelectedStageIndex(profile) {
+  const frontier = getStageStatus(profile).stageIndex;
+  const maxSelectable = Math.min(Math.max(frontier, 0), STAGES.length - 1);
+  const raw = Number(profile?.get?.("selectedStageIndex", NaN) ?? profile?.selectedStageIndex);
+  if (!Number.isFinite(raw)) return maxSelectable;
+  const idx = Math.floor(raw);
+  if (!isStageUnlocked(profile, idx)) return maxSelectable;
+  return idx;
+}
+
+export function getSelectedStage(profile) {
+  return STAGES[getSelectedStageIndex(profile)];
+}
+
+export function selectStage(profile, index) {
+  const i = Math.floor(Number(index));
+  if (!isStageUnlocked(profile, i)) return false;
+  if (typeof profile?.update === "function") profile.update({ selectedStageIndex: i });
+  else if (profile && typeof profile === "object") profile.selectedStageIndex = i;
+  return true;
+}
+
+export function nextArenaLabel(profile) {
+  const region = regionConquest(profile, getSelectedStageIndex(profile));
+  const mark = region.sealed ? "sealed" : `${region.fillPct}%`;
+  return `Stage ${region.index + 1} · ${region.stage.name} · ${mark}`;
+}
+
+// HUD / title view of the shore the next match will use.
+export function arenaStageStatus(profile) {
+  const selected = getSelectedStageIndex(profile);
+  const region = regionConquest(profile, selected);
+  const frontier = getStageStatus(profile);
+  return {
+    ...frontier,
+    stageIndex: selected,
+    stageNumber: selected + 1,
+    stage: region.stage,
+    stageName: region.stage.name,
+    stageCredit: region.stageCredit,
+    completionTarget: region.completionTarget,
+    progress: region.fill,
+    progressPct: region.fillPct,
+    frontierIndex: frontier.stageIndex,
+    frontierName: frontier.stageName,
   };
 }

@@ -9,18 +9,30 @@ export const BOT_BEAD_FALLBACK = Object.freeze({
   2: "char-plate-knight",
   3: "char-toon-female-adventurer",
   4: "char-toon-zombie",
+  5: "char-toon-male-adventurer",
+  6: "char-toon-female-person",
+  7: "char-toon-robot",
+  8: "char-plate-dragon",
 });
 
 export const BOT_ORB_FALLBACK = Object.freeze({
   2: "char-bead-blue",
   3: "char-bead-blue-alt",
   4: "char-shape-squircle",
+  5: "char-bead-red-alt",
+  6: "char-shape-circle",
+  7: "char-bead-blue",
+  8: "char-shape-squircle",
 });
 
 export const BOT_PATTERN_FALLBACK = Object.freeze({
   2: "skin-paint-circle",
   3: "skin-paint-splat",
   4: "skin-paint-drips",
+  5: "skin-paint-circle",
+  6: "skin-paint-splat",
+  7: "skin-paint-drips",
+  8: "skin-paint-circle",
 });
 
 // CSS custom properties fed by catalog ids. Paths are resolved to absolute

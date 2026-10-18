@@ -1,6 +1,6 @@
 // Cosmetic player inks. Skins only recolor the player's bead, trail and
 // territory; they never change gameplay. Hues stay clear of the bot inks
-// (Tide teal, Ochre, Moss) so color-vision separation holds on the plane.
+// (Tide, Ochre, Moss, Bramble, Soot, Lichen, Mulberry) so the plane stays readable.
 //
 // Unlock rule (Phase 1): a skin is unlocked once the profile's best share of
 // the plane reaches its `unlockPct`. Unlocks are persisted and never revoked.
@@ -57,6 +57,28 @@ export function equipSkin(profile, id) {
 
 // Record a finished run. `share` is 0..1. Returns what changed so the UI can
 // say "New best" or announce unlocks.
+// The next locked figure, scored the same way unlocks are: best % of the plane.
+// There is no price. A finished set says so instead of inventing a shop.
+export function nextInkChallenge(bestPct) {
+  const best = Number(bestPct) || 0;
+  const next = SKINS.find((skin) => skin.unlockPct > best);
+  if (!next) {
+    return {
+      done: true,
+      name: "All inks open",
+      gate: "Every figure on this set is earned.",
+      remain: "",
+    };
+  }
+  const remain = Math.max(0, Math.round((next.unlockPct - best) * 10) / 10);
+  return {
+    done: false,
+    name: next.name,
+    gate: `Reach ${next.unlockPct.toFixed(1)}% of the plane.`,
+    remain: `${remain.toFixed(1)}% to go`,
+  };
+}
+
 export function recordRun(profile, share) {
   const pct = Math.round(Math.max(0, Math.min(1, share || 0)) * 1000) / 10;
   const previousBest = profile.get("bestPct", 0);

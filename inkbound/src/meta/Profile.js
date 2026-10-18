@@ -17,6 +17,8 @@ export const PROFILE_DEFAULTS = Object.freeze({
   unlockedSkinIds: Object.freeze(["seal"]),
   stageIndex: 0,
   stageCredit: 0,
+  // Which unlocked shore the next match uses. Missing saves follow stageIndex.
+  selectedStageIndex: 0,
   // Once the player closes a loop and gains territory, the claim hint stays off.
   ftueClaimDone: false,
 });
@@ -50,9 +52,14 @@ export class Profile {
     } catch {
       stored = null;
     }
-    if (!stored || typeof stored !== "object" || Array.isArray(stored)) stored = {};
-    this.data = { ...clonePlain(PROFILE_DEFAULTS), ...stored };
+    const storedObject = stored && typeof stored === "object" && !Array.isArray(stored)
+      ? stored
+      : {};
+    const hadSelection = Object.prototype.hasOwnProperty.call(storedObject, "selectedStageIndex");
+    this.data = { ...clonePlain(PROFILE_DEFAULTS), ...storedObject };
     this.sanitize();
+    // Older profiles predate the atlas. Keep their frontier as the next arena.
+    if (!hadSelection) this.data.selectedStageIndex = this.data.stageIndex;
     return this;
   }
 
@@ -76,6 +83,10 @@ export class Profile {
     const stageCredit = Number(this.data.stageCredit);
     this.data.stageCredit = Number.isFinite(stageCredit) && stageCredit >= 0
       ? stageCredit
+      : 0;
+    const selected = Number(this.data.selectedStageIndex);
+    this.data.selectedStageIndex = Number.isFinite(selected) && selected >= 0
+      ? Math.floor(selected)
       : 0;
     this.data.ftueClaimDone = Boolean(this.data.ftueClaimDone);
   }

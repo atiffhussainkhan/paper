@@ -5,7 +5,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { SKINS } from "../src/meta/Skins.js";
 import { STAGES } from "../src/meta/Stages.js";
-import { BOT_BEAD_FALLBACK, BOT_PATTERN_FALLBACK, CSS_IMAGE_VARS } from "../src/assets/ImageCatalog.js";
+import {
+  BOT_BEAD_FALLBACK,
+  BOT_ORB_FALLBACK,
+  BOT_PATTERN_FALLBACK,
+  CSS_IMAGE_VARS,
+} from "../src/assets/ImageCatalog.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const indexPath = join(root, "assets/IMAGE_INDEX.json");
@@ -104,11 +109,13 @@ assert.equal(index.bindings.fallback.background, "bg-plane-fallback");
 assert.ok(byId.has(index.bindings.characters.defaultBead));
 assert.ok(byId.has(index.bindings.characters.botBead));
 assert.ok(byId.has(index.bindings.characters.shapeAccent));
-for (const id of ["2", "3", "4"]) {
+for (const id of Object.keys(BOT_BEAD_FALLBACK)) {
   assert.equal(index.bindings.characters.botBeads[id], BOT_BEAD_FALLBACK[id]);
   assert.equal(index.bindings.characters.botPatterns[id], BOT_PATTERN_FALLBACK[id]);
+  assert.equal(index.bindings.characters.botOrbs[id], BOT_ORB_FALLBACK[id]);
   assert.ok(byId.has(index.bindings.characters.botBeads[id]));
   assert.ok(byId.has(index.bindings.characters.botPatterns[id]));
+  assert.ok(byId.has(index.bindings.characters.botOrbs[id]));
 }
 
 const css = readFileSync(join(root, "css/style.css"), "utf8");

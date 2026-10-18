@@ -38,7 +38,9 @@ export const CONFIG = Object.freeze({
   playerSelfMinTrailLength: 220,
   enemyHeadGracePoints: 4,
 
-  botCount: 3,
+  // Named roster is Tide through Mulberry (7). Lower this to 3 for the
+  // Phase 0 ring. Game.reset clamps to the specs that exist.
+  botCount: 7,
   botInitialSpawnRadius: 920,
   botMinPlayerSeparation: 520,
   botLoopOutDistance: 185,
@@ -115,4 +117,8 @@ export const ENTITY_SPECS = Object.freeze([
   { id: 2, name: "Tide", dryToken: "--ink-bot-1", wetToken: "--ink-bot-1-wet", role: "edge-farmer" },
   { id: 3, name: "Ochre", dryToken: "--ink-bot-2", wetToken: "--ink-bot-2-wet", role: "small-looper" },
   { id: 4, name: "Moss", dryToken: "--ink-bot-3", wetToken: "--ink-bot-3-wet", role: "opportunistic-cutter" },
+  { id: 5, name: "Bramble", dryToken: "--ink-bot-4", wetToken: "--ink-bot-4-wet", role: "edge-farmer" },
+  { id: 6, name: "Soot", dryToken: "--ink-bot-5", wetToken: "--ink-bot-5-wet", role: "small-looper" },
+  { id: 7, name: "Lichen", dryToken: "--ink-bot-6", wetToken: "--ink-bot-6-wet", role: "opportunistic-cutter" },
+  { id: 8, name: "Mulberry", dryToken: "--ink-bot-7", wetToken: "--ink-bot-7-wet", role: "edge-farmer" },
 ]);

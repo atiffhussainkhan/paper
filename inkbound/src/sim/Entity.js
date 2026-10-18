@@ -4,6 +4,7 @@ export class Entity {
   constructor(spec, position, heading, speed, config) {
     this.id = spec.id;
     this.name = spec.name;
+    this.role = spec.role ?? null;
     this.isPlayer = spec.id === 1;
     this.color = spec.color;
     this.wetColor = spec.wetColor;

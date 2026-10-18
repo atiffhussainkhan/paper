@@ -35,6 +35,7 @@ export class Game {
     this.playerClaimed = false;
     this.matchAge = 0;
     this.events = [];
+    this.killFeed = [];
     this.lastCapture = null;
 
     const player = this.createEntity(ENTITY_SPECS[0], { x: 0, y: 0 }, -0.2);
@@ -42,19 +43,34 @@ export class Game {
     this.runPeakShare = this.grid.share(player.id);
     this.entities.push(player);
 
+    const roster = this.botRoster();
     const spawnR = this.config.botInitialSpawnRadius ?? this.config.arenaRadius * 0.75;
-    const initialAngles = [-Math.PI * 0.72, -Math.PI * 0.05, Math.PI * 0.62];
-    for (let index = 0; index < this.config.botCount; index += 1) {
-      const angle = initialAngles[index];
+    for (let index = 0; index < roster.length; index += 1) {
+      const angle = -Math.PI * 0.72 + (index * Math.PI * 2) / roster.length;
       const point = { x: Math.cos(angle) * spawnR, y: Math.sin(angle) * spawnR };
-      this.spawnBot(ENTITY_SPECS[index + 1], point);
+      this.spawnBot(roster[index], point);
     }
   }
 
-  // Home / title. Tick, bot headings, and wet trails all require "playing".
+  botRoster() {
+    const named = ENTITY_SPECS.filter((spec) => spec.role !== "player");
+    const count = Math.max(0, Math.min(named.length, this.config.botCount ?? named.length));
+    return named.slice(0, count);
+  }
+
+  // Shell screens. Tick, bot headings, and wet trails all require "playing".
   // reset() is the cold spawn that opens a match.
+  // title | map | howto stay frozen. dead | won are set when the life ends.
   holdForTitle() {
     this.state = "title";
+  }
+
+  holdShell(name) {
+    if (name === "title") {
+      this.state = "title";
+      return;
+    }
+    if (name === "map" || name === "howto") this.state = name;
   }
 
   createEntity(spec, position, heading) {
@@ -130,6 +146,12 @@ export class Game {
     return null;
   }
 
+  noteKill(text, isPlayer) {
+    if (!text) return;
+    this.killFeed.push({ text, isPlayer: Boolean(isPlayer), at: this.matchAge });
+    if (this.killFeed.length > 5) this.killFeed.splice(0, this.killFeed.length - 5);
+  }
+
   // Presentation-only event queue. Headless runs never drain it, so it is
   // capped to stay bounded.
   emit(type, data) {
@@ -172,7 +194,7 @@ export class Game {
   }
 
   tick(dt) {
-    // "title" and "over" stay frozen: no steering, bots, or wet trails.
+    // title, map, howto, dead, and won stay frozen: no steering, bots, or wet trails.
     if (this.state !== "playing") return;
     const player = this.player;
     this.matchAge = (this.matchAge ?? 0) + dt;
@@ -270,9 +292,10 @@ export class Game {
       if (entity.isPlayer) {
         this.finalShare = entity.deathShare ?? this.grid.share(entity.id);
         this.runPeakShare = Math.max(this.runPeakShare ?? 0, this.finalShare);
-        this.state = "over";
+        this.state = "dead";
         this.outcome = { type: "death", title: entity.deathReason };
       }
+      this.noteKill(entity.deathReason, entity.isPlayer);
       this.emit("death", {
         entityId: entity.id,
         isPlayer: entity.isPlayer,
@@ -297,13 +320,13 @@ export class Game {
       entity.deathApplied = true;
     }
 
-    // 8. Replace dead inks on wholly unowned ground to maintain three bots.
+    // 8. Replace dead inks on wholly unowned ground so the roster stays full.
     //    A sealed plane has nowhere legal to spawn; a same-tick disk would
     //    steal the win.
     const planeSealed = Boolean(player?.alive)
       && this.grid.share(player.id) >= this.config.winShare;
     if (!planeSealed && this.state === "playing") {
-      for (const spec of ENTITY_SPECS.slice(1, this.config.botCount + 1)) {
+      for (const spec of this.botRoster()) {
         const bot = this.entities.find((entity) => entity.id === spec.id);
         if (!bot || !bot.alive) this.spawnBot(spec);
       }
@@ -313,7 +336,7 @@ export class Game {
     if (player.alive && this.grid.share(player.id) >= this.config.winShare) {
       this.finalShare = this.grid.share(player.id);
       this.runPeakShare = Math.max(this.runPeakShare ?? 0, this.finalShare);
-      this.state = "over";
+      this.state = "won";
       this.outcome = { type: "win", title: "The plane is yours." };
     }
   }

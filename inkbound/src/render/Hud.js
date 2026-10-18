@@ -9,9 +9,13 @@ export class Hud {
     this.profile = null;
     this.percent = root.querySelector('[data-hud="percent"]');
     this.board = root.querySelector('[data-hud="board"]');
+    this.feed = root.querySelector('[data-hud="feed"]');
     this.hint = root.querySelector('[data-hud="hint"]');
     this.overlay = root.querySelector('[data-hud="overlay"]');
+    this.overlayKicker = root.querySelector('[data-hud="overlay-kicker"]');
     this.overlayTitle = root.querySelector('[data-hud="overlay-title"]');
+    this.overlayLine = root.querySelector('[data-hud="overlay-line"]');
+    this.overlayMedal = root.querySelector('[data-hud="overlay-medal"]');
     this.overlayStats = root.querySelector('[data-hud="overlay-stats"]');
     this.restart = root.querySelector('[data-hud="restart"]');
     this.home = root.querySelector('[data-hud="home"]');
@@ -34,6 +38,7 @@ export class Hud {
     this.rows = new Map();
     this.lastPercentText = "";
     this.lastOrderKey = "";
+    this.lastFeedKey = "";
     this.initialPlayerCells = null;
     this.playerVenturedOut = false;
     this.hasClaimed = false;
@@ -74,7 +79,7 @@ export class Hud {
 
     this.handleOverlayKeyDown = (event) => {
       if (!this.overlayVisible) return;
-      if (event.target?.closest?.('[data-hud="skins"], [data-hud="home"], [data-hud="menu"]')) return;
+      if (event.target?.closest?.('[data-hud="skins"], [data-hud="home"], [data-hud="menu"], [data-hud="map"]')) return;
       if (event.code === "Enter" || event.code === "Space") {
         event.preventDefault();
         this.handleRestartEvent(event);
@@ -253,6 +258,7 @@ export class Hud {
     this.renderStageSummary();
     this.lastPercentText = "";
     this.lastOrderKey = "";
+    this.lastFeedKey = "";
     this.initialPlayerCells = null;
     this.playerVenturedOut = false;
     this.hasClaimed = false;
@@ -260,8 +266,11 @@ export class Hud {
     if (this.hint) {
       this.hint.classList.remove("is-faded");
     }
+    if (this.restart) this.restart.textContent = "Restart";
+    this.setWinChrome(false);
     if (this.overlay) {
       this.overlay.hidden = true;
+      delete this.overlay.dataset.screen;
       this.overlay.classList.remove(
         "hud-overlay--win",
         "hud-overlay--new-best",
@@ -272,6 +281,11 @@ export class Hud {
       this.overlayUnlocks.hidden = true;
       this.overlayUnlocks.replaceChildren();
     }
+    if (this.feed) {
+      this.feed.hidden = true;
+      this.feed.replaceChildren();
+    }
+    if (this.overlayKicker) this.overlayKicker.textContent = "";
     // Restart clears the live hint, then the saved flag puts it back if the
     // player has already closed a loop. A reload was already doing this.
     this.applyFtueState();
@@ -354,7 +368,8 @@ export class Hud {
       }
     }
 
-    const rawShare = game.state === "over"
+    const ended = game.state === "dead" || game.state === "won" || game.state === "over";
+    const rawShare = ended
       ? game.finalShare
       : game.grid.share(playerId);
     const displayedShare = Math.max(0, Math.min(1, rawShare || 0));
@@ -393,17 +408,21 @@ export class Hud {
       }
     }
     this.lastOrderKey = orderKey;
+    this.renderFeed(game);
 
-    if (game.state === "over") {
+    if (ended) {
       if (!this.overlayVisible && this.overlay) {
         this.overlayVisible = true;
         this.overlay.hidden = false;
-        const won = game.outcome?.type === "win";
+        const won = game.state === "won" || game.outcome?.type === "win";
+        this.overlay.dataset.screen = won ? "won" : "dead";
         this.overlay.classList.toggle("hud-overlay--win", won);
-        if (this.overlayTitle) {
-          this.overlayTitle.textContent = game.outcome?.title
-            || (won ? "The plane is yours." : "You crossed your own line.");
-        }
+        this.setWinChrome(won);
+        if (this.restart) this.restart.textContent = won ? "Play again" : "Restart";
+        const cause = game.outcome?.title
+          || (won ? "The plane is yours." : "You crossed your own line.");
+        if (this.overlayKicker) this.overlayKicker.textContent = won ? "Sealed" : "Last line";
+        if (this.overlayTitle) this.overlayTitle.textContent = cause;
         if (this.overlayStats) {
           this.overlayStats.textContent = `${(Math.max(0, game.finalShare || 0) * 100).toFixed(1)}% of the plane.`;
         }
@@ -416,8 +435,36 @@ export class Hud {
     } else if (this.overlayVisible && this.overlay) {
       this.overlayVisible = false;
       this.overlay.hidden = true;
+      delete this.overlay.dataset.screen;
       this.overlay.classList.remove("hud-overlay--win");
+      this.setWinChrome(false);
+      if (this.restart) this.restart.textContent = "Restart";
     }
+  }
+
+  setWinChrome(won) {
+    if (this.overlayLine) {
+      this.overlayLine.hidden = !won;
+      this.overlayLine.textContent = won ? "Every cell on the plane carries your ink." : "";
+    }
+    if (this.overlayMedal) this.overlayMedal.hidden = !won;
+  }
+
+  renderFeed(game) {
+    if (!this.feed) return;
+    const lines = (game.killFeed || []).slice(-3);
+    const key = lines.map((line) => `${line.at}:${line.text}`).join("|");
+    if (key === this.lastFeedKey) return;
+    this.lastFeedKey = key;
+    this.feed.replaceChildren();
+    for (const line of lines) {
+      const item = document.createElement("li");
+      item.className = "hud-feed__line";
+      if (line.isPlayer || /your line/i.test(line.text)) item.classList.add("is-you");
+      item.textContent = line.text;
+      this.feed.appendChild(item);
+    }
+    this.feed.hidden = lines.length === 0;
   }
 
   destroy() {

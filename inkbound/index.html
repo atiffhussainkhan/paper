@@ -12,9 +12,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=title-gate-4">
+  <link rel="stylesheet" href="css/style.css?v=world-map-1">
 
-  <script type="module" src="src/main.js?v=title-gate-2"></script>
+  <script type="module" src="src/main.js?v=world-map-1"></script>
 </head>
 <body data-mode="title">
   <main class="stage">
@@ -48,7 +48,18 @@
           <p class="title-meta__stage" data-title="stage">Stage 1 · Quiet Plane · 0%</p>
         </div>
 
+        <section class="title-next" data-title="next" aria-label="Next ink challenge">
+          <p class="title-next__kicker">Next ink challenge</p>
+          <p class="title-next__name" data-title="next-name">Tideglass</p>
+          <p class="title-next__gate" data-title="next-gate">Reach 2.0% of the plane. 2.0% to go.</p>
+        </section>
+
         <button type="button" class="btn-play" data-title="play">Play</button>
+        <nav class="title-routes" aria-label="Menu">
+          <button type="button" class="btn-route" data-title="map">World map</button>
+          <button type="button" class="btn-route" data-title="ink">Ink</button>
+          <button type="button" class="btn-route" data-title="howto">How to play</button>
+        </nav>
         <p class="title-hint">Point to steer. Close the loop to claim.</p>
 
         <div class="title-ink">
@@ -57,6 +68,79 @@
         </div>
 
         <div class="hud-cast title-cast" data-hud="cast" aria-label="Figures"></div>
+      </div>
+    </section>
+
+    <!--
+      SYS2 world-map mount.
+      data-screen="map" and game.state "map" while this screen is showing.
+      The match does not tick. Replace [data-map="board"] or call
+      window.InkboundFlow.mountMap(function (board, status, catalog) {}).
+      Leave [data-map="play"], [data-map="home"], and [data-map="ink"].
+    -->
+    <section class="shell-screen map-screen" data-screen="map" hidden aria-labelledby="map-title">
+      <div class="shell-screen__plate" aria-hidden="true"></div>
+      <div class="shell-screen__shade" aria-hidden="true"></div>
+      <div class="shell-screen__grain" aria-hidden="true"></div>
+      <div class="shell-screen__content">
+        <p class="shell-kicker">Planes</p>
+        <h2 class="shell-title" id="map-title">World map</h2>
+        <p class="shell-status" data-map="status">Stage 1 · Quiet Plane · 0%</p>
+        <div class="map-board" data-map="board" data-map-hook="sys2" aria-label="Planes"></div>
+        <p class="shell-detail" data-map="detail">Play continues on Quiet Plane.</p>
+        <div class="shell-actions">
+          <button type="button" class="btn-play" data-map="play">Play</button>
+          <button type="button" class="btn-home" data-map="ink">Ink</button>
+          <button type="button" class="btn-home" data-map="home">Home</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell-screen howto-screen" data-screen="howto" hidden aria-labelledby="howto-title">
+      <div class="shell-screen__plate" aria-hidden="true"></div>
+      <div class="shell-screen__shade" aria-hidden="true"></div>
+      <div class="shell-screen__grain" aria-hidden="true"></div>
+      <div class="shell-screen__content">
+        <p class="shell-kicker">Before you ink</p>
+        <h2 class="shell-title" id="howto-title">How to play</h2>
+        <ol class="howto-list">
+          <li><strong>Steer.</strong> Point, or hold WASD. The bead keeps moving.</li>
+          <li><strong>Leave a line.</strong> Inside your ink you are safe. Step outside and you lay a wet line.</li>
+          <li><strong>Close the loop.</strong> Come home across your own ink to claim the ground you enclosed.</li>
+          <li><strong>Do not cross your line.</strong> Your own wet trail ends the run.</li>
+          <li><strong>Guard the trail.</strong> An enemy bead on your wet line cuts you. Their body does not. The rim does not.</li>
+          <li><strong>Take the plane.</strong> Own every cell and the plane is yours. Your best share opens new inks.</li>
+        </ol>
+        <div class="shell-actions">
+          <button type="button" class="btn-play" data-howto="play">Play</button>
+          <button type="button" class="btn-home" data-howto="home">Home</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell-screen ink-screen" data-screen="ink" hidden aria-labelledby="ink-title">
+      <div class="shell-screen__plate" aria-hidden="true"></div>
+      <div class="shell-screen__shade" aria-hidden="true"></div>
+      <div class="shell-screen__grain" aria-hidden="true"></div>
+      <div class="shell-screen__content">
+        <p class="shell-kicker">Your figure</p>
+        <h2 class="shell-title" id="ink-title">Choose your ink</h2>
+        <figure class="title-preview">
+          <div class="title-preview__pair">
+            <span class="title-preview__disk" aria-hidden="true"></span>
+            <img class="title-preview__figure" data-ink="figure" alt="">
+            <img class="title-preview__orb" data-ink="orb" alt="">
+          </div>
+          <figcaption class="title-preview__name" data-ink="skin-name">Seal</figcaption>
+        </figure>
+        <p class="shell-detail" data-ink="blurb">The stamped vermilion.</p>
+        <p class="shell-detail" data-ink="next">Tideglass</p>
+        <div class="skin-picker ink-picker" data-ink="skins"></div>
+        <div class="shell-actions">
+          <button type="button" class="btn-play" data-ink="play">Play</button>
+          <button type="button" class="btn-home" data-ink="map">World map</button>
+          <button type="button" class="btn-home" data-ink="home">Home</button>
+        </div>
       </div>
     </section>
 
@@ -89,11 +173,16 @@
 
       <ol class="hud-board" data-hud="board" aria-label="Leaderboard"></ol>
 
+      <ol class="hud-feed" data-hud="feed" aria-label="Recent cuts" hidden></ol>
+
       <p class="hud-hint" data-hud="hint">Point to steer. Close the loop to claim.</p>
 
       <div class="hud-overlay" data-hud="overlay" role="dialog" aria-modal="true" aria-labelledby="hud-overlay-title" hidden>
         <div class="hud-overlay__card">
+          <span class="hud-overlay__medal" data-hud="overlay-medal" hidden aria-hidden="true"></span>
+          <p class="hud-overlay__kicker" data-hud="overlay-kicker"></p>
           <h2 class="hud-overlay__title" id="hud-overlay-title" data-hud="overlay-title"></h2>
+          <p class="hud-overlay__line" data-hud="overlay-line" hidden></p>
           <p class="hud-overlay__stats" data-hud="overlay-stats"></p>
           <p class="hud-overlay__best" data-hud="overlay-best"></p>
           <div class="hud-overlay__unlocks" data-hud="overlay-unlocks" hidden aria-live="polite"></div>
@@ -104,6 +193,7 @@
           </div>
           <div class="hud-overlay__actions">
             <button type="button" class="btn-restart" data-hud="restart">Restart</button>
+            <button type="button" class="btn-home" data-hud="map">Map</button>
             <button type="button" class="btn-home" data-hud="home">Home</button>
           </div>
         </div>

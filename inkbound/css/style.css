@@ -13,6 +13,9 @@
      .hud-hint                     add .is-faded to dismiss
      .title-screen                 home / title; match HUD stays under it until Play
      .title-cast                   figure plates, home only (not on the playfield)
+     .title-next                   next earned ink; not a shop
+     .hud-feed                     recent cut lines during a match
+     .hud-overlay__kicker          "Last line" or "Sealed" above the death sentence
      .hud-overlay[hidden]          death / win card; remove [hidden] to show
         .hud-overlay--win          win variant
         .hud-overlay__title  .hud-overlay__stats  .btn-restart
@@ -44,6 +47,14 @@
   --ink-bot-2-wet: #f2bd4f;
   --ink-bot-3: #6f9a3c;
   --ink-bot-3-wet: #9cc95c;
+  --ink-bot-4: #8d4ea8;
+  --ink-bot-4-wet: #c48ad8;
+  --ink-bot-5: #b85a2a;
+  --ink-bot-5-wet: #e89262;
+  --ink-bot-6: #2f8f6a;
+  --ink-bot-6-wet: #67c9a0;
+  --ink-bot-7: #9a3d88;
+  --ink-bot-7-wet: #d67bc4;
 
   /* State */
   --state-cut: #ff6a4a;
@@ -158,7 +169,7 @@ body {
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "brand  board"
-    ".      board"
+    "feed   board"
     "score  hint";
   gap: var(--hud-pad);
   text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
@@ -340,7 +351,9 @@ body {
   margin: 0;
   padding: 6px 0;
   min-width: 196px;
-  background: rgb(17 19 22 / 0.72);
+  max-height: min(52vh, 480px);
+  overflow-y: auto;
+  background: rgb(17 19 22 / 0.92);
   border: var(--hairline);
   border-radius: var(--radius);
   backdrop-filter: blur(6px);
@@ -355,18 +368,18 @@ body {
 .hud-board__row {
   --row-ink: var(--bone-500);
   display: grid;
-  grid-template-columns: 28px 1fr auto;
+  grid-template-columns: 22px 1fr auto;
   align-items: center;
-  gap: 10px;
-  padding: 5px 14px;
+  gap: 8px;
+  padding: 3px 12px;
   font-size: 14px;
-  color: var(--bone-300);
+  color: var(--bone-100);
   transition: opacity 240ms var(--ease-out);
 }
 
 .hud-board__swatch {
-  width: 28px;
-  height: 32px;
+  width: 22px;
+  height: 26px;
   border-radius: 4px;
   background: var(--row-ink) center / contain no-repeat;
 }
@@ -418,6 +431,47 @@ body {
   background: var(--art-leader-medal, none) center / contain no-repeat;
 }
 
+/* ---------- Kill feed ---------- */
+
+.hud-feed {
+  grid-area: feed;
+  align-self: end;
+  justify-self: start;
+  list-style: none;
+  margin: 0;
+  padding: 8px 12px;
+  min-width: 200px;
+  max-width: min(340px, 48vw);
+  background: rgb(17 19 22 / 0.92);
+  border: var(--hairline);
+  border-left: 3px solid var(--state-cut);
+  border-radius: var(--radius);
+  text-shadow: none;
+}
+
+.hud-feed[hidden] {
+  display: none;
+}
+
+.hud-feed__line {
+  margin: 0;
+  padding: 2px 0;
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--bone-100);
+}
+
+.hud-feed__line.is-you {
+  color: var(--ink-player-wet);
+  font-weight: 600;
+}
+
+/* The catalog gallery stays on the home screen. A match never paints it. */
+body[data-mode="playing"] .hud-cast,
+body[data-mode="playing"] [data-hud="cast"] {
+  display: none !important;
+}
+
 /* ---------- Hint ---------- */
 
 .hud-hint {
@@ -443,7 +497,8 @@ body {
   inset: 0;
   z-index: 3;
   display: grid;
-  place-items: center;
+  place-items: safe center;
+  overflow-y: auto;
   padding: var(--hud-pad);
   pointer-events: auto;
   background: rgb(11 12 14 / 0.62);
@@ -467,8 +522,70 @@ body {
   animation: card-in 320ms var(--ease-out) both;
 }
 
-.hud-overlay--win .hud-overlay__card {
+.hud-overlay--win .hud-overlay__card,
+.hud-overlay--win.hud-overlay--has-unlocks .hud-overlay__card {
   border-top-color: var(--state-win);
+  text-align: center;
+  background-image:
+    linear-gradient(180deg, rgb(17 19 22 / 0.2), rgb(17 19 22 / 0.94)),
+    var(--art-plane-grain, none);
+  background-size: auto, 480px 480px;
+  background-position: center;
+}
+
+.hud-overlay__medal {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 8px;
+  background: var(--art-stage-medal, none) center / contain no-repeat;
+}
+
+.hud-overlay__medal[hidden] {
+  display: none;
+}
+
+.hud-overlay__line {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--bone-300);
+}
+
+.hud-overlay__line[hidden] {
+  display: none;
+}
+
+.hud-overlay--win .hud-overlay__title {
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 0.95;
+}
+
+.hud-overlay--win .hud-overlay__actions,
+.hud-overlay--win .skin-picker {
+  justify-content: center;
+}
+
+.hud-overlay--win .hud-overlay__ink {
+  text-align: center;
+}
+
+.hud-overlay__kicker {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-player-wet);
+}
+
+.hud-overlay__kicker:empty {
+  display: none;
+}
+
+.hud-overlay--win .hud-overlay__kicker {
+  color: var(--bone-100);
 }
 
 .hud-overlay__title {
@@ -476,8 +593,8 @@ body {
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 400;
-  font-size: 34px;
-  line-height: 1.05;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.08;
   color: var(--bone-100);
 }
 
@@ -892,7 +1009,10 @@ body {
 
 /* ---------- Title / home ---------- */
 
-body[data-mode="title"] #hud {
+body[data-mode="title"] #hud,
+body[data-mode="map"] #hud,
+body[data-mode="howto"] #hud,
+body[data-mode="ink"] #hud {
   visibility: hidden;
 }
 
@@ -1112,6 +1232,74 @@ body[data-mode="title"] #hud {
   font-variant-numeric: tabular-nums;
 }
 
+.title-next {
+  width: min(440px, 100%);
+  padding: 10px 14px 12px;
+  text-align: center;
+  background: rgb(11 12 14 / 0.72);
+  border: 1px solid rgb(143 137 124 / 0.45);
+  border-radius: var(--radius);
+}
+
+.title-next__kicker {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bone-300);
+}
+
+.title-next__name {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 28px;
+  line-height: 1.05;
+  color: var(--bone-100);
+}
+
+.title-next__gate {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--bone-100);
+}
+
+.title-routes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-route {
+  appearance: none;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgb(143 137 124 / 0.45);
+  border-radius: var(--radius);
+  background: rgb(11 12 14 / 0.45);
+  color: var(--bone-100);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn-route:hover {
+  border-color: var(--bone-300);
+  background: rgb(11 12 14 / 0.7);
+}
+
+.btn-route:focus-visible,
+.shell-screen button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
 .title-hint {
   margin: 0;
   font-family: var(--font-display);
@@ -1203,6 +1391,484 @@ body[data-mode="title"] #hud {
   display: none;
 }
 
+/* ---------- Shell screens: map, how to play, ink ---------- */
+
+.shell-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  pointer-events: auto;
+  touch-action: pan-y;
+  color: var(--bone-100);
+  background: var(--sumi-950);
+  text-shadow: none;
+}
+
+.shell-screen[hidden] {
+  display: none;
+}
+
+.shell-screen__plate {
+  position: absolute;
+  inset: -8%;
+  background-image: var(--shell-plate, var(--art-title-plate, none));
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.shell-screen__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgb(11 12 14 / 0.18), rgb(11 12 14 / 0.88) 74%),
+    linear-gradient(180deg, rgb(11 12 14 / 0.28), rgb(11 12 14 / 0.62));
+  pointer-events: none;
+}
+
+.shell-screen__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image: var(--art-plane-grain, none);
+  background-size: 680px 680px;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.shell-screen__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(960px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: calc(18px + var(--safe-t)) 0 calc(20px + var(--safe-b));
+  text-align: center;
+}
+
+.shell-kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--bone-300);
+}
+
+.shell-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 0.92;
+  color: var(--bone-100);
+}
+
+.shell-status,
+.shell-detail {
+  margin: 0;
+  max-width: 46ch;
+  font-size: 15px;
+  color: var(--bone-300);
+}
+
+.shell-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.shell-actions .btn-play,
+.shell-actions .btn-home {
+  pointer-events: auto;
+}
+
+.howto-list {
+  width: min(560px, 100%);
+  margin: 0;
+  padding: 0 0 0 1.2em;
+  text-align: left;
+}
+
+.howto-list li {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--bone-100);
+}
+
+.howto-list strong {
+  font-weight: 600;
+}
+
+.map-screen .shell-title {
+  font-size: clamp(28px, 5vw, 44px);
+}
+
+.map-screen .shell-screen__content {
+  gap: 8px;
+  width: min(1040px, calc(100% - 20px));
+  padding-top: calc(8px + var(--safe-t));
+  padding-bottom: calc(12px + var(--safe-b));
+}
+
+.map-screen .shell-detail {
+  max-width: 64ch;
+}
+
+.map-board {
+  position: relative;
+  width: min(920px, 100%);
+}
+
+.map-board.is-atlas {
+  aspect-ratio: 16 / 10;
+  width: min(760px, 100%);
+  max-height: min(400px, 46vh);
+  min-height: 220px;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: #cbb892;
+  background-image: var(--art-map-vellum, none);
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    0 0 0 1px rgb(239 233 219 / 0.45),
+    0 18px 40px rgb(0 0 0 / 0.38);
+}
+
+.map-board.is-atlas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.38;
+  background-image: var(--art-map-grain, var(--art-plane-grain, none));
+  background-size: 460px 460px;
+  mix-blend-mode: multiply;
+}
+
+.map-compass {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  z-index: 1;
+  width: min(34%, 240px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: var(--art-map-compass, var(--art-icon-circle, none)) center / contain no-repeat;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.shore {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: var(--bone-100);
+  cursor: pointer;
+  filter: drop-shadow(0 8px 8px rgb(48 28 8 / 0.35));
+}
+
+.shore--quiet-plane {
+  left: 4%;
+  top: 52%;
+  width: 36%;
+  height: 42%;
+  z-index: 4;
+  clip-path: polygon(14% 22%, 4% 46%, 8% 74%, 26% 96%, 58% 98%, 88% 76%, 98% 46%, 80% 18%, 50% 6%, 22% 10%);
+}
+
+.shore--rimward-marsh {
+  left: 2%;
+  top: 22%;
+  width: 34%;
+  height: 36%;
+  z-index: 3;
+  clip-path: polygon(30% 8%, 8% 24%, 2% 52%, 16% 80%, 40% 96%, 70% 86%, 96% 58%, 84% 26%, 56% 6%);
+}
+
+.shore--sumi-basin {
+  left: 32%;
+  top: 36%;
+  width: 34%;
+  height: 34%;
+  z-index: 5;
+  clip-path: polygon(22% 14%, 6% 38%, 14% 70%, 38% 94%, 70% 92%, 94% 66%, 96% 34%, 72% 10%, 42% 4%);
+}
+
+.shore--cinnabar-reach {
+  left: 58%;
+  top: 14%;
+  width: 38%;
+  height: 36%;
+  z-index: 3;
+  clip-path: polygon(18% 22%, 4% 48%, 20% 78%, 48% 96%, 80% 84%, 98% 50%, 86% 18%, 54% 4%, 28% 8%);
+}
+
+.shore--obsidian-shallows {
+  left: 50%;
+  top: 52%;
+  width: 46%;
+  height: 42%;
+  z-index: 4;
+  clip-path: polygon(8% 30%, 2% 58%, 20% 88%, 52% 98%, 84% 80%, 98% 46%, 80% 14%, 48% 4%, 22% 12%);
+}
+
+.shore--unsealed-horizon {
+  left: 20%;
+  top: 2%;
+  width: 54%;
+  height: 32%;
+  z-index: 2;
+  clip-path: polygon(8% 48%, 16% 22%, 34% 6%, 60% 2%, 84% 16%, 98% 42%, 88% 74%, 60% 96%, 32% 90%, 10% 68%);
+}
+
+.shore.is-selected {
+  z-index: 7;
+  box-shadow: 0 0 0 3px var(--bone-100), 0 0 0 7px rgb(217 69 43 / 0.92);
+}
+
+.shore.is-frontier:not(.is-selected) {
+  box-shadow: inset 0 0 0 2px rgb(239 233 219 / 0.8);
+}
+
+.shore.is-locked {
+  cursor: not-allowed;
+}
+
+.shore.is-locked .shore__plate,
+.shore.is-locked .shore__terrain,
+.shore.is-locked .shore__accent {
+  filter: grayscale(0.95) brightness(0.52);
+}
+
+.shore__plate,
+.shore__terrain,
+.shore__accent,
+.shore__ink {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shore__plate {
+  background-image: var(--shore-plate, none);
+  background-size: cover;
+  background-position: var(--shore-pos, center);
+}
+
+.shore__terrain {
+  background-image: var(--shore-terrain, none);
+  background-size: cover;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+.shore__accent {
+  background-image: var(--shore-accent, none);
+  background-repeat: no-repeat;
+  background-position: 78% 18%;
+  background-size: 68% auto;
+  opacity: 0.75;
+  mix-blend-mode: soft-light;
+}
+
+.shore__ink {
+  top: auto;
+  height: var(--shore-fill, 0%);
+  background: linear-gradient(to top, rgb(217 69 43 / 0.82), rgb(217 69 43 / 0.18));
+}
+
+.shore__medal {
+  display: none;
+  position: absolute;
+  z-index: 5;
+  top: 8%;
+  left: 10%;
+  width: 16px;
+  height: 32px;
+  background: var(--art-stage-medal, none) center / contain no-repeat;
+  pointer-events: none;
+}
+
+.shore.is-sealed .shore__medal {
+  display: block;
+}
+
+.shore__copy {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 54%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  max-width: 86%;
+  padding: 5px 8px 6px;
+  transform: translate(-50%, -50%);
+  background: rgb(11 12 14 / 0.66);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.shore__lock {
+  display: none;
+  width: 20px;
+  height: 20px;
+  background: var(--art-hud-jewel, none) center / contain no-repeat;
+}
+
+.shore.is-locked .shore__lock {
+  display: block;
+}
+
+.shore__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.shore__meta {
+  font-family: var(--font-num);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--bone-100);
+}
+
+.shore.is-selected .shore__meta::before {
+  content: "Next · ";
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-player-wet);
+}
+
+.shore:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.map-plate {
+  position: relative;
+  display: block;
+  min-height: 148px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgb(143 137 124 / 0.35);
+  border-radius: var(--radius);
+  background: var(--sumi-900);
+  color: var(--bone-100);
+  text-align: left;
+  cursor: pointer;
+}
+
+.map-plate.is-current,
+.map-plate.is-selected {
+  border-color: var(--bone-100);
+  box-shadow: inset 0 0 0 1px var(--ink-player);
+}
+
+.map-plate.is-ahead {
+  opacity: 0.72;
+}
+
+.map-plate__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 62%;
+}
+
+.map-plate__shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(11 12 14 / 0.15), rgb(11 12 14 / 0.82));
+}
+
+.map-plate__mark {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(11 12 14 / 0.55);
+}
+
+.map-plate__medal {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  background: var(--art-stage-medal, none) center / contain no-repeat;
+}
+
+.map-plate__copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+}
+
+.map-plate__index {
+  font-family: var(--font-num);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--bone-300);
+}
+
+.map-plate__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.map-plate__meta {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bone-100);
+}
+
+.ink-screen .skin-picker {
+  justify-content: center;
+  width: min(720px, 100%);
+}
+
+.ink-screen .title-preview__pair {
+  height: 180px;
+}
+
 /* ---------- Misc ---------- */
 
 .noscript {
@@ -1276,13 +1942,19 @@ body[data-mode="title"] #hud {
 @media (max-width: 640px) {
   .hud {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr auto auto;
+    grid-template-rows: auto auto auto 1fr auto auto;
     grid-template-areas:
       "brand"
       "board"
+      "feed"
       "."
       "hint"
       "score";
+  }
+
+  .hud-feed {
+    justify-self: stretch;
+    max-width: none;
   }
 
   .hud-board {
@@ -1368,6 +2040,49 @@ body[data-mode="title"] #hud {
   .title-cast .hud-cast__plate img {
     width: 44px;
     height: 44px;
+  }
+
+  .map-board.is-atlas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    aspect-ratio: auto;
+    min-height: 0;
+    padding: 8px;
+    overflow: visible;
+  }
+
+  .map-compass {
+    position: absolute;
+    left: auto;
+    top: 8px;
+    right: 8px;
+    width: 46px;
+    transform: none;
+  }
+
+  .shore,
+  .shore--quiet-plane,
+  .shore--rimward-marsh,
+  .shore--sumi-basin,
+  .shore--cinnabar-reach,
+  .shore--obsidian-shallows,
+  .shore--unsealed-horizon {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    height: 128px;
+    clip-path: none;
+    border-radius: 16px;
+  }
+
+  .shell-title {
+    font-size: 40px;
+  }
+
+  .howto-list {
+    font-size: 15px;
   }
 }
 

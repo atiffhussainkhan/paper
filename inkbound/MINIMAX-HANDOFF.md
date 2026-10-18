@@ -7,12 +7,20 @@
 
 SYS5 — System Analyst: integrate SYS2–SYS4, verify, and ship on `cursor/inkbound-final-dev-c3dd`.
 
-1. Wait for SYS2 (world map), SYS3 (flow screens), and SYS4 (gameplay parity) commits, including `docs/SYS_AUDIT_2.md`, `docs/SYS_AUDIT_3.md`, and `docs/SYS_AUDIT_4.md`.
+1. Wait for SYS2 (world map), SYS3 (flow screens), and SYS4 (gameplay parity) commits. SYS3's report is `docs/SYS_AUDIT_3_FLOW.md` (not `SYS_AUDIT_3.md`). SYS2 and SYS4 reports, if named `docs/SYS_AUDIT_2.md` and `docs/SYS_AUDIT_4.md`, still belong in the rollup.
 2. Merge or rebase to one clean tip and fix conflicts.
 3. Run `node tools/run_acceptance.mjs` plus any new smokes. Fix failures.
 4. Browser proof on `http://127.0.0.1:8765/`: title → world map → select region → home → Play → claim → death → Home. The world map must be embedded in the game, not a separate page.
 5. Write `docs/SYS_AUDIT_MASTER.md`: does the build fulfill every user requirement (YES/NO table). Exact Paper.io 2 copy is NO, with what is still absent (online multiplayer and the rest). World map status.
 6. Update PR #3. The local server must serve the latest tree.
+
+## SYS3 — flow screens (Cursor)
+
+**Status:** `done`
+**Report:** `docs/SYS_AUDIT_3_FLOW.md`
+**Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
+
+The shell is Home, World map, How to play, and Ink, then Play into a match, then a death or win card. `game.state` is `title | map | howto | playing | dead | won`. The frame loop does not tick on title, map, or how to play. The ink picker is a screen; while it is open the sim state stays `title` or `map`. Play still calls `reset()`. The win card reads "The plane is yours." with Play again, Map, and Home. SYS2 replaces `[data-map="board"]` or calls `InkboundFlow.mountMap`. Shots: `/opt/cursor/artifacts/sys3_*.png`.
 
 ## SYS5 (Cursor)
 

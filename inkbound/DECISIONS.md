@@ -8,8 +8,8 @@
 | 1 | **Engine** | **Web Canvas (ES modules)** for Phase 0 prototype. Portable sim layer → Godot 4 for mobile later. Unity not used. |
 | 2 | **Steering** | **360° continuous** heading from pointer / stick / WASD bias. Always moving. |
 | 3 | **Arena** | **Circular.** Walls **non-lethal** (slide along rim). |
-| 4 | **Opponents** | **Bots only** (3 in Phase 0). No real multiplayer. |
-| 5 | **Revive** | **Skipped in Phase 0.** Death → brief summary → click/tap Restart. (Stage % credit deferred to Phase 2.) |
+| 4 | **Opponents** | **Bots only.** No real multiplayer. Phase 0 shipped 3. The 2026-10-18 parity request raises the default to 7 (`botCount`), still scripted, still no network. |
+| 5 | **Revive** | **Skipped.** Death → summary with the last line → Restart. Not a continue. |
 | 6 | **Brand** | **Inkbound** — original IP. Never use Paper.io names, logos, or skins. |
 
 ## Phase 0 scope (in)

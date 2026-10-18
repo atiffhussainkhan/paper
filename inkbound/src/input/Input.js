@@ -171,12 +171,14 @@ export class Input {
   }
 
   isTitleGate() {
-    return document.body?.dataset?.mode === "title";
+    return document.body?.dataset?.mode !== "playing";
   }
 
   isOverlayInteractive(target) {
     if (!target || typeof target.closest !== "function") return false;
-    return Boolean(target.closest("button, [data-hud='overlay']:not([hidden]), [data-screen='title']:not([hidden])"));
+    return Boolean(target.closest(
+      "button, [data-hud='overlay']:not([hidden]), [data-screen='title']:not([hidden]), .shell-screen:not([hidden])",
+    ));
   }
 
   canvasCoords(clientX, clientY) {

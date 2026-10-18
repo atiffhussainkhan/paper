@@ -118,6 +118,9 @@ assert.equal(hudSrc.includes('"is-lead"'), true);
 
   assert.equal(game.state, "playing");
   assert.equal(game.bots.filter((entity) => entity.alive).length, CONFIG.botCount);
+  assert.ok(CONFIG.botCount >= 6 && CONFIG.botCount <= 8, "arena crowd stays in the 6–8 band");
+  assert.equal(new Set(game.bots.map((entity) => entity.role)).size, 3);
+  assert.ok(game.killFeed.some((line) => line.text.includes(bot.name)));
   assert.equal(bot.trail.points.length, 0, "sim trail cleared after the death snapshot");
 
   const vfx = new Vfx(colors, CONFIG, () => 0.25);
@@ -144,7 +147,7 @@ assert.equal(hudSrc.includes('"is-lead"'), true);
   player.trail.add({ x: 40, y: 0 }, true);
   player.markDead("You crossed your own line.", null);
   game.tick(1 / CONFIG.simHz);
-  assert.equal(game.state, "over");
+  assert.equal(game.state, "dead");
   assert.equal(game.outcome.title, "You crossed your own line.");
 
   const vfx = new Vfx(colors, CONFIG, () => 0.5);

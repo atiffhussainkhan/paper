@@ -55,7 +55,9 @@ if (endShare <= startShare + 0.0005) {
   console.error("FAIL: share did not increase", startShare, endShare);
   process.exit(1);
 }
-if (!game.playerClaimed || !game.lastCapture?.firstClaim) {
+// A denser roster can seal on the same tick and overwrite lastCapture.
+// playerClaimed is the flag that stays with the player's first seal.
+if (!game.playerClaimed) {
   console.error("FAIL: first claim was not marked", game.playerClaimed, game.lastCapture);
   process.exit(1);
 }
@@ -238,7 +240,7 @@ for (let index = 0; index < winGrid.cells.length; index += 1) {
 winGrid.counts[1] = sealed;
 for (const bot of winner.bots) bot.markDead("plane sealed", winner.player);
 winner.tick(dt);
-if (winner.state !== "over" || winner.outcome?.type !== "win") {
+if (winner.state !== "won" || winner.outcome?.type !== "win") {
   console.error("FAIL: full plane did not win", winner.state, winner.outcome);
   process.exit(1);
 }
@@ -247,7 +249,7 @@ if (winner.bots.some((bot) => winGrid.counts[bot.id] > 0)) {
   process.exit(1);
 }
 for (let extra = 0; extra < 8; extra += 1) winner.tick(dt);
-if (winner.state !== "over" || winner.bots.some((bot) => bot.alive || winGrid.counts[bot.id] > 0)) {
+if (winner.state !== "won" || winner.bots.some((bot) => bot.alive || winGrid.counts[bot.id] > 0)) {
   console.error("FAIL: win did not stay sealed", winner.state, winner.bots.map((bot) => bot.alive));
   process.exit(1);
 }
@@ -280,7 +282,7 @@ const expectedLiving = livingAfterDeath();
 doomed.tick(dt);
 doomed.tick(dt);
 if (
-  doomed.state !== "over"
+  doomed.state !== "dead"
   || doomed.outcome?.type !== "death"
   || livingAfterDeath() !== expectedLiving
   || doomed.bots[0].alive

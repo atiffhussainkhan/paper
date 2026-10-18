@@ -16,6 +16,7 @@ function clampToArena(arena, point, margin) {
 }
 
 export function roleForBot(entity) {
+  if (typeof entity.role === "string" && ROLES.includes(entity.role)) return entity.role;
   if (entity.id === 2 || entity.name === "Tide") return "edge-farmer";
   if (entity.id === 3 || entity.name === "Ochre") return "small-looper";
   if (entity.id === 4 || entity.name === "Moss") return "opportunistic-cutter";
