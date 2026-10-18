@@ -20,14 +20,60 @@ function graceLength(points, config) {
   return points * config.trailSampleSpacing;
 }
 
-export function resolveCombat(entities, config, matchAge = Infinity) {
+function clamp01(value) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function shareProgress(playerShare, config) {
+  const start = config.botDifficultyShareStart ?? 0;
+  const full = Math.max(start + Number.EPSILON, config.botDifficultyShareFull ?? 0.2);
+  return clamp01((Math.max(0, playerShare) - start) / (full - start));
+}
+
+export function botDifficultyCurve(matchAge, playerShare, config) {
+  const openingSafety = config.botOpeningSafetySeconds ?? 10;
+  const rampSeconds = Math.max(1, config.botDifficultyRampSeconds ?? 70);
+  const age = clamp01((Math.max(0, matchAge) - openingSafety) / rampSeconds);
+  const share = shareProgress(playerShare, config);
+  const ageWeight = config.botDifficultyAgeWeight ?? 0.65;
+  const shareWeight = config.botDifficultyShareWeight ?? 0.35;
+  const aggression = clamp01(
+    (ageWeight * age + shareWeight * share) * Math.sqrt(age),
+  );
+
+  const minRange = config.botCutterMinRange ?? config.botCutterRange;
+  const maxRange = Math.max(minRange, config.botCutterRange ?? minRange);
+  return {
+    aggression,
+    cutterRange: minRange + (maxRange - minRange) * aggression,
+    maxOutTime: (config.botMaxOutTime ?? 3.1)
+      + (config.botMaxOutTimeBonus ?? 0) * aggression,
+    speed: config.botSpeed + (config.botSpeedBonus ?? 0) * aggression,
+  };
+}
+
+export function playerSafeFromBots(matchAge, playerShare, config) {
+  const openingSafety = config.botOpeningSafetySeconds ?? 10;
+  const lowShareBonus = config.botLowShareSafetyBonusSeconds ?? 0;
+  const adaptiveGrace = openingSafety
+    + lowShareBonus * (1 - shareProgress(playerShare, config));
+  return matchAge < adaptiveGrace;
+}
+
+export function resolveCombat(
+  entities,
+  config,
+  matchAge = Infinity,
+  playerShare = 0,
+) {
   const living = entities.filter((entity) => entity.alive);
   const deaths = new Map();
   const selfGrace = graceLength(config.selfGracePoints, config);
   const enemyGrace = graceLength(config.enemyHeadGracePoints, config);
-  // Phase 0 teaching window: bots cannot cut the player yet. Self-cuts and
-  // player-vs-bot cuts still resolve normally.
-  const playerSafeFromBots = matchAge < (config.botHuntGraceSeconds ?? 0);
+  // Bots cannot cut the player during the guaranteed opening safety period.
+  // Players below the configured share curve receive a small adaptive bonus.
+  // Self-cuts and player-vs-bot cuts still resolve normally.
+  const playerIsSafeFromBots = playerSafeFromBots(matchAge, playerShare, config);
 
   // Self-cut uses a tighter radius than enemy cuts so normal turning along a
   // fresh stroke does not register as suicide. Grace is still arc-length based.
@@ -58,7 +104,7 @@ export function resolveCombat(entities, config, matchAge = Infinity) {
     if (endSegment <= 0) continue;
     for (const attacker of living) {
       if (attacker === owner) continue;
-      if (playerSafeFromBots && owner.isPlayer && !attacker.isPlayer) continue;
+      if (playerIsSafeFromBots && owner.isPlayer && !attacker.isPlayer) continue;
       if (owner.trail.collidesSegment(
         attacker.previousPosition,
         attacker.position,

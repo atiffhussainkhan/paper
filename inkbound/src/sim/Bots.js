@@ -1,3 +1,5 @@
+import { botDifficultyCurve, playerSafeFromBots } from "./Combat.js";
+
 const ROLES = ["edge-farmer", "small-looper", "opportunistic-cutter"];
 
 function wrapAngle(angle) {
@@ -283,11 +285,11 @@ function makeLoopForRole(brain, arena, config) {
   return makeOpportunisticCutterLoop(brain, arena, config);
 }
 
-function findOpportunisticCutTarget(bot, rivals, arena, config) {
+function findOpportunisticCutTarget(bot, rivals, arena, config, cutterRange) {
   const maxSelfTrail = config.botCutterMaxSelfTrail ?? 26;
   if (bot.trail.points.length > maxSelfTrail) return null;
 
-  const range = config.botCutterRange ?? 265;
+  const range = cutterRange ?? config.botCutterRange ?? 265;
   const rangeSq = range * range;
   const margin = config.bodyRadius * 2.4;
   const ownEndSeg = olderTrailEndSegment(bot, config);
@@ -459,11 +461,18 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
   const game = gameArg ?? arena?.game;
   const grid = game?.grid;
   const allEntities = game?.entities ?? bots;
-  const huntAllowed = (game?.matchAge ?? 0) >= (config.botHuntGraceSeconds ?? 0);
+  const matchAge = game?.matchAge ?? 0;
+  const player = game?.player;
+  const playerShare = grid && player ? grid.share(player.id) : 0;
+  const difficulty = botDifficultyCurve(matchAge, playerShare, config);
+  const huntAllowed = difficulty.aggression > 0
+    && !playerSafeFromBots(matchAge, playerShare, config);
+  const outTimeBonus = difficulty.maxOutTime - (config.botMaxOutTime ?? 3.1);
 
   for (const bot of bots) {
     if (!bot.alive) continue;
     if (!bot.brain) attachBotBrain(bot, arena, config);
+    bot.speed = difficulty.speed;
 
     const brain = bot.brain;
     brain.age += dt;
@@ -504,10 +513,10 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
     }
 
     const maxOutTime = brain.role === "small-looper"
-      ? 2.25
+      ? 2.25 + outTimeBonus * 0.35
       : brain.role === "edge-farmer"
-        ? (config.botMaxOutTime ?? 3.1) + 0.35
-        : (config.botMaxOutTime ?? 3.1);
+        ? difficulty.maxOutTime + 0.35
+        : difficulty.maxOutTime;
     const maxTrailPts = brain.role === "small-looper"
       ? 28
       : brain.role === "edge-farmer"
@@ -540,7 +549,13 @@ export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
       && brain.role === "opportunistic-cutter"
       && brain.mode !== "returning"
     ) {
-      const cutTarget = findOpportunisticCutTarget(bot, allEntities, arena, config);
+      const cutTarget = findOpportunisticCutTarget(
+        bot,
+        allEntities,
+        arena,
+        config,
+        difficulty.cutterRange,
+      );
       if (cutTarget) {
         brain.mode = "cutting";
         brain.cutTarget = cutTarget;

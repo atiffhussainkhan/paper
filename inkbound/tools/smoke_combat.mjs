@@ -1,6 +1,10 @@
 import { CONFIG } from "../src/config.js";
 import { Trail } from "../src/sim/Trail.js";
-import { resolveCombat } from "../src/sim/Combat.js";
+import {
+  botDifficultyCurve,
+  playerSafeFromBots,
+  resolveCombat,
+} from "../src/sim/Combat.js";
 
 function entity(id, name, isPlayer, x, y) {
   const e = {
@@ -21,7 +25,8 @@ function entity(id, name, isPlayer, x, y) {
   return e;
 }
 
-// Bot crossing player trail during grace must NOT kill player.
+// Bot crossing player trail during the guaranteed opening must NOT kill the
+// player, even if their territory share is already high.
 const player = entity(1, "You", true, 0, 0);
 player.trail.begin({ x: -40, y: 0 });
 for (let x = -32; x <= 80; x += 8) player.trail.add({ x, y: 0 }, true);
@@ -30,22 +35,50 @@ const bot = entity(2, "Moss", false, 20, -30);
 bot.previousPosition = { x: 20, y: -30 };
 bot.position = { x: 20, y: 30 };
 
-resolveCombat([player, bot], CONFIG, 3);
+resolveCombat([player, bot], CONFIG, 9.99, 0.5);
 if (!player.alive) {
-  console.error("FAIL: player died during hunt grace:", player.deathReason);
+  console.error("FAIL: player died during guaranteed opening:", player.deathReason);
   process.exit(1);
 }
-console.log("PASS: hunt grace blocks bot cut");
+console.log("PASS: opening safety blocks bot cut");
 
-// After grace, same cut kills.
-player.alive = true;
-player.deathReason = "";
-resolveCombat([player, bot], CONFIG, 30);
+// A struggling player gets the configured low-share safety extension.
+resolveCombat([player, bot], CONFIG, 12, 0);
+if (!player.alive || !playerSafeFromBots(12, 0, CONFIG)) {
+  console.error("FAIL: low-share safety extension did not hold");
+  process.exit(1);
+}
+console.log("PASS: low-share safety extension blocks bot cut");
+
+// Once adaptive grace expires, the same cut kills.
+resolveCombat([player, bot], CONFIG, 16, 0);
 if (player.alive) {
   console.error("FAIL: player should die after grace");
   process.exit(1);
 }
 console.log("PASS: bot cut works after grace");
+
+// Age and share should continuously increase each aggression output, with no
+// jump at the ten-second opening boundary.
+const openingCurve = botDifficultyCurve(10, 0.2, CONFIG);
+const midCurve = botDifficultyCurve(45, 0.08, CONFIG);
+const lateCurve = botDifficultyCurve(100, 0.2, CONFIG);
+if (
+  openingCurve.aggression !== 0
+  || !(midCurve.aggression > openingCurve.aggression)
+  || !(lateCurve.aggression > midCurve.aggression)
+  || !(lateCurve.cutterRange > midCurve.cutterRange)
+  || !(lateCurve.maxOutTime > midCurve.maxOutTime)
+  || !(lateCurve.speed > midCurve.speed)
+) {
+  console.error("FAIL: bot difficulty curve is not monotonic", {
+    openingCurve,
+    midCurve,
+    lateCurve,
+  });
+  process.exit(1);
+}
+console.log("PASS: bot aggression outputs ramp with age and share");
 
 // Forward motion along own fresh trail should not self-kill.
 const p2 = entity(1, "You", true, 0, 0);

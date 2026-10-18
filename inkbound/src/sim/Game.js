@@ -168,7 +168,12 @@ export class Game {
     }
 
     // 5. Resolve cuts. Combat only marks deaths; cleanup happens in step 7.
-    resolveCombat(this.entities, this.config, this.matchAge);
+    resolveCombat(
+      this.entities,
+      this.config,
+      this.matchAge,
+      this.grid.share(player.id),
+    );
     this.snapshotDeathShares();
 
     // 6. Survivors seal loops when they re-enter their own dry ink. Combat has
