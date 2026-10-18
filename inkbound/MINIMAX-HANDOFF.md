@@ -1,9 +1,25 @@
-# MINIMAX-HANDOFF — Inkbound RULE1 match start
+# MINIMAX-HANDOFF — Inkbound SYS5 integrate
 
 ## Status
-`done`
+`awaiting-cursor`
 
 ## Task
+
+SYS5 — System Analyst: integrate SYS2–SYS4, verify, and ship on `cursor/inkbound-final-dev-c3dd`.
+
+1. Wait for SYS2 (world map), SYS3 (flow screens), and SYS4 (gameplay parity) commits, including `docs/SYS_AUDIT_2.md`, `docs/SYS_AUDIT_3.md`, and `docs/SYS_AUDIT_4.md`.
+2. Merge or rebase to one clean tip and fix conflicts.
+3. Run `node tools/run_acceptance.mjs` plus any new smokes. Fix failures.
+4. Browser proof on `http://127.0.0.1:8765/`: title → world map → select region → home → Play → claim → death → Home. The world map must be embedded in the game, not a separate page.
+5. Write `docs/SYS_AUDIT_MASTER.md`: does the build fulfill every user requirement (YES/NO table). Exact Paper.io 2 copy is NO, with what is still absent (online multiplayer and the rest). World map status.
+6. Update PR #3. The local server must serve the latest tree.
+
+## SYS5 (Cursor)
+
+**Status:** `awaiting-cursor` — polling origin for SYS2–SYS4 (started 2026-10-18).
+**Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
+
+## Prior task — title gate (done)
 
 Add Paper.io-class home/start screen with Play gate; match must not run until Play.
 
