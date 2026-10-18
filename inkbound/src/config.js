@@ -106,6 +106,7 @@ export const CONFIG = Object.freeze({
   cameraFirstClaimZoomFollow: 3.4,
   planeGridSpacing: 120,
 
+  // Fraction of the plane (0..1) that ends the match. 1 seals the whole disc.
   winShare: 1,
 });
 
