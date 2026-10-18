@@ -55,4 +55,195 @@ if (endShare <= startShare + 0.0005) {
   console.error("FAIL: share did not increase", startShare, endShare);
   process.exit(1);
 }
+if (!game.playerClaimed || !game.lastCapture?.firstClaim) {
+  console.error("FAIL: first claim was not marked", game.playerClaimed, game.lastCapture);
+  process.exit(1);
+}
 console.log("PASS: scripted claim loop increased territory");
+
+const { TerritoryGrid } = await import("../src/sim/TerritoryGrid.js");
+const { Trail } = await import("../src/sim/Trail.js");
+const { captureLoop } = await import("../src/sim/Capture.js");
+
+function assertCounts(grid, label) {
+  let sum = 0;
+  for (let index = 0; index < grid.counts.length; index += 1) sum += grid.counts[index];
+  if (sum !== grid.insideCount) {
+    console.error("FAIL: owner counts drifted", label, sum, grid.insideCount);
+    process.exit(1);
+  }
+}
+
+function assertInsideArena(grid, ownerId, label) {
+  for (let index = 0; index < grid.cells.length; index += 1) {
+    if (grid.cells[index] !== ownerId) continue;
+    const col = index % grid.size;
+    const row = Math.floor(index / grid.size);
+    const center = grid.cellCenter(col, row);
+    if (center.x * center.x + center.y * center.y > grid.radius * grid.radius + 1) {
+      console.error("FAIL: capture leaked outside the arena", label);
+      process.exit(1);
+    }
+  }
+}
+
+const pocket = new TerritoryGrid(CONFIG.arenaRadius, CONFIG.gridSize, 4);
+pocket.setDisk(1, 0, 0, CONFIG.startTerritoryRadius);
+pocket.setDisk(2, 200, 90, 36);
+pocket.setDisk(2, -520, 0, 40);
+const pocketTrail = new Trail(CONFIG.trailWidth, CONFIG.trailSampleSpacing);
+pocketTrail.begin({ x: 70, y: -30 });
+pocketTrail.add({ x: 300, y: -30 }, true);
+pocketTrail.add({ x: 300, y: 210 }, true);
+pocketTrail.add({ x: 70, y: 210 }, true);
+pocketTrail.add({ x: 70, y: 30 }, true);
+const pocketChanged = captureLoop(pocket, 1, pocketTrail);
+if (pocketChanged <= 0 || pocket.ownerAt(200, 90) !== 1 || pocket.ownerAt(-400, 0) !== 0 || pocket.ownerAt(-520, 0) !== 2) {
+  console.error("FAIL: small loop did not steal only the enclosed ink", {
+    pocketChanged,
+    enclosed: pocket.ownerAt(200, 90),
+    west: pocket.ownerAt(-400, 0),
+    spared: pocket.ownerAt(-520, 0),
+    share: pocket.share(1),
+  });
+  process.exit(1);
+}
+if (pocket.share(1) > 0.2) {
+  console.error("FAIL: small loop swallowed the plane", pocket.share(1));
+  process.exit(1);
+}
+assertCounts(pocket, "pocket");
+assertInsideArena(pocket, 1, "pocket");
+console.log("PASS: small loop fills inside and steals enclosed ink", pocket.share(1).toFixed(4));
+
+const sweep = new TerritoryGrid(CONFIG.arenaRadius, CONFIG.gridSize, 4);
+sweep.setDisk(1, 0, 0, CONFIG.startTerritoryRadius);
+const sweepTrail = new Trail(CONFIG.trailWidth, CONFIG.trailSampleSpacing, CONFIG.maxTrailPoints);
+const sweepRadius = 980;
+sweepTrail.begin({ x: 100, y: -12 });
+const sweepSteps = 100;
+for (let step = 0; step <= sweepSteps; step += 1) {
+  const angle = -0.2 + (step / sweepSteps) * (Math.PI * 2 - 0.45);
+  sweepTrail.add({
+    x: Math.cos(angle) * sweepRadius,
+    y: Math.sin(angle) * sweepRadius,
+  }, true);
+}
+sweepTrail.add({ x: 100, y: 12 }, true);
+const sweepChanged = captureLoop(sweep, 1, sweepTrail);
+const sweepShare = sweep.share(1);
+if (
+  sweepChanged <= 0
+  || sweepShare < 0.5
+  || sweep.ownerAt(0, 400) !== 1
+  || sweep.ownerAt(1150, 0) === 1
+) {
+  console.error("FAIL: majority circuit did not claim its interior", {
+    sweepChanged,
+    sweepShare,
+    interior: sweep.ownerAt(0, 400),
+    rim: sweep.ownerAt(1150, 0),
+  });
+  process.exit(1);
+}
+assertCounts(sweep, "sweep");
+assertInsideArena(sweep, 1, "sweep");
+console.log("PASS: majority circuit claims the inside of the stroke", sweepShare.toFixed(4));
+
+const { Entity } = await import("../src/sim/Entity.js");
+const { updateInkContact } = await import("../src/sim/Movement.js");
+const pokeGrid = new TerritoryGrid(CONFIG.arenaRadius, CONFIG.gridSize, 4);
+pokeGrid.setDisk(1, 0, 0, CONFIG.startTerritoryRadius);
+const pokeShare = pokeGrid.share(1);
+let probeX = null;
+for (let x = 0; x < 200; x += 1) {
+  if (!pokeGrid.isOwnedBy(1, x, 0)) {
+    probeX = x;
+    break;
+  }
+}
+const pokeEntity = new Entity(
+  { id: 1, name: "You", color: "#d9452b", wetColor: "#ff6a4a" },
+  { x: probeX, y: 0 },
+  0,
+  CONFIG.playerSpeed,
+  CONFIG,
+);
+pokeEntity.previousPosition = { x: probeX - 8, y: 0 };
+const pokeRadius = CONFIG.bodyRadius * CONFIG.firstClaimContactScale;
+updateInkContact(pokeEntity, pokeGrid, pokeRadius);
+if (!pokeEntity.outsideOwnTerritory || pokeEntity.clearedHome || pokeEntity.capturePending) {
+  console.error("FAIL: leaving the disk did not open an uncommitted stroke", {
+    outside: pokeEntity.outsideOwnTerritory,
+    cleared: pokeEntity.clearedHome,
+    pending: pokeEntity.capturePending,
+    probeX,
+  });
+  process.exit(1);
+}
+pokeEntity.previousPosition = { ...pokeEntity.position };
+pokeEntity.position = { x: 0, y: 0 };
+updateInkContact(pokeEntity, pokeGrid, pokeRadius);
+if (
+  pokeEntity.outsideOwnTerritory
+  || pokeEntity.trail.active
+  || pokeEntity.capturePending
+  || pokeGrid.share(1) > pokeShare + 0.0000001
+) {
+  console.error("FAIL: edge poke committed a claim", {
+    outside: pokeEntity.outsideOwnTerritory,
+    trail: pokeEntity.trail.points.length,
+    pending: pokeEntity.capturePending,
+    share: pokeGrid.share(1),
+  });
+  process.exit(1);
+}
+console.log("PASS: grazing home does not commit a stroke");
+
+heading = 0;
+const runner = new Game({ headingFor() { return heading; } }, colors, CONFIG, () => 0.15);
+let previous = { ...runner.player.position };
+for (let tick = 0; tick < 520; tick += 1) {
+  runner.tick(dt);
+  if (!runner.player.alive) {
+    console.error("FAIL: rim run died", runner.player.deathReason, "tick", tick);
+    process.exit(1);
+  }
+  const step = Math.hypot(
+    runner.player.position.x - previous.x,
+    runner.player.position.y - previous.y,
+  );
+  if (step < 0.2) {
+    console.error("FAIL: avatar stopped", step, runner.player.position);
+    process.exit(1);
+  }
+  previous = { ...runner.player.position };
+}
+const rimDistance = Math.hypot(runner.player.position.x, runner.player.position.y);
+if (rimDistance < CONFIG.arenaRadius - CONFIG.bodyRadius - 40) {
+  console.error("FAIL: straight run did not reach the rim", rimDistance);
+  process.exit(1);
+}
+console.log("PASS: always-move rim slide", rimDistance.toFixed(1));
+
+const winner = new Game({ headingFor() { return 0; } }, colors, CONFIG, () => 0.3);
+const winGrid = winner.grid;
+winGrid.counts.fill(0);
+let sealed = 0;
+for (let index = 0; index < winGrid.cells.length; index += 1) {
+  if (winGrid.cells[index] < 0) continue;
+  winGrid.cells[index] = 1;
+  sealed += 1;
+}
+winGrid.counts[1] = sealed;
+for (const bot of winner.bots) bot.markDead("plane sealed", winner.player);
+winner.tick(dt);
+if (winner.state !== "over" || winner.outcome?.type !== "win") {
+  console.error("FAIL: full plane did not win", winner.state, winner.outcome);
+  process.exit(1);
+}
+if (winner.bots.some((bot) => winGrid.counts[bot.id] > 0)) {
+  console.error("FAIL: bot respawned onto a sealed plane");
+  process.exit(1);
+}
+console.log("PASS: sealed plane wins and does not respawn bots");

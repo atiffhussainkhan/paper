@@ -21,7 +21,7 @@ Run from `/workspace/inkbound` on the integrated tree. All exit 0.
 | Smoke | Result | What it locks |
 |-------|--------|----------------|
 | `node tools/smoke_combat.mjs` | **pass** | Opening safety blocks bot cuts; low-share extension; cut works after grace; aggression ramps with age and share; no false self-kill on a straight trail; early self-forgiveness on short curves |
-| `node tools/smoke_loop.mjs` | **pass** | Scripted claim stays alive. Start share 0.0103 → end share 0.0276, trail closed, state `playing` |
+| `node tools/smoke_loop.mjs` | **pass** | Scripted claim stays alive (0.0103 → 0.0276). Small loop steals only enclosed ink (share 0.0262). Majority circuit claims the interior (share 0.6715) and stays inside the arena. Grazing home does not commit a stroke. Straight run rim-slides (distance 1187) without stopping. A sealed plane wins and does not respawn bots |
 | `node tools/smoke_hud.mjs` | **pass** | Best % and Stage (Quiet Plane + bar) hooks and contrast styles. No Paper.io strings in HTML/CSS/HUD |
 | `node tools/smoke_vfx.mjs` | **pass** | Capture `+%` floats, three-phase death juice, crown holder, and `drawCrown` does not throw |
 | `node tools/smoke_meta.mjs` | **pass** | Five skins, best %, stage credit and clear |
@@ -44,8 +44,9 @@ Run from `/workspace/inkbound` on the integrated tree. All exit 0.
 ## Gaps
 
 - **Godot is not the playable build.** `godot/scripts/sim/capture.gd` `capture_loop` still returns 0. The comment now matches the web fill rule. Do not ship the Godot project as the game.
-- **Browser did not close a successful claim.** The pointer square cut its own line first. Territory growth on a closed loop is **pass** only in `smoke_loop.mjs` (1.03% → 2.76%).
-- **100% win overlay was not run.** `winShare` stayed at 1. "The plane is yours." was not shown.
+- **Browser did not close a successful claim.** The pointer square cut its own line first. Territory growth on a closed loop is **pass** in `smoke_loop.mjs` (1.03% → 2.76%, plus the pocket and majority-circuit cases).
+- **Win overlay copy was not shown in the browser.** `smoke_loop.mjs` does seal the plane and reaches `state === "over"` with `outcome.type === "win"`. The on-screen line "The plane is yours." was not opened.
+- **Rim slide was not driven in the browser.** `smoke_loop.mjs` holds a straight heading for 520 ticks, keeps moving, and finishes at distance 1187 (arena radius 1200).
 - **No five-minute soak and no tab-switch test.**
 - **A sharp pointer hook still dies on your own line.** Seen in this session. Opening grace does not make every flick safe.
 - **Out of scope, confirmed absent as product:** real multiplayer, shop, ads, powers. Not treated as defects.

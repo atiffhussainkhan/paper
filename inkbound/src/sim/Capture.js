@@ -104,6 +104,7 @@ function pathThroughInk(grid, ownerId, fromIndex, toIndex) {
     cursor = next;
     steps += 1;
   }
+  if (cursor !== fromIndex) return null;
   reversed.reverse();
   return reversed;
 }
