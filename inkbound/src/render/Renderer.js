@@ -453,27 +453,27 @@ export class Renderer {
     // than the Kenney skies. Stage hue still reads through the multiply.
     if (bg) {
       context.save();
-      context.globalAlpha = 0.72;
+      context.globalAlpha = 0.84;
       this.drawCover(context, bg, diameter);
       context.restore();
     }
     context.save();
     context.globalCompositeOperation = "multiply";
-    context.globalAlpha = 0.78;
-    context.fillStyle = this.colors["--sumi-900"];
+    context.globalAlpha = 0.62;
+    context.fillStyle = this.colors["--sumi-800"];
     context.beginPath();
     context.arc(0, 0, radius, 0, Math.PI * 2);
     context.fill();
     context.restore();
 
-    const tile = Math.max(96, Math.round(radius * 0.18));
-    this.fillTiled(context, this.grainImageId, radius, tile, 0.2, "overlay");
+    const tile = Math.max(140, Math.round(radius * 0.34));
+    this.fillTiled(context, this.grainImageId, radius, tile, 0.09, "overlay");
     this.fillTiled(
       context,
       this.terrainImageId,
       radius,
-      Math.max(128, Math.round(radius * 0.26)),
-      0.22,
+      Math.max(160, Math.round(radius * 0.4)),
+      0.12,
       "soft-light",
     );
 
@@ -483,7 +483,7 @@ export class Renderer {
       const dist = radius * 0.84;
       const size = Math.max(36, radius * 0.055);
       context.save();
-      context.globalAlpha = 0.26;
+      context.globalAlpha = 0.18;
       for (let i = 0; i < count; i += 1) {
         const angle = (i / count) * Math.PI * 2 + 0.35;
         const jitter = ((i * 17) % 5) - 2;
