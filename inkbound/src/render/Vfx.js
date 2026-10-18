@@ -5,9 +5,10 @@
 // territory on the death tick; Vfx keeps snapshots so the plane can let go of
 // them on the schedule below instead of popping.
 export const VFX_TIMING = Object.freeze({
-  floatDuration: 1.3,
-  floatRise: 58,
-  floatStackGap: 30,
+  // Phase 1.5: longer / taller floats so the first claim +% is unmistakable.
+  floatDuration: 1.75,
+  floatRise: 78,
+  floatStackGap: 34,
 
   // Phase 1: the wet stroke beads apart and evaporates.
   dissolveDuration: 0.5,
@@ -416,27 +417,34 @@ export class Vfx {
     context.save();
     context.textAlign = "center";
     context.textBaseline = "alphabetic";
-    context.font = "italic 34px 'Instrument Serif', Georgia, serif";
+    context.font = "italic 44px 'Instrument Serif', Georgia, serif";
     context.lineJoin = "round";
     for (const item of this.floats) {
       const entity = game.entities.find((e) => e.id === item.entityId);
       if (entity?.alive) item.anchor = positionOf(entity);
       const t = clamp01(item.age / VFX_TIMING.floatDuration);
       const rise = easeOutCubic(t) * VFX_TIMING.floatRise;
-      const fadeIn = clamp01(item.age / 0.12);
-      const fadeOut = 1 - clamp01((t - 0.6) / 0.4);
-      const scale = 0.85 + 0.15 * easeOutBack(clamp01(item.age / 0.22));
+      const fadeIn = clamp01(item.age / 0.1);
+      const fadeOut = 1 - clamp01((t - 0.55) / 0.45);
+      // First claim pops harder so the +% reads as the reward beat.
+      const isLeadFloat = item.stack === 0;
+      const pop = easeOutBack(clamp01(item.age / (isLeadFloat ? 0.28 : 0.2)));
+      const scale = (isLeadFloat ? 0.78 : 0.85) + (isLeadFloat ? 0.32 : 0.15) * pop;
       const x = item.anchor.x;
-      const y = item.anchor.y - 34 - rise - item.stack * VFX_TIMING.floatStackGap;
+      const y = item.anchor.y - 40 - rise - item.stack * VFX_TIMING.floatStackGap;
+      const wet = entity?.wetColor
+        || this.colors["--ink-player-wet"]
+        || this.colors["--bone-100"];
 
       context.save();
       context.translate(x, y);
       context.scale(scale, scale);
       context.globalAlpha = fadeIn * fadeOut;
-      context.lineWidth = 6;
+      // Thick sumi halo then wet fill — claim +% must pop off any plane ink.
+      context.lineWidth = isLeadFloat ? 9 : 7;
       context.strokeStyle = this.colors["--sumi-950"];
       context.strokeText(item.text, 0, 0);
-      context.fillStyle = this.colors["--bone-100"];
+      context.fillStyle = wet;
       context.fillText(item.text, 0, 0);
       context.restore();
     }

@@ -47,9 +47,10 @@ export const CONFIG = Object.freeze({
   // aggression = (ageWeight * age + shareWeight * share) * sqrt(age)
   // The sqrt(age) gate keeps the curve continuous at the end of opening safety,
   // even if a fast player has already claimed a large share.
-  botOpeningSafetySeconds: 10,
-  botLowShareSafetyBonusSeconds: 5,
-  botDifficultyRampSeconds: 70,
+  // Phase 1.5: longer teaching window so bots don't spoil the first claim.
+  botOpeningSafetySeconds: 14,
+  botLowShareSafetyBonusSeconds: 8,
+  botDifficultyRampSeconds: 85,
   botDifficultyShareStart: 0.015,
   botDifficultyShareFull: 0.2,
   botDifficultyAgeWeight: 0.65,

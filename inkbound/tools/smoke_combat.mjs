@@ -51,7 +51,11 @@ if (!player.alive || !playerSafeFromBots(12, 0, CONFIG)) {
 console.log("PASS: low-share safety extension blocks bot cut");
 
 // Once adaptive grace expires, the same cut kills.
-resolveCombat([player, bot], CONFIG, 16, 0);
+// With opening 14 + low-share bonus 8, zero-share grace ends at 22s.
+const afterGraceAge = (CONFIG.botOpeningSafetySeconds ?? 14)
+  + (CONFIG.botLowShareSafetyBonusSeconds ?? 8)
+  + 0.5;
+resolveCombat([player, bot], CONFIG, afterGraceAge, 0);
 if (player.alive) {
   console.error("FAIL: player should die after grace");
   process.exit(1);
@@ -59,10 +63,10 @@ if (player.alive) {
 console.log("PASS: bot cut works after grace");
 
 // Age and share should continuously increase each aggression output, with no
-// jump at the ten-second opening boundary.
-const openingCurve = botDifficultyCurve(10, 0.2, CONFIG);
+// jump at the opening safety boundary.
+const openingCurve = botDifficultyCurve(CONFIG.botOpeningSafetySeconds ?? 14, 0.2, CONFIG);
 const midCurve = botDifficultyCurve(45, 0.08, CONFIG);
-const lateCurve = botDifficultyCurve(100, 0.2, CONFIG);
+const lateCurve = botDifficultyCurve(120, 0.2, CONFIG);
 if (
   openingCurve.aggression !== 0
   || !(midCurve.aggression > openingCurve.aggression)
