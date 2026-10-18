@@ -10,8 +10,9 @@
         style="--row-ink: var(--ink-bot-1)"   per-row ink color
         .is-self / .is-dead / .is-lead          row states (lead wears the crown)
         > .hud-board__swatch  .hud-board__name  .hud-board__pct
-     .hud-cast                     every catalog character plate
      .hud-hint                     add .is-faded to dismiss
+     .title-screen                 home / title; match HUD stays under it until Play
+     .title-cast                   figure plates, home only (not on the playfield)
      .hud-overlay[hidden]          death / win card; remove [hidden] to show
         .hud-overlay--win          win variant
         .hud-overlay__title  .hud-overlay__stats  .btn-restart
@@ -829,6 +830,358 @@ body {
   outline-offset: 3px;
 }
 
+.hud-overlay__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-home,
+.btn-menu {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.btn-home {
+  min-width: 120px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--sumi-600);
+  background: transparent;
+  color: var(--bone-100);
+  font-size: 15px;
+}
+
+.btn-home:hover {
+  border-color: var(--bone-500);
+  background: rgb(11 12 14 / 0.35);
+}
+
+.btn-menu {
+  margin-left: 8px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgb(143 137 124 / 0.45);
+  background: rgb(11 12 14 / 0.55);
+  color: var(--bone-300);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.btn-menu:hover {
+  color: var(--bone-100);
+  border-color: var(--bone-500);
+}
+
+.btn-home:focus-visible,
+.btn-menu:focus-visible,
+.btn-play:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* ---------- Title / home ---------- */
+
+body[data-mode="title"] #hud {
+  visibility: hidden;
+}
+
+.title-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  pointer-events: auto;
+  touch-action: pan-y;
+  color: var(--bone-100);
+  background: var(--sumi-950);
+  text-shadow: none;
+}
+
+.title-screen[hidden] {
+  display: none;
+}
+
+.title-screen__plate {
+  position: absolute;
+  inset: -8%;
+  background-image: var(--art-title-plate, none);
+  background-size: cover;
+  background-position: center;
+  animation: plate-drift 32s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.title-screen__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgb(11 12 14 / 0.08), rgb(11 12 14 / 0.84) 74%),
+    linear-gradient(180deg, rgb(11 12 14 / 0.28), rgb(11 12 14 / 0.55));
+  pointer-events: none;
+}
+
+.title-screen__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image: var(--art-plane-grain, none);
+  background-size: 680px 680px;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.title-screen__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(880px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: calc(16px + var(--safe-t)) 0 calc(18px + var(--safe-b));
+  text-align: center;
+}
+
+.title-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.title-hero__seal {
+  width: 72px;
+  height: 72px;
+  background-color: transparent;
+  background-image: var(--art-brand-seal, none), var(--art-icon-circle, none);
+  background-size: 100% 100%, 124% 124%;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.28);
+  animation: seal-in 700ms var(--ease-out) both;
+}
+
+.title-hero__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(68px, 11vw, 112px);
+  line-height: 0.86;
+  letter-spacing: -0.02em;
+  color: var(--bone-100);
+  animation: title-rise 640ms var(--ease-out) 60ms both;
+}
+
+.title-hero__rule {
+  width: 56px;
+  height: 2px;
+  margin-top: 2px;
+  background: var(--ink-player);
+}
+
+.title-hero__tag {
+  margin: 2px 0 0;
+  max-width: 24ch;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.25;
+  color: var(--bone-300);
+}
+
+.title-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+}
+
+.title-preview__pair {
+  position: relative;
+  width: min(220px, 58vw);
+  height: min(188px, 26vh);
+  min-height: 140px;
+}
+
+.title-preview__disk {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 6%;
+  width: 68%;
+  height: 22px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, var(--title-ink-wet, var(--ink-player-wet)) 0%, var(--title-ink, var(--ink-player)) 62%, transparent 72%);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.28);
+}
+
+.title-preview__figure:not([src]),
+.title-preview__orb:not([src]) {
+  visibility: hidden;
+}
+
+.title-preview__figure {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 10%;
+  height: 88%;
+  width: auto;
+  max-width: 78%;
+  transform: translateX(-58%);
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 14px 12px rgb(0 0 0 / 0.45));
+  animation: figure-float 4.8s ease-in-out infinite;
+}
+
+.title-preview__orb {
+  position: absolute;
+  z-index: 2;
+  right: 10%;
+  bottom: 16%;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px rgb(11 12 14 / 0.45), 0 8px 14px rgb(0 0 0 / 0.4);
+  animation: figure-float 4.8s ease-in-out 0.4s infinite;
+}
+
+.title-preview__name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--bone-100);
+}
+
+.title-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+}
+
+.title-meta p {
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bone-300);
+  background: rgb(11 12 14 / 0.55);
+  border: 1px solid rgb(143 137 124 / 0.35);
+  border-radius: var(--radius);
+}
+
+.title-meta__best span,
+.title-meta [data-title="best"] {
+  margin-left: 6px;
+  font-family: var(--font-num);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--bone-100);
+  font-variant-numeric: tabular-nums;
+}
+
+.title-hint {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--bone-500);
+}
+
+.title-ink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(640px, 100%);
+}
+
+.title-ink__label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-500);
+}
+
+.title-screen .skin-picker {
+  justify-content: center;
+}
+
+.btn-play {
+  appearance: none;
+  min-width: min(260px, 78vw);
+  min-height: 56px;
+  padding: 0 36px;
+  border: 0;
+  border-radius: var(--radius);
+  background-color: var(--ink-player);
+  background-image: var(--art-restart, none);
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: soft-light;
+  color: var(--bone-100);
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgb(217 69 43 / 0.28);
+  transition: background-color 140ms var(--ease-out), transform 140ms var(--ease-out);
+}
+
+.btn-play:hover {
+  background-color: var(--ink-player-wet);
+}
+
+.btn-play:active {
+  transform: translateY(1px);
+}
+
+.title-screen .hud-cast {
+  position: static;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  z-index: 1;
+  width: min(760px, 100%);
+  max-width: 100%;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  overflow-x: auto;
+  pointer-events: auto;
+  touch-action: pan-x;
+  background: rgb(11 12 14 / 0.5);
+}
+
+.title-cast .hud-cast__plate:not(.is-figure) {
+  display: none;
+}
+
 /* ---------- Misc ---------- */
 
 .noscript {
@@ -877,17 +1230,37 @@ body {
   100% { transform: scale(1); }
 }
 
+@keyframes seal-in {
+  from { opacity: 0; transform: rotate(-16deg) scale(0.92); }
+  to   { opacity: 1; transform: rotate(-4deg) scale(1); }
+}
+
+@keyframes title-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes figure-float {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -8px; }
+}
+
+@keyframes plate-drift {
+  from { transform: scale(1.04) translate3d(0, -1.2%, 0); }
+  to   { transform: scale(1.08) translate3d(0, 1.2%, 0); }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
   .hud {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto auto;
     grid-template-areas:
       "brand"
       "board"
-      "cast"
       "."
+      "hint"
       "score";
   }
 
@@ -906,7 +1279,25 @@ body {
   }
 
   .hud-hint {
-    display: none;
+    display: block;
+    justify-self: start;
+    align-self: end;
+    max-width: min(280px, 72vw);
+    font-size: 15px;
+  }
+
+  .title-hero__seal {
+    width: 56px;
+    height: 56px;
+  }
+
+  .title-preview__pair {
+    height: 150px;
+    min-height: 150px;
+  }
+
+  .title-screen__content {
+    gap: 10px;
   }
 
   .hud-percent,
@@ -931,34 +1322,14 @@ body {
     margin-bottom: 8px;
   }
 
-  .hud-cast {
-    position: static;
-    top: auto;
-    bottom: auto;
-    left: auto;
-    right: auto;
-    grid-area: cast;
-    transform: none;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    max-width: none;
-    width: auto;
-    margin-top: 8px;
-  }
-
-  .hud-cast__plate {
+  .title-cast .hud-cast__plate {
     flex: none;
     width: 52px;
   }
 
-  .hud-cast__plate img {
+  .title-cast .hud-cast__plate img {
     width: 44px;
     height: 44px;
-  }
-
-  .hud-cast__plate:not(.is-figure) {
-    display: none;
   }
 }
 

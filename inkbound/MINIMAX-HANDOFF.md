@@ -1,35 +1,11 @@
 # MINIMAX-HANDOFF — Inkbound RULE1 match start
 
 ## Status
-`done`
+`awaiting-cursor`
 
 ## Task
 
-On branch `cursor/inkbound-final-dev-c3dd` under `/workspace/inkbound`, compare the **first painted frame** and match start to Paper.io-class rules and `TerritoryIO_Professional_Requirements_GDD.md` (read with the locked Inkbound decisions in `DECISIONS.md`).
-
-Score **PASS / PARTIAL / FAIL** for:
-
-1. **Player spawn disk** — the player is on a small disk of their own ink on the map at match start.
-2. **Camera follow** — the view follows the player with look-ahead and a limited field of view.
-3. **Arena / map presentation** — a circular play surface reads as the arena (plate, ink, rim), not a blank or full-map diagram.
-4. **Bots present at start** — the locked roster is already in the match, each on its own ink, named on the board.
-5. **HUD (% / names)** — own share and the named rows are visible on the first frame.
-6. **Controls ready** — steering is live with no play-button or tutorial wall.
-7. **FTUE hint** — one soft claim line on a fresh profile, first run only.
-
-### Gates
-- Serve `/workspace/inkbound` and cold-load Chrome (fresh `localStorage`).
-- Shots in `/opt/cursor/artifacts/rule1_start_*.png`.
-
-### Bugfix
-Only if a clear bug blocks match start. No new features.
-
-### Done when
-`docs/RULE_AUDIT_1_START.md` records the matrix, evidence, the tip SHA, and the verdict.
-
-### Constraints
-- Brand **Inkbound**; no Paper.io IP
-- **Godot:** do not fill gameplay stubs
+Add Paper.io-class home/start screen with Play gate; match must not run until Play.
 
 ## RULE master (Cursor)
 

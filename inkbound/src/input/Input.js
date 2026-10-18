@@ -36,7 +36,7 @@ export class Input {
     this.onKeyDown = (event) => {
       const dir = this.directionForEvent(event);
       if (!dir) return;
-      if (this.isOverlayInteractive(event.target)) return;
+      if (this.isTitleGate() || this.isOverlayInteractive(event.target)) return;
       this.keys.add(dir);
       if (!this.pointer.down) {
         this.pointer.active = false;
@@ -50,7 +50,7 @@ export class Input {
     };
 
     this.onPointerDown = (event) => {
-      if (this.isOverlayInteractive(event.target)) return;
+      if (this.isTitleGate() || this.isOverlayInteractive(event.target)) return;
       const pos = this.canvasCoords(event.clientX, event.clientY);
       this.pointer.x = pos.x;
       this.pointer.y = pos.y;
@@ -65,6 +65,7 @@ export class Input {
     };
 
     this.onPointerMove = (event) => {
+      if (this.isTitleGate()) return;
       if (this.isOverlayInteractive(event.target) && !this.pointer.down) return;
       const pos = this.canvasCoords(event.clientX, event.clientY);
       const moved = Math.hypot(pos.x - this.pointer.x, pos.y - this.pointer.y);
@@ -89,7 +90,7 @@ export class Input {
     };
 
     this.onTouchStart = (event) => {
-      if (this.isOverlayInteractive(event.target)) return;
+      if (this.isTitleGate() || this.isOverlayInteractive(event.target)) return;
       if (!event.touches || event.touches.length === 0) return;
       const touch = event.touches[0];
       const pos = this.canvasCoords(touch.clientX, touch.clientY);
@@ -107,6 +108,7 @@ export class Input {
     };
 
     this.onTouchMove = (event) => {
+      if (this.isTitleGate()) return;
       if (this.isOverlayInteractive(event.target) && !this.pointer.down) return;
       if (!event.touches || event.touches.length === 0) return;
       const touch = event.touches[0];
@@ -168,9 +170,13 @@ export class Input {
     return Boolean(KEY_MAP[code]);
   }
 
+  isTitleGate() {
+    return document.body?.dataset?.mode === "title";
+  }
+
   isOverlayInteractive(target) {
     if (!target || typeof target.closest !== "function") return false;
-    return Boolean(target.closest("button, [data-hud='overlay']:not([hidden])"));
+    return Boolean(target.closest("button, [data-hud='overlay']:not([hidden]), [data-screen='title']:not([hidden])"));
   }
 
   canvasCoords(clientX, clientY) {

@@ -1,9 +1,10 @@
 import { catalogAssetUrl } from "../assets/ImageCatalog.js";
 
 export class Hud {
-  constructor(root, onRestart, catalog = null) {
+  constructor(root, onRestart, catalog = null, onHome = null) {
     this.root = root;
     this.onRestart = onRestart;
+    this.onHome = onHome;
     this.catalog = catalog;
     this.profile = null;
     this.percent = root.querySelector('[data-hud="percent"]');
@@ -13,6 +14,8 @@ export class Hud {
     this.overlayTitle = root.querySelector('[data-hud="overlay-title"]');
     this.overlayStats = root.querySelector('[data-hud="overlay-stats"]');
     this.restart = root.querySelector('[data-hud="restart"]');
+    this.home = root.querySelector('[data-hud="home"]');
+    this.menu = root.querySelector('[data-hud="menu"]');
     this.best = root.querySelector('[data-hud="best"]');
     this.overlayBest = root.querySelector('[data-hud="overlay-best"]');
     this.overlayUnlocks = root.querySelector('[data-hud="overlay-unlocks"]');
@@ -22,7 +25,8 @@ export class Hud {
     this.stageBar = root.querySelector('[data-hud="stage-bar"]');
     this.stageFill = root.querySelector('[data-hud="stage-fill"]');
     this.overlayStage = root.querySelector('[data-hud="overlay-stage"]');
-    this.cast = root.querySelector('[data-hud="cast"]');
+    this.cast = root.querySelector('[data-hud="cast"]')
+      || document.querySelector('[data-hud="cast"]');
     this.lastBestText = "";
     this.runSummary = null;
     this.stageSummary = null;
@@ -55,23 +59,49 @@ export class Hud {
       event.stopPropagation();
     };
 
+    this.handleHomeEvent = (event) => {
+      if (event) {
+        event.stopPropagation();
+        if (event.type === "touchend" && event.cancelable) {
+          event.preventDefault();
+        }
+      }
+      const now = performance.now();
+      if (now - this.lastRestartAt < 80) return;
+      this.lastRestartAt = now;
+      if (typeof this.onHome === "function") this.onHome();
+    };
+
     this.handleOverlayKeyDown = (event) => {
       if (!this.overlayVisible) return;
-      if (event.target?.closest?.('[data-hud="skins"]')) return;
+      if (event.target?.closest?.('[data-hud="skins"], [data-hud="home"], [data-hud="menu"]')) return;
       if (event.code === "Enter" || event.code === "Space") {
         event.preventDefault();
         this.handleRestartEvent(event);
       }
     };
 
-    if (this.restart) {
-      this.restart.addEventListener("pointerdown", this.stopPointerPropagation);
-      this.restart.addEventListener("touchstart", this.stopPointerPropagation, { passive: true });
-      this.restart.addEventListener("click", this.handleRestartEvent);
-      this.restart.addEventListener("touchend", this.handleRestartEvent, { passive: false });
-    }
+    this.bindAction(this.restart, this.handleRestartEvent);
+    this.bindAction(this.home, this.handleHomeEvent);
+    this.bindAction(this.menu, this.handleHomeEvent);
     window.addEventListener("keydown", this.handleOverlayKeyDown);
     this.mountCast();
+  }
+
+  bindAction(button, handler) {
+    if (!button || !handler) return;
+    button.addEventListener("pointerdown", this.stopPointerPropagation);
+    button.addEventListener("touchstart", this.stopPointerPropagation, { passive: true });
+    button.addEventListener("click", handler);
+    button.addEventListener("touchend", handler, { passive: false });
+  }
+
+  unbindAction(button, handler) {
+    if (!button || !handler) return;
+    button.removeEventListener("pointerdown", this.stopPointerPropagation);
+    button.removeEventListener("touchstart", this.stopPointerPropagation);
+    button.removeEventListener("click", handler);
+    button.removeEventListener("touchend", handler);
   }
 
   mountCast() {
@@ -391,12 +421,9 @@ export class Hud {
   }
 
   destroy() {
-    if (this.restart) {
-      this.restart.removeEventListener("pointerdown", this.stopPointerPropagation);
-      this.restart.removeEventListener("touchstart", this.stopPointerPropagation);
-      this.restart.removeEventListener("click", this.handleRestartEvent);
-      this.restart.removeEventListener("touchend", this.handleRestartEvent);
-    }
+    this.unbindAction(this.restart, this.handleRestartEvent);
+    this.unbindAction(this.home, this.handleHomeEvent);
+    this.unbindAction(this.menu, this.handleHomeEvent);
     window.removeEventListener("keydown", this.handleOverlayKeyDown);
   }
 }

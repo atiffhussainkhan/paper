@@ -67,6 +67,19 @@ game.playerSkin = SKINS[0];
 game.reset();
 assert.equal(game.player.color, SKINS[0].dry);
 
+const frozenX = game.player.position.x;
+const frozenBot = game.bots[0].position.x;
+game.holdForTitle();
+assert.equal(game.state, "title");
+game.tick(2);
+assert.equal(game.state, "title");
+assert.equal(game.player.position.x, frozenX, "title gate does not move the player");
+assert.equal(game.bots[0].position.x, frozenBot, "title gate does not move bots");
+assert.equal(game.player.trail.points.length, 0, "title gate does not emit a trail");
+assert.equal(game.bots[0].trail.points.length, 0, "title gate does not emit bot trails");
+game.reset();
+assert.equal(game.state, "playing", "Play cold-spawns a live match");
+
 const corrupt = memoryStorage();
 corrupt.setItem("inkbound.profile.v1", "{not json");
 assert.equal(new Profile(corrupt).get("bestPct"), 0);

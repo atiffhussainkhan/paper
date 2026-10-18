@@ -12,25 +12,64 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+Condensed:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=mobile-overlay">
+  <link rel="stylesheet" href="css/style.css?v=title-gate">
 
-  <script type="module" src="src/main.js?v=art-layers"></script>
+  <script type="module" src="src/main.js?v=title-gate"></script>
 </head>
-<body>
+<body data-mode="title">
   <main class="stage">
     <canvas id="game" aria-label="Inkbound arena">
       Inkbound needs a browser with Canvas support.
     </canvas>
+
+    <section class="title-screen" data-screen="title" aria-labelledby="title-name">
+      <div class="title-screen__plate" aria-hidden="true"></div>
+      <div class="title-screen__shade" aria-hidden="true"></div>
+      <div class="title-screen__grain" aria-hidden="true"></div>
+      <div class="title-screen__content">
+        <header class="title-hero">
+          <span class="title-hero__seal" aria-hidden="true"></span>
+          <h1 class="title-hero__name" id="title-name">Inkbound</h1>
+          <span class="title-hero__rule" aria-hidden="true"></span>
+          <p class="title-hero__tag">Leave your ink. Close the loop.</p>
+        </header>
+
+        <figure class="title-preview">
+          <div class="title-preview__pair">
+            <span class="title-preview__disk" aria-hidden="true"></span>
+            <img class="title-preview__figure" data-title="figure" alt="">
+            <img class="title-preview__orb" data-title="orb" alt="">
+          </div>
+          <figcaption class="title-preview__name" data-title="skin-name">Seal</figcaption>
+        </figure>
+
+        <div class="title-meta">
+          <p class="title-meta__best">Best <span data-title="best">0.0%</span></p>
+          <p class="title-meta__stage" data-title="stage">Stage 1 · Quiet Plane · 0%</p>
+        </div>
+
+        <button type="button" class="btn-play" data-title="play">Play</button>
+        <p class="title-hint">Point to steer. Close the loop to claim.</p>
+
+        <div class="title-ink">
+          <span class="title-ink__label">Ink</span>
+          <div class="skin-picker" data-title="skins"></div>
+        </div>
+
+        <div class="hud-cast title-cast" data-hud="cast" aria-label="Figures"></div>
+      </div>
+    </section>
 
     <!--
       HUD root. src/render/Hud.js owns everything inside #hud.
       The child elements below are optional hooks; Hud.js may fill, replace, or ignore them.
       Class contract is documented in css/style.css.
     -->
-    <div id="hud" class="hud">
-      <header class="hud__brand brand" aria-hidden="true">
-        <span class="brand__seal"></span>
+    <div id="hud" class="hud" aria-hidden="true">
+      <header class="hud__brand brand">
+        <span class="brand__seal" aria-hidden="true"></span>
         <span class="brand__word">Inkbound</span>
+        <button type="button" class="btn-menu" data-hud="menu">Home</button>
       </header>
 
       <section class="hud-percent" aria-live="polite" aria-atomic="true">
@@ -50,8 +89,6 @@
 
       <ol class="hud-board" data-hud="board" aria-label="Leaderboard"></ol>
 
-      <div class="hud-cast" data-hud="cast" aria-label="Character plates"></div>
-
       <p class="hud-hint" data-hud="hint">Point to steer. Close the loop to claim.</p>
 
       <div class="hud-overlay" data-hud="overlay" role="dialog" aria-modal="true" aria-labelledby="hud-overlay-title" hidden>
@@ -65,7 +102,10 @@
             <span class="hud-overlay__ink-label">Ink</span>
             <div class="skin-picker" data-hud="skins"></div>
           </div>
-          <button type="button" class="btn-restart" data-hud="restart">Restart</button>
+          <div class="hud-overlay__actions">
+            <button type="button" class="btn-restart" data-hud="restart">Restart</button>
+            <button type="button" class="btn-home" data-hud="home">Home</button>
+          </div>
         </div>
       </div>
     </div>

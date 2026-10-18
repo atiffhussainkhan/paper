@@ -51,6 +51,12 @@ export class Game {
     }
   }
 
+  // Home / title. Tick, bot headings, and wet trails all require "playing".
+  // reset() is the cold spawn that opens a match.
+  holdForTitle() {
+    this.state = "title";
+  }
+
   createEntity(spec, position, heading) {
     const isPlayer = spec.role === "player";
     const skin = isPlayer ? this.playerSkin : null;
@@ -166,6 +172,7 @@ export class Game {
   }
 
   tick(dt) {
+    // "title" and "over" stay frozen: no steering, bots, or wet trails.
     if (this.state !== "playing") return;
     const player = this.player;
     this.matchAge = (this.matchAge ?? 0) + dt;
