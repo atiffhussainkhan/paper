@@ -31,6 +31,15 @@ Only if a clear bug blocks match start. No new features.
 - Brand **Inkbound**; no Paper.io IP
 - **Godot:** do not fill gameplay stubs
 
+## RULE4 — requirements gaps (Cursor)
+
+**Status:** `done`
+**Verdict:** **12/12 MATCHED (100%)** of GDD §16 Must-have MVP. Unmatched must-haves: none.
+**Exact copy of Paper.io 2:** **No.** Online play, real players, shop, revive, ads, powers, a home screen, and a 8–15 opponent crowd are not in this build.
+**Audited tree:** `b8faf77` (smokes re-run; game bytes unchanged since `21cf6b0`)
+
+Report: `docs/RULE_AUDIT_4_GAPS.md`. Graphics claim stays catalog-only, better-or-equal to a flat paper.io-style web clone, not to official Paper.io 2 art.
+
 ## REQ3 — meta (Cursor)
 
 **Status:** `done`
