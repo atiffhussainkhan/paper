@@ -8,8 +8,9 @@ import { captureLoop } from "./Capture.js";
 import { attachBotBrain, updateBotHeadings } from "./Bots.js";
 
 export class Game {
-  constructor(input, colors, config = CONFIG, random = Math.random) {
+  constructor(input, colors, config = CONFIG, random = Math.random, options = {}) {
     this.input = input;
+    this.playerSkin = options.playerSkin ?? null;
     this.colors = colors;
     this.config = config;
     this.random = random;
@@ -28,10 +29,14 @@ export class Game {
     this.state = "playing";
     this.outcome = null;
     this.finalShare = 0;
+    this.runPeakShare = 0;
     this.matchAge = 0;
+    this.events = [];
+    this.lastCapture = null;
 
     const player = this.createEntity(ENTITY_SPECS[0], { x: 0, y: 0 }, -0.2);
     this.grid.setDisk(player.id, 0, 0, this.config.startTerritoryRadius);
+    this.runPeakShare = this.grid.share(player.id);
     this.entities.push(player);
 
     const spawnR = this.config.botInitialSpawnRadius ?? this.config.arenaRadius * 0.75;
@@ -44,10 +49,12 @@ export class Game {
   }
 
   createEntity(spec, position, heading) {
+    const skin = spec.role === "player" ? this.playerSkin : null;
     const entitySpec = {
       ...spec,
-      color: this.colors[spec.dryToken],
-      wetColor: this.colors[spec.wetToken],
+      color: skin?.dry ?? this.colors[spec.dryToken],
+      wetColor: skin?.wet ?? this.colors[spec.wetToken],
+      coreColor: skin?.core,
     };
     return new Entity(
       entitySpec,
@@ -108,6 +115,29 @@ export class Game {
       if (separated) return point;
     }
     return null;
+  }
+
+  // Presentation-only event queue. Headless runs never drain it, so it is
+  // capped to stay bounded.
+  emit(type, data) {
+    this.events.push({ type, matchAge: this.matchAge, ...data });
+    if (this.events.length > 256) this.events.splice(0, this.events.length - 256);
+  }
+
+  drainEvents() {
+    const events = this.events;
+    this.events = [];
+    return events;
+  }
+
+  ownedCellIndices(ownerId) {
+    const indices = new Int32Array(Math.max(0, this.grid.counts[ownerId]));
+    const { cells } = this.grid;
+    let cursor = 0;
+    for (let index = 0; index < cells.length && cursor < indices.length; index += 1) {
+      if (cells[index] === ownerId) indices[cursor++] = index;
+    }
+    return indices;
   }
 
   get player() {
@@ -184,10 +214,23 @@ export class Game {
     const swallowed = new Map();
     for (const entity of this.entities) {
       if (!entity.alive || !entity.capturePending) continue;
+      const cellsBefore = this.grid.counts[entity.id];
       const changed = captureLoop(this.grid, entity.id, entity.trail);
       entity.trail.clear();
       entity.capturePending = false;
       if (!changed) continue;
+      const gained = this.grid.counts[entity.id] - cellsBefore;
+      if (gained > 0) {
+        this.lastCapture = {
+          entityId: entity.id,
+          isPlayer: entity.isPlayer,
+          delta: gained / this.grid.insideCount,
+          share: this.grid.share(entity.id),
+          position: { ...entity.position },
+          matchAge: this.matchAge,
+        };
+        this.emit("capture", this.lastCapture);
+      }
       for (const other of this.entities) {
         if (other !== entity && other.alive && this.grid.counts[other.id] === 0) {
           swallowed.set(other, entity);
@@ -205,14 +248,30 @@ export class Game {
     }
     this.snapshotDeathShares();
 
+    if (player?.alive) {
+      this.runPeakShare = Math.max(this.runPeakShare ?? 0, this.grid.share(player.id));
+    }
+
     // 7. Apply deaths by erasing both wet and dry ink. Runs once per entity.
     for (const entity of this.entities) {
       if (entity.alive || entity.deathApplied) continue;
       if (entity.isPlayer) {
         this.finalShare = entity.deathShare ?? this.grid.share(entity.id);
+        this.runPeakShare = Math.max(this.runPeakShare ?? 0, this.finalShare);
         this.state = "over";
         this.outcome = { type: "death", title: entity.deathReason };
       }
+      this.emit("death", {
+        entityId: entity.id,
+        isPlayer: entity.isPlayer,
+        killedById: entity.killedBy?.id ?? null,
+        position: { ...entity.position },
+        trail: entity.trail.points.map((point) => ({ x: point.x, y: point.y })),
+        trailWidth: entity.trail.width,
+        color: entity.color,
+        wetColor: entity.wetColor,
+        cells: this.ownedCellIndices(entity.id),
+      });
       entity.trail.clear();
       entity.outsideOwnTerritory = false;
       entity.capturePending = false;
@@ -229,6 +288,7 @@ export class Game {
     // 9. A complete plane ends the match and offers a fresh restart.
     if (player.alive && this.grid.share(player.id) >= this.config.winShare) {
       this.finalShare = this.grid.share(player.id);
+      this.runPeakShare = Math.max(this.runPeakShare ?? 0, this.finalShare);
       this.state = "over";
       this.outcome = { type: "win", title: "The plane is yours." };
     }

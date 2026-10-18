@@ -1,3 +1,5 @@
+import { Vfx } from "./Vfx.js";
+
 export const BRAND_TOKENS = Object.freeze([
   "--sumi-950",
   "--sumi-900",
@@ -46,9 +48,7 @@ export class Renderer {
     this.territoryScale = 4;
     this.cachedGrid = null;
     this.cachedVersion = -1;
-    this.cutFlash = 0;
-    this.cutPosition = null;
-    this.wasGameOver = false;
+    this.vfx = new Vfx(this.colors, config);
     this.resize();
   }
 
@@ -74,9 +74,7 @@ export class Renderer {
     this.cameraReady = true;
     this.cachedGrid = null;
     this.cachedVersion = -1;
-    this.cutFlash = 0;
-    this.cutPosition = null;
-    this.wasGameOver = false;
+    this.vfx.reset();
   }
 
   computeScale() {
@@ -210,18 +208,7 @@ export class Renderer {
       this.camera.y += (targetY - this.camera.y) * camBlend;
     }
 
-    if (game.state === "over" && !this.wasGameOver) {
-      this.wasGameOver = true;
-      if (game.outcome?.type === "death") {
-        this.cutFlash = 1;
-        this.cutPosition = { ...playerPosition };
-      }
-    } else if (game.state !== "over") {
-      this.wasGameOver = false;
-    }
-    if (this.cutFlash > 0) {
-      this.cutFlash = Math.max(0, this.cutFlash - frameTime * 2.4);
-    }
+    this.vfx.update(game, frameTime);
 
     const context = this.ctx;
     context.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
@@ -254,18 +241,18 @@ export class Renderer {
       radius * 2,
     );
 
+    this.vfx.drawUnder(context);
+
     for (const entity of game.entities) {
       this.drawTrail(context, entity, alpha);
     }
     for (const entity of game.entities) {
       if (entity.alive) this.drawEntity(context, entity, alpha);
     }
-    if (this.cutFlash > 0 && this.cutPosition) {
-      this.drawCutFlash(context, this.cutPosition, this.cutFlash);
-    }
     context.restore();
 
     this.drawArenaRim(context, radius);
+    this.vfx.drawOver(context, game, (entity) => this.interpolatedPosition(entity, alpha));
     context.restore();
 
     return this.worldToScreen(playerPosition, scale);
@@ -463,7 +450,7 @@ export class Renderer {
     // Inner core (dry tone ring inside wet bead)
     context.beginPath();
     context.arc(-r * 0.1, 0, r * 0.48, 0, Math.PI * 2);
-    context.fillStyle = entity.color;
+    context.fillStyle = entity.coreColor ?? entity.color;
     context.fill();
 
     // Liquid surface-tension crescent sheen along leading edge
@@ -475,18 +462,6 @@ export class Renderer {
     context.globalAlpha = 0.6;
     context.stroke();
 
-    context.restore();
-  }
-
-  drawCutFlash(context, position, intensity) {
-    context.save();
-    const radius = this.config.bodyRadius * (1.5 + (1 - intensity) * 3.8);
-    context.beginPath();
-    context.arc(position.x, position.y, radius, 0, Math.PI * 2);
-    context.strokeStyle = this.colors["--state-cut"];
-    context.lineWidth = 4 * intensity + 1;
-    context.globalAlpha = intensity * 0.85;
-    context.stroke();
     context.restore();
   }
 }
