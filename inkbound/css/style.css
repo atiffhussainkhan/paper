@@ -916,6 +916,21 @@ body {
     z-index: 4;
   }
 
+  /* The death card must sit above the live HUD and stay fully reachable.
+     A centered card was sliding its title under the board and its Restart
+     button under the score panel. */
+  .hud-overlay {
+    z-index: 6;
+    overflow-y: auto;
+    align-items: safe center;
+    justify-items: center;
+  }
+
+  .hud-overlay__card {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
   .hud-cast {
     position: static;
     top: auto;

@@ -64,3 +64,11 @@ Core loop meets the locked Paper.io-class rules (360° steer, constant move, non
 **Audited runtime:** `41f27cc5f914026a1011ecf0b5fff5d420e7ad15`
 
 Every catalog bitmap is bound and drawn from the Image repo mirror. No binding fix. Report: `docs/ACCEPTANCE_REQ2_GRAPHICS.md`.
+
+## REQ4 — full playtests (Cursor)
+
+**Status:** `done`
+**Verdict:** **PASS**
+**Audited runtime:** the commit that adds `docs/ACCEPTANCE_REQ4_PLAYTESTS.md` and the phone death-card fix.
+
+Five complete Chrome sessions from a server rooted at `/workspace/inkbound`: gentle first claim, multi-loop, self-trail death, Emberline equip with reload persistence, and a 375px touch session. Each one seals, dies, shows Best and Stage, and Restarts onto a fresh 1.0% disk. Phone overlay stacking was fixed so the death title and Restart sit above the live HUD. Report: `docs/ACCEPTANCE_REQ4_PLAYTESTS.md`.
