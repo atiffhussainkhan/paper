@@ -736,12 +736,17 @@ export class Renderer {
       context.beginPath();
       context.arc(0, orbY, orbR, 0, Math.PI * 2);
       context.clip();
-      context.drawImage(orb, -orbR, orbY - orbR, orbR * 2, orbR * 2);
+      context.fillStyle = entity.wetColor;
+      context.fill();
+      context.globalCompositeOperation = "multiply";
+      context.globalAlpha = 0.82;
+      const span = orbR * 2.2;
+      context.drawImage(orb, -span * 0.5, orbY - span * 0.5, span, span);
       context.restore();
       context.beginPath();
       context.arc(0, orbY, orbR, 0, Math.PI * 2);
-      context.strokeStyle = entity.wetColor;
-      context.lineWidth = 3;
+      context.strokeStyle = this.colors["--sumi-950"];
+      context.lineWidth = 2.4;
       context.stroke();
     }
 
@@ -789,8 +794,8 @@ export class Renderer {
 
     const plate = this.catalog?.boundImage?.("ui", "iconCircle");
     if (plate) {
-      const plateR = r * 1.45;
-      context.globalAlpha = 0.92;
+      const plateR = r * 1.62;
+      context.globalAlpha = 0.4;
       context.drawImage(plate, -plateR, -plateR, plateR * 2, plateR * 2);
       context.globalAlpha = 1;
     }

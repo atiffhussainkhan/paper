@@ -882,10 +882,11 @@ body {
 @media (max-width: 640px) {
   .hud {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto auto 1fr auto;
     grid-template-areas:
       "brand"
       "board"
+      "cast"
       "."
       "score";
   }
@@ -916,16 +917,19 @@ body {
   }
 
   .hud-cast {
-    top: 118px;
+    position: static;
+    top: auto;
     bottom: auto;
-    left: 8px;
-    right: 8px;
+    left: auto;
+    right: auto;
+    grid-area: cast;
     transform: none;
     flex-wrap: nowrap;
     justify-content: flex-start;
     overflow-x: auto;
     max-width: none;
     width: auto;
+    margin-top: 8px;
   }
 
   .hud-cast__plate {
