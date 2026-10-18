@@ -10,14 +10,14 @@ Catalog total: **58** (background 7, character 15, skin 8, ui 7, vfx 7, terrain 
 
 | id | path | role | where it shows |
 |---|---|---|---|
-| `char-plate-dragon` | `assets/catalog/character/char-plate-dragon.png` | Emberline figure — Dragon idle plate | Emberline skin figure: skin picker and cast strip; arena when Emberline is equipped |
+| `char-plate-dragon` | `assets/catalog/character/char-plate-dragon.png` | Emberline figure — Dragon idle plate | Emberline when equipped; Mulberry bot |
 | `char-plate-knight` | `assets/catalog/character/char-plate-knight.png` | Tide figure — Knight idle plate (Tideglass skin and Tide bot) | Tide bot figure and Tideglass skin: arena, leaderboard swatch, skin picker, cast strip |
 | `char-plate-princess` | `assets/catalog/character/char-plate-princess.png` | Player figure — Princess idle plate (Seal / You) | Player figure (Seal / You) in the arena, leaderboard swatch, skin picker bead, cast strip |
 | `char-toon-female-adventurer` | `assets/catalog/character/char-toon-female-adventurer.png` | Ochre figure — female adventurer idle plate | Ochre bot figure: arena, leaderboard swatch, cast strip |
-| `char-toon-female-person` | `assets/catalog/character/char-toon-female-person.png` | Roster figure — female person idle plate | Roster plate (Walker): cast strip |
-| `char-toon-male-adventurer` | `assets/catalog/character/char-toon-male-adventurer.png` | Roster figure — male adventurer idle plate | Roster plate (Ranger): cast strip |
+| `char-toon-female-person` | `assets/catalog/character/char-toon-female-person.png` | Soot figure — female person idle plate | Soot bot; home cast |
+| `char-toon-male-adventurer` | `assets/catalog/character/char-toon-male-adventurer.png` | Bramble figure — male adventurer idle plate | Bramble bot; home cast |
 | `char-toon-male-person` | `assets/catalog/character/char-toon-male-person.png` | Bone figure — male person idle plate | Bone skin figure: skin picker and cast strip; arena when Bone is equipped |
-| `char-toon-robot` | `assets/catalog/character/char-toon-robot.png` | Nightquarry figure — robot idle plate | Nightquarry skin figure: skin picker and cast strip; arena when Nightquarry is equipped |
+| `char-toon-robot` | `assets/catalog/character/char-toon-robot.png` | Nightquarry figure — robot idle plate | Nightquarry when equipped; Lichen bot |
 | `char-toon-zombie` | `assets/catalog/character/char-toon-zombie.png` | Moss figure — zombie idle plate | Moss bot figure: arena, leaderboard swatch, cast strip |
 | `char-bead-blue` | `assets/catalog/character/char-bead-blue.png` | Bot ink bead — 1024 shaded sphere | Tide orb under the Tide bot and Tideglass picker; cast strip |
 | `char-bead-blue-alt` | `assets/catalog/character/char-bead-blue-alt.png` | Alternate bot bead — 1280 marble sphere | Quarry orb under Ochre and on the Nightquarry picker; cast strip |
@@ -26,7 +26,7 @@ Catalog total: **58** (background 7, character 15, skin 8, ui 7, vfx 7, terrain 
 | `char-shape-circle` | `assets/catalog/character/char-shape-circle.png` | Circular bead — 1280 marble sphere | Bone orb on the Bone picker; cast strip; under the figure when Bone is equipped |
 | `char-shape-squircle` | `assets/catalog/character/char-shape-squircle.png` | Soft bead accent — 1280 marble sphere | Moss orb under the Moss bot; shape accent binding; cast strip |
 
-Standing figures use the `figure` tag. The arena draws that plate upright on its catalog orb. Tide, Ochre, and Moss are the three bots. Seal is the player default. Ranger and Walker have no skin slot; the cast strip under the arena shows them with every other character plate.
+Standing figures use the `figure` tag. The arena draws that plate upright on its catalog orb. The match roster is You plus seven bots: Tide, Ochre, Moss, Bramble (Ranger plate), Soot (Walker plate), Lichen (robot plate), and Mulberry (dragon plate). Seal is the player default. The figure strip is on the home screen. A match hides it.
 
 ## Backgrounds
 

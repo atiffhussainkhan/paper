@@ -33,6 +33,15 @@ The atlas was missing. Home → World map draws six shores from catalog parchmen
 
 The shell is Home, World map, How to play, and Ink, then Play into a match, then a death or win card. `game.state` is `title | map | howto | playing | dead | won`. The frame loop does not tick on title, map, or how to play. The ink picker is a screen; while it is open the sim state stays `title` or `map`. Play still calls `reset()`. The win card reads "The plane is yours." with Play again, Map, and Home. SYS2 replaces `[data-map="board"]` or calls `InkboundFlow.mountMap`. Shots: `/opt/cursor/artifacts/sys3_*.png`.
 
+## SYS4 — gameplay parity (Cursor)
+
+**Status:** `done`
+**Report:** `docs/SYS_AUDIT_4_PARITY.md` (also `docs/SYS_AUDIT_4.md`)
+**Exact copy of Paper.io 2:** **58.8%** (11.75 / 20). Local bots only. This build does not claim multiplayer.
+**Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
+
+`botCount` defaults to 7 (Tide, Ochre, Moss, Bramble, Soot, Lichen, Mulberry) with the three roles repeated. Set `botCount` to 3 for the Phase 0 ring. A 20-second Node bench was 0.202 ms/tick at 3 bots and 0.967 ms/tick at 7, against a 16.7 ms frame. The match shows a three-line kill feed and an eight-row leaderboard. The death card kicker is **Last line** over the cause. The figure gallery stays on home; a match forces it to `display: none`. Home shows **Next ink challenge** (Tideglass at 2.0% on a fresh profile). Shop and revive were left out. Chrome on this tree: 1.0% → 2.6% seal → self-cross at 2.9% with “You crossed your own line.” and Tideglass opened. Shots: `/opt/cursor/artifacts/sys4_*.png`.
+
 ## SYS5 (Cursor)
 
 **Status:** `awaiting-cursor` — polling origin for SYS2–SYS4 (started 2026-10-18).
