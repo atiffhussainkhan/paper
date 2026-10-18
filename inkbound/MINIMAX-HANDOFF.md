@@ -39,3 +39,11 @@ Only if persistence or the HUD is broken. No new meta systems.
 **Audited runtime:** `efbf5f5ff88c9d99a6ac88e5686dbbd6ae97a810`
 
 `node tools/run_acceptance.mjs` runs all six smokes and exits non-zero on failure. Notes: `docs/DEPLOY.md`. Report: `docs/ACCEPTANCE_REQ5_DEPLOY.md`. Godot stays a stub and does not block the static host.
+
+## REQ1 — core play (Cursor)
+
+**Status:** `done`
+**Verdict:** **FULL**
+**Audited runtime:** `efbf5f5ff88c9d99a6ac88e5686dbbd6ae97a810`
+
+Core loop meets the locked Paper.io-class rules (360° steer, constant move, non-lethal rim, trail outside own ink, loop claim, self-cut, enemy cut, non-lethal bodies, bot roles and opening curve, 100% seal, death → Restart, first-claim forgiveness). Report: `docs/ACCEPTANCE_REQ1_CORE.md`. No gameplay bugfix.
