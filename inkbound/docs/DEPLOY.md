@@ -19,9 +19,11 @@ assets/catalog/**/*.png
 
 `assets/upstream/` is provenance for the art sync. The running game does not fetch it. `tools/`, `docs/`, and `godot/` are not required at runtime. Leaving them in the upload is harmless.
 
-Do not publish the repository root as if it were Inkbound. The root `index.html` is a different project. Inkbound is only this folder.
+Do not publish the repository root as if it were Inkbound. The root `index.html` is a different project (Santa's Visit). There is one Inkbound tree in this repository: `inkbound/`. That folder is the deploy root.
 
-Relative URLs are used throughout (`css/style.css`, `src/main.js`, catalog paths like `assets/catalog/...`). The same files work at a domain root (`https://play.example/`) and at a project-page prefix (`https://<user>.github.io/<repo>/`). Nothing in the web runtime points at a domain-root path such as `/src/` or `/assets/`.
+To host on your own site, upload the contents of `inkbound/` (or the built Pages root) as static files. `index.html` must stay next to `css/`, `src/`, and `assets/`.
+
+Relative URLs are used throughout (`css/style.css`, `src/main.js`, catalog paths like `assets/catalog/...`). The same files work at a domain root (`https://play.example/`) and at a project-page prefix (`https://<user>.github.io/<repo>/`). Nothing in the web runtime points at a domain-root path such as `/src/` or `/assets/`. GitHub Pages project sites use that prefix and a trailing slash (`https://<user>.github.io/<repo>/`).
 
 ## How to serve it
 
@@ -46,54 +48,25 @@ Expect `200` on each.
 
 ## GitHub Pages
 
-Two ways. Both need the published root to be the **contents** of `inkbound/`, not the repository root.
+The public project-site URL pattern is:
 
-### Actions (fits this repo)
-
-Add a workflow that uploads only `inkbound`:
-
-```yaml
-name: pages
-on:
-  push:
-    branches: [main]
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: pages
-  cancel-in-progress: true
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: inkbound
-      - id: deployment
-        uses: actions/deploy-pages@v4
+```text
+https://<user>.github.io/<repo>/
 ```
 
-In the repository settings, set Pages to **GitHub Actions**. The site URL is `https://<user>.github.io/<repo>/`. This workflow is not committed here, so a push does not go live by itself.
+For this game the GitHub account is `atiffhussainkhan`. Once the repository that contains `inkbound/` is on that account, the playable link is `https://atiffhussainkhan.github.io/<repo>/`. The published root must be the **contents** of `inkbound/`, not the repository root, so `index.html` is at the site root.
+
+### Actions (committed)
+
+[`.github/workflows/pages.yml`](../../.github/workflows/pages.yml) deploys `inkbound/` with `actions/upload-pages-artifact` and `actions/deploy-pages` on every push to `main`.
+
+In the repository on github.com: **Settings → Pages → Build and deployment → Source: GitHub Actions**. That is the one click that turns the workflow into the live site. The workflow does not run on Cursor Origin (`origin.cursor.com`); it runs only after this repository is on GitHub and Pages is set to GitHub Actions.
 
 ### Branch publish
 
-From a clean checkout, publish this folder to `gh-pages` (the `.nojekyll` file in `inkbound/` is included so Jekyll does not rewrite the tree):
+`gh-pages` carries the contents of `inkbound/` at the branch root (including `.nojekyll`, so Jekyll does not rewrite the tree). If Actions is unavailable, use **Settings → Pages → Deploy from a branch → Branch: `gh-pages` / `/ (root)`**.
 
-```bash
-cd inkbound
-git checkout --orphan gh-pages
-git add -A
-git commit -m "Publish Inkbound static site"
-git push -u origin gh-pages
-```
-
-Set Pages to deploy from branch `gh-pages` / root. Prefer the Actions path above if `gh-pages` should not carry the Godot scaffold and docs.
+Do not point Pages at `main` / root. That would publish Santa's Visit at `/` and hide Inkbound under `/inkbound/`.
 
 ## Any other static host
 
@@ -133,7 +106,7 @@ Tunables live in `src/config.js` (`CONFIG`, frozen). Meta tables live next to th
 |----------|--------|---------|
 | `CONFIG.winShare` | `1` | Match seals when the player holds the whole plane (share `0..1`). |
 | `CONFIG.simHz` | `60` | Fixed simulation step. |
-| `CONFIG.botCount` | `3` | Tide, Ochre, Moss. No network. |
+| `CONFIG.botCount` | `7` | Tide, Ochre, Moss, Bramble, Soot, Lichen, Mulberry. No network. |
 | `CONFIG.arenaRadius` | `1200` | World units, circular plane. |
 
 `winShare` is read in `src/sim/Game.js`. A sealed plane sets the win outcome and does not respawn bots.

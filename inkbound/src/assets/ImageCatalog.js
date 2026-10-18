@@ -74,10 +74,22 @@ export function plateFrames(image) {
   };
 }
 
+// Catalog paths are relative to the page directory (`assets/catalog/...`).
+// A project site is `https://<user>.github.io/<repo>/`. If the address bar
+// omits the trailing slash, resolve against the directory so art still loads.
+function pageDirectory() {
+  const url = new URL(window.location.href);
+  const last = url.pathname.split("/").pop() || "";
+  if (!url.pathname.endsWith("/") && !last.includes(".")) {
+    url.pathname = `${url.pathname}/`;
+  }
+  return url.href;
+}
+
 export function catalogAssetUrl(assetPath) {
   if (!assetPath) return "none";
   if (typeof window !== "undefined" && window.location) {
-    return `url("${new URL(assetPath, window.location.href).href}")`;
+    return `url("${new URL(assetPath, pageDirectory()).href}")`;
   }
   return `url("${assetPath}")`;
 }
