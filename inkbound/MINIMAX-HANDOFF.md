@@ -69,6 +69,6 @@ Every catalog bitmap is bound and drawn from the Image repo mirror. No binding f
 
 **Status:** `done`
 **Verdict:** **PASS**
-**Audited runtime:** the commit that adds `docs/ACCEPTANCE_REQ4_PLAYTESTS.md` and the phone death-card fix.
+**Audited runtime:** `5d86bb430bcd8c3bc2e4b70eabf17c5c91076b6f`
 
 Five complete Chrome sessions from a server rooted at `/workspace/inkbound`: gentle first claim, multi-loop, self-trail death, Emberline equip with reload persistence, and a 375px touch session. Each one seals, dies, shows Best and Stage, and Restarts onto a fresh 1.0% disk. Phone overlay stacking was fixed so the death title and Restart sit above the live HUD. Report: `docs/ACCEPTANCE_REQ4_PLAYTESTS.md`.

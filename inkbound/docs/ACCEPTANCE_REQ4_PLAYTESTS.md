@@ -3,6 +3,7 @@
 **Role:** REQ4 Full Playtest Runner
 **Date:** 2026-10-18
 **Branch:** `cursor/inkbound-final-dev-c3dd`
+**Audited runtime:** `5d86bb430bcd8c3bc2e4b70eabf17c5c91076b6f`
 **Server:** `python3 -m http.server 8771 --bind 127.0.0.1` with cwd `/workspace/inkbound`
 **Browser:** Chrome 154.0.8037.92, headless, Chrome DevTools Protocol. Fresh browser context per run (`localStorage` empty at cold load).
 **Viewports:** desktop 1280×800 (runs 1–4); phone 375×812, device scale 2, touch emulation (run 5).
