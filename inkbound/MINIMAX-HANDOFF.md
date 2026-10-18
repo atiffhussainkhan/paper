@@ -19,6 +19,14 @@ SYS5 — System Analyst: integrate SYS2–SYS4, verify, and ship on `cursor/inkb
 **Status:** `awaiting-cursor` — polling origin for SYS2–SYS4 (started 2026-10-18).
 **Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
 
+## SYS1 — gap closure (Cursor)
+
+**Status:** `done`
+**Tip scored:** `31afde0` (game). Handoff commit `9c541e0` does not change `src/`.
+**Report:** `docs/SYS_AUDIT_1_GAPS.md`
+
+Must-haves **12/12 MATCHED**. Title holds the sim until Play. Highest gaps: 8-rival crowd and revive (**SYS4**), original zone map (**SYS2**), local shop plus home entries and settings (**SYS3**). **SYS5** integrates and does not build those. Online multiplayer, Paper.io art, copyrighted countries, ads, and IAP are **BLOCKED**.
+
 ## Prior task — title gate (done)
 
 Add Paper.io-class home/start screen with Play gate; match must not run until Play.
