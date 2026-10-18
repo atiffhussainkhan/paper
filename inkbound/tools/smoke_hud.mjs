@@ -19,9 +19,10 @@ assert.match(css, /\.hud-stage__track/);
 assert.match(css, /--ink-player-wet/);
 // Score cluster must sit in a readable panel (Phase 1.5).
 assert.match(css, /\.hud-percent\s*\{[^}]*backdrop-filter/s);
-assert.match(css, /\.hud-percent__best\s*\{[^}]*font-size:\s*14px/s);
+assert.match(css, /\.hud-percent__best\s*\{[^}]*font-size:\s*15px/s);
 assert.match(css, /\.hud-stage__name\s*\{[^}]*color:\s*var\(--bone-100\)/s);
-assert.match(css, /\.hud-stage__track\s*\{[^}]*height:\s*7px/s);
+assert.match(css, /\.hud-stage__track\s*\{[^}]*height:\s*10px/s);
+assert.match(css, /\.hud-percent__best \[data-hud="best"\]\s*\{[^}]*color:\s*var\(--bone-100\)/s);
 
 assert.match(hud, /setBest\(/);
 assert.match(hud, /setStage\(/);
