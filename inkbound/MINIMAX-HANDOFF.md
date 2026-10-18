@@ -1,7 +1,7 @@
 # MINIMAX-HANDOFF — Inkbound SYS5 integrate
 
 ## Status
-`awaiting-cursor`
+`done`
 
 ## Task
 
@@ -44,8 +44,13 @@ The shell is Home, World map, How to play, and Ink, then Play into a match, then
 
 ## SYS5 (Cursor)
 
-**Status:** `awaiting-cursor` — polling origin for SYS2–SYS4 (started 2026-10-18).
+**Status:** `done`
+**Verdict:** **NO** — not every requirement. Exact Paper.io 2 copy: **NO**. World map: **YES**, embedded.
+**Game bytes:** `46063314ffd4a880891a72e8dcc380a169c2172e`
 **Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
+**Report:** `docs/SYS_AUDIT_MASTER.md`
+
+SYS2, SYS3, and SYS4 were already one linear tip. No conflicts. `node tools/run_acceptance.mjs` — **ACCEPTANCE: PASS 6/6**. No extra smoke files. Chrome on that URL: title (match frozen) → World map (same document, six shores) → Quiet Plane selected, Rimward Marsh stayed locked → Home → Play (eight rows, 1.0%) → 3.4% claim → "You crossed your own line." → Home. Shots: `/opt/cursor/artifacts/sys5_*.png`.
 
 ## SYS1 — gap closure (Cursor)
 
