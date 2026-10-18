@@ -286,7 +286,7 @@ export class Game {
     //    steal the win.
     const planeSealed = Boolean(player?.alive)
       && this.grid.share(player.id) >= this.config.winShare;
-    if (!planeSealed) {
+    if (!planeSealed && this.state === "playing") {
       for (const spec of ENTITY_SPECS.slice(1, this.config.botCount + 1)) {
         const bot = this.entities.find((entity) => entity.id === spec.id);
         if (!bot || !bot.alive) this.spawnBot(spec);
