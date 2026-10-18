@@ -31,6 +31,15 @@ Only if a clear bug blocks match start. No new features.
 - Brand **Inkbound**; no Paper.io IP
 - **Godot:** do not fill gameplay stubs
 
+## RULE5 — runnable link + full session (Cursor)
+
+**Status:** `done`
+**Verdict:** **PASS** — one complete life on a local static server
+**Runnable URL:** `http://127.0.0.1:8765/` (cwd `/workspace/inkbound`, `python3 -m http.server 8765 --bind 127.0.0.1`)
+**Audited game bytes:** `21cf6b0` (docs-only commits after that do not change `src/`)
+
+Cold start shows the player on the 1.0% disk, the map, bot names on the board, and the HUD. A keyboard loop claims 3.8%. The life ends on "You crossed your own line." at 4.0%. Restart returns a fresh 1.0% disk and keeps Best 4.0% and Quiet Plane at 8%. This is a local URL, not a public host. Report: `docs/RULE_AUDIT_5_RUN.md`.
+
 ## RULE4 — requirements gaps (Cursor)
 
 **Status:** `done`
