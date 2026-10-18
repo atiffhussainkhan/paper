@@ -14,6 +14,9 @@
      .hud-overlay[hidden]          death / win card; remove [hidden] to show
         .hud-overlay--win          win variant
         .hud-overlay__title  .hud-overlay__stats  .btn-restart
+        .hud-overlay__best           new-best / unlock line
+        .skin-picker > .skin-chip    player ink picker (src/render/SkinPicker.js)
+     .hud-percent__best            persisted best % (data-hud="best")
    ========================================================================== */
 
 :root {
@@ -207,6 +210,23 @@ body {
   padding-left: 2px;
 }
 
+.hud-percent__best {
+  padding-left: 2px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-500);
+}
+
+.hud-percent__best [data-hud="best"] {
+  margin-left: 4px;
+  font-family: var(--font-num);
+  letter-spacing: 0;
+  color: var(--bone-300);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---------- Leaderboard ---------- */
 
 .hud-board {
@@ -340,7 +360,7 @@ body {
 }
 
 .hud-overlay__stats {
-  margin: 0 0 24px;
+  margin: 0 0 6px;
   font-size: 15px;
   color: var(--bone-300);
   font-variant-numeric: tabular-nums;
@@ -348,6 +368,99 @@ body {
 
 .hud-overlay__stats:empty {
   display: none;
+}
+
+.hud-overlay__best {
+  margin: 0 0 20px;
+  min-height: 1.4em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--bone-500);
+}
+
+.hud-overlay__best:empty {
+  display: none;
+}
+
+.hud-overlay__ink {
+  margin: 0 0 22px;
+  padding-top: 14px;
+  border-top: var(--hairline);
+}
+
+.hud-overlay__ink-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-500);
+}
+
+/* ---------- Skin picker ---------- */
+
+.skin-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skin-chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px 0 8px;
+  border: 1px solid var(--sumi-700);
+  border-radius: var(--radius);
+  background: var(--sumi-900);
+  color: var(--bone-300);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 140ms var(--ease-out), background-color 140ms var(--ease-out);
+}
+
+.skin-chip:hover:not(:disabled) {
+  border-color: var(--sumi-600);
+  background: var(--sumi-950);
+}
+
+.skin-chip.is-selected,
+.skin-chip.is-selected:hover:not(:disabled) {
+  border-color: var(--skin-wet);
+  color: var(--bone-100);
+}
+
+.skin-chip:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.skin-chip:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.skin-chip.is-locked .skin-chip__name {
+  font-family: var(--font-num);
+  font-size: 12px;
+}
+
+.skin-chip__bead {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 50%, var(--skin-core) 0 28%, var(--skin-wet) 30% 100%);
+  box-shadow: 0 0 0 2px var(--skin-dry);
+}
+
+.skin-chip.is-locked .skin-chip__bead {
+  background: var(--sumi-700);
+  box-shadow: 0 0 0 2px var(--sumi-600);
 }
 
 .btn-restart {

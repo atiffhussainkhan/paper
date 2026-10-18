@@ -9,6 +9,11 @@ export class Hud {
     this.overlayTitle = root.querySelector('[data-hud="overlay-title"]');
     this.overlayStats = root.querySelector('[data-hud="overlay-stats"]');
     this.restart = root.querySelector('[data-hud="restart"]');
+    this.best = root.querySelector('[data-hud="best"]');
+    this.overlayBest = root.querySelector('[data-hud="overlay-best"]');
+    this.skinsRoot = root.querySelector('[data-hud="skins"]');
+    this.lastBestText = "";
+    this.runSummary = null;
 
     this.rows = new Map();
     this.lastPercentText = "";
@@ -40,6 +45,7 @@ export class Hud {
 
     this.handleOverlayKeyDown = (event) => {
       if (!this.overlayVisible) return;
+      if (event.target?.closest?.('[data-hud="skins"]')) return;
       if (event.code === "Enter" || event.code === "Space") {
         event.preventDefault();
         this.handleRestartEvent(event);
@@ -55,7 +61,35 @@ export class Hud {
     window.addEventListener("keydown", this.handleOverlayKeyDown);
   }
 
+  setBest(bestPct) {
+    const text = `${bestPct.toFixed(1)}%`;
+    if (this.best && text !== this.lastBestText) this.best.textContent = text;
+    this.lastBestText = text;
+  }
+
+  // Result of the finished run (see recordRun in meta/Skins.js); shown on the overlay.
+  setRunSummary(summary) {
+    this.runSummary = summary;
+    this.renderRunSummary();
+  }
+
+  renderRunSummary() {
+    if (!this.overlayBest) return;
+    const summary = this.runSummary;
+    if (!summary) {
+      this.overlayBest.textContent = "";
+      return;
+    }
+    const parts = [summary.isNewBest ? "New best." : `Best ${summary.bestPct.toFixed(1)}%.`];
+    if (summary.unlockedNow?.length) {
+      parts.push(`${summary.unlockedNow.map((skin) => skin.name).join(", ")} unlocked.`);
+    }
+    this.overlayBest.textContent = parts.join(" ");
+  }
+
   reset() {
+    this.runSummary = null;
+    this.renderRunSummary();
     this.lastPercentText = "";
     this.lastOrderKey = "";
     this.initialPlayerCells = null;
@@ -179,6 +213,7 @@ export class Hud {
         if (this.overlayStats) {
           this.overlayStats.textContent = `${(Math.max(0, game.finalShare || 0) * 100).toFixed(1)}% of the plane.`;
         }
+        this.renderRunSummary();
         if (this.restart && typeof this.restart.focus === "function") {
           this.restart.focus({ preventScroll: true });
         }

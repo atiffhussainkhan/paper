@@ -3,20 +3,28 @@ import { Game } from "./sim/Game.js";
 import { Input } from "./input/Input.js";
 import { Renderer, readBrandTokens } from "./render/Renderer.js";
 import { Hud } from "./render/Hud.js";
+import { SkinPicker } from "./render/SkinPicker.js";
+import { getProfile } from "./meta/Profile.js";
+import { equippedSkin, equipSkin, recordRun, syncUnlocks } from "./meta/Skins.js";
 
 const canvas = document.querySelector("#game");
 const hudRoot = document.querySelector("#hud");
 const colors = readBrandTokens(document.documentElement);
 
 const input = new Input(canvas);
-const game = new Game(input, colors);
+const profile = getProfile();
+syncUnlocks(profile);
+const game = new Game(input, colors, CONFIG, Math.random, { playerSkin: equippedSkin(profile) });
 game.arena.game = game;
 const renderer = new Renderer(canvas, colors, CONFIG);
 let accumulator = 0;
 let previousTime = performance.now();
+let runRecorded = false;
 
 const restart = () => {
   input.reset();
+  game.playerSkin = equippedSkin(profile);
+  runRecorded = false;
   game.reset();
   game.arena.game = game;
   renderer.resetCamera(game.player.position, game.player.heading);
@@ -27,6 +35,21 @@ const restart = () => {
 };
 
 const hud = new Hud(hudRoot, restart);
+hud.setBest(profile.get("bestPct", 0));
+const skinPicker = hud.skinsRoot
+  ? new SkinPicker(hud.skinsRoot, (id) => {
+    if (equipSkin(profile, id)) skinPicker.update(profile);
+  })
+  : null;
+skinPicker?.update(profile);
+
+function finishRun() {
+  runRecorded = true;
+  const summary = recordRun(profile, game.finalShare);
+  hud.setBest(summary.bestPct);
+  hud.setRunSummary(summary);
+  skinPicker?.update(profile);
+}
 renderer.resetCamera(game.player.position, game.player.heading);
 hud.render(game);
 
@@ -44,6 +67,8 @@ function frame(now) {
     steps += 1;
   }
   if (steps === CONFIG.maxStepsPerFrame) accumulator = Math.min(accumulator, fixedStep);
+
+  if (game.state === "over" && !runRecorded) finishRun();
 
   const playerScreen = renderer.render(game, accumulator / fixedStep, frameTime);
   input.setSteeringOrigin(playerScreen.x, playerScreen.y);

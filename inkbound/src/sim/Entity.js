@@ -7,6 +7,7 @@ export class Entity {
     this.isPlayer = spec.id === 1;
     this.color = spec.color;
     this.wetColor = spec.wetColor;
+    this.coreColor = spec.coreColor ?? spec.color;
     this.position = { ...position };
     this.previousPosition = { ...position };
     this.heading = heading;
