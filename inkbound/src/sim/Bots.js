@@ -455,10 +455,11 @@ export function attachBotBrain(entity, arena, config, random = Math.random) {
   entity.brain.waypoints = makeLoopForRole(entity.brain, arena, config);
 }
 
-export function updateBotHeadings(bots, arena, config, dt) {
-  const game = arena?.game;
+export function updateBotHeadings(bots, arena, config, dt, gameArg = null) {
+  const game = gameArg ?? arena?.game;
   const grid = game?.grid;
   const allEntities = game?.entities ?? bots;
+  const huntAllowed = (game?.matchAge ?? 0) >= (config.botHuntGraceSeconds ?? 0);
 
   for (const bot of bots) {
     if (!bot.alive) continue;
@@ -534,7 +535,11 @@ export function updateBotHeadings(bots, arena, config, dt) {
       brain.waypoints[brain.waypoint] = { ...brain.safeAnchor };
     }
 
-    if (brain.role === "opportunistic-cutter" && brain.mode !== "returning") {
+    if (
+      huntAllowed
+      && brain.role === "opportunistic-cutter"
+      && brain.mode !== "returning"
+    ) {
       const cutTarget = findOpportunisticCutTarget(bot, allEntities, arena, config);
       if (cutTarget) {
         brain.mode = "cutting";
@@ -545,6 +550,9 @@ export function updateBotHeadings(bots, arena, config, dt) {
         brain.waypoint = brain.waypoints.length - 1;
         brain.waypoints[brain.waypoint] = { ...brain.safeAnchor };
       }
+    } else if (!huntAllowed && brain.mode === "cutting") {
+      brain.mode = "looping";
+      brain.cutTarget = null;
     }
 
     let target;

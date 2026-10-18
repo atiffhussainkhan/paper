@@ -18,6 +18,7 @@ export class Game {
 
   reset() {
     this.arena = new Arena(this.config.arenaRadius);
+    this.arena.game = this;
     this.grid = new TerritoryGrid(
       this.config.arenaRadius,
       this.config.gridSize,
@@ -27,15 +28,17 @@ export class Game {
     this.state = "playing";
     this.outcome = null;
     this.finalShare = 0;
+    this.matchAge = 0;
 
     const player = this.createEntity(ENTITY_SPECS[0], { x: 0, y: 0 }, -0.2);
     this.grid.setDisk(player.id, 0, 0, this.config.startTerritoryRadius);
     this.entities.push(player);
 
+    const spawnR = this.config.botInitialSpawnRadius ?? this.config.arenaRadius * 0.75;
     const initialAngles = [-Math.PI * 0.72, -Math.PI * 0.05, Math.PI * 0.62];
     for (let index = 0; index < this.config.botCount; index += 1) {
       const angle = initialAngles[index];
-      const point = { x: Math.cos(angle) * 610, y: Math.sin(angle) * 610 };
+      const point = { x: Math.cos(angle) * spawnR, y: Math.sin(angle) * spawnR };
       this.spawnBot(ENTITY_SPECS[index + 1], point);
     }
   }
@@ -84,9 +87,18 @@ export class Game {
 
   findBotSpawn() {
     const inset = this.config.startTerritoryRadius + this.config.bodyRadius;
+    const player = this.player;
+    const minPlayerSep = this.config.botMinPlayerSeparation
+      ?? this.config.startTerritoryRadius * 4;
     for (let attempt = 0; attempt < this.config.botRespawnAttempts; attempt += 1) {
       const point = this.arena.randomPoint(this.random, inset);
       if (!this.isSpawnClear(point)) continue;
+      if (
+        player?.alive
+        && Math.hypot(point.x - player.position.x, point.y - player.position.y) < minPlayerSep
+      ) {
+        continue;
+      }
       const separated = this.entities
         .filter((entity) => entity.alive)
         .every((entity) => Math.hypot(
@@ -119,15 +131,16 @@ export class Game {
   tick(dt) {
     if (this.state !== "playing") return;
     const player = this.player;
+    this.matchAge = (this.matchAge ?? 0) + dt;
 
     // 1. Read input and update the player's target heading.
-    if (player.alive) {
+    if (player?.alive) {
       const inputHeading = this.input.headingFor(player.heading);
       if (inputHeading !== null) player.desiredHeading = inputHeading;
     }
 
     // 2. Update bot target headings.
-    updateBotHeadings(this.bots, this.arena, this.config, dt);
+    updateBotHeadings(this.bots, this.arena, this.config, dt, this);
 
     // 3. Move every living entity, including rim sliding.
     for (const entity of this.entities) {
@@ -155,7 +168,7 @@ export class Game {
     }
 
     // 5. Resolve cuts. Combat only marks deaths; cleanup happens in step 7.
-    resolveCombat(this.entities, this.config);
+    resolveCombat(this.entities, this.config, this.matchAge);
     this.snapshotDeathShares();
 
     // 6. Survivors seal loops when they re-enter their own dry ink. Combat has

@@ -20,12 +20,18 @@ function graceLength(points, config) {
   return points * config.trailSampleSpacing;
 }
 
-export function resolveCombat(entities, config) {
+export function resolveCombat(entities, config, matchAge = Infinity) {
   const living = entities.filter((entity) => entity.alive);
   const deaths = new Map();
   const selfGrace = graceLength(config.selfGracePoints, config);
   const enemyGrace = graceLength(config.enemyHeadGracePoints, config);
+  // Phase 0 teaching window: bots cannot cut the player yet. Self-cuts and
+  // player-vs-bot cuts still resolve normally.
+  const playerSafeFromBots = matchAge < (config.botHuntGraceSeconds ?? 0);
 
+  // Self-cut uses a tighter radius than enemy cuts so normal turning along a
+  // fresh stroke does not register as suicide. Grace is still arc-length based.
+  const selfRadiusScale = config.selfCollisionRadiusScale ?? 0.45;
   for (const entity of living) {
     const trail = entity.trail;
     const endSegment = trail.olderSegmentCount(selfGrace, entity.position);
@@ -33,7 +39,7 @@ export function resolveCombat(entities, config) {
       && trail.collidesSegment(
         entity.previousPosition,
         entity.position,
-        entity.radius,
+        entity.radius * selfRadiusScale,
         0,
         endSegment,
       )) {
@@ -52,6 +58,7 @@ export function resolveCombat(entities, config) {
     if (endSegment <= 0) continue;
     for (const attacker of living) {
       if (attacker === owner) continue;
+      if (playerSafeFromBots && owner.isPlayer && !attacker.isPlayer) continue;
       if (owner.trail.collidesSegment(
         attacker.previousPosition,
         attacker.position,
