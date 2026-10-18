@@ -13,6 +13,7 @@ assert.match(html, /data-hud="stage-name"/);
 assert.match(html, /Quiet Plane/);
 assert.match(html, /data-hud="stage-bar"/);
 assert.match(html, /data-hud="stage-fill"/);
+assert.match(html, /data-hud="overlay-unlocks"/);
 
 assert.match(css, /\.hud-percent__best/);
 assert.match(css, /\.hud-stage__track/);
@@ -26,7 +27,11 @@ assert.match(css, /\.hud-percent__best \[data-hud="best"\]\s*\{[^}]*color:\s*var
 
 assert.match(hud, /setBest\(/);
 assert.match(hud, /setStage\(/);
+assert.match(hud, /renderUnlockCelebration/);
+assert.match(hud, /ftueClaimDone/);
 assert.match(hud, /data-hud="best"/);
+assert.match(css, /\.hud-overlay__unlocks/);
+assert.match(css, /--art-unlock-burst/);
 assert.equal(/paper\.io/i.test(html + css + hud), false);
 
 console.log("PASS: Best / Stage HUD hooks and contrast styles present");

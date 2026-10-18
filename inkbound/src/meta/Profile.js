@@ -17,6 +17,8 @@ export const PROFILE_DEFAULTS = Object.freeze({
   unlockedSkinIds: Object.freeze(["seal"]),
   stageIndex: 0,
   stageCredit: 0,
+  // Once the player closes a loop and gains territory, the claim hint stays off.
+  ftueClaimDone: false,
 });
 
 function clonePlain(value) {
@@ -75,6 +77,7 @@ export class Profile {
     this.data.stageCredit = Number.isFinite(stageCredit) && stageCredit >= 0
       ? stageCredit
       : 0;
+    this.data.ftueClaimDone = Boolean(this.data.ftueClaimDone);
   }
 
   get(key, fallback = undefined) {

@@ -1,7 +1,11 @@
+import { catalogAssetUrl } from "../assets/ImageCatalog.js";
+
 export class Hud {
-  constructor(root, onRestart) {
+  constructor(root, onRestart, catalog = null) {
     this.root = root;
     this.onRestart = onRestart;
+    this.catalog = catalog;
+    this.profile = null;
     this.percent = root.querySelector('[data-hud="percent"]');
     this.board = root.querySelector('[data-hud="board"]');
     this.hint = root.querySelector('[data-hud="hint"]');
@@ -11,6 +15,7 @@ export class Hud {
     this.restart = root.querySelector('[data-hud="restart"]');
     this.best = root.querySelector('[data-hud="best"]');
     this.overlayBest = root.querySelector('[data-hud="overlay-best"]');
+    this.overlayUnlocks = root.querySelector('[data-hud="overlay-unlocks"]');
     this.skinsRoot = root.querySelector('[data-hud="skins"]');
     this.stageName = root.querySelector('[data-hud="stage-name"]');
     this.stagePct = root.querySelector('[data-hud="stage-pct"]');
@@ -67,6 +72,19 @@ export class Hud {
     window.addEventListener("keydown", this.handleOverlayKeyDown);
   }
 
+  bindProfile(profile) {
+    this.profile = profile;
+    this.applyFtueState();
+  }
+
+  applyFtueState() {
+    if (!this.hint || !this.profile) return;
+    if (this.profile.get("ftueClaimDone", false)) {
+      this.hasClaimed = true;
+      this.hint.classList.add("is-faded");
+    }
+  }
+
   setBest(bestPct) {
     const text = `${bestPct.toFixed(1)}%`;
     if (this.best && text !== this.lastBestText) this.best.textContent = text;
@@ -84,6 +102,10 @@ export class Hud {
     const summary = this.runSummary;
     if (!summary) {
       this.overlayBest.textContent = "";
+      this.renderUnlockCelebration([]);
+      if (this.overlay) {
+        this.overlay.classList.remove("hud-overlay--new-best", "hud-overlay--has-unlocks");
+      }
       return;
     }
     const parts = [summary.isNewBest ? "New best." : `Best ${summary.bestPct.toFixed(1)}%.`];
@@ -91,6 +113,55 @@ export class Hud {
       parts.push(`${summary.unlockedNow.map((skin) => skin.name).join(", ")} unlocked.`);
     }
     this.overlayBest.textContent = parts.join(" ");
+    if (this.overlay) {
+      this.overlay.classList.toggle("hud-overlay--new-best", Boolean(summary.isNewBest));
+      this.overlay.classList.toggle(
+        "hud-overlay--has-unlocks",
+        Boolean(summary.unlockedNow?.length),
+      );
+    }
+    this.renderUnlockCelebration(summary.unlockedNow || []);
+  }
+
+  renderUnlockCelebration(unlockedNow) {
+    const root = this.overlayUnlocks;
+    if (!root) return;
+    if (!unlockedNow.length) {
+      root.hidden = true;
+      root.replaceChildren();
+      return;
+    }
+    root.hidden = false;
+    root.replaceChildren();
+    const label = document.createElement("p");
+    label.className = "hud-overlay__unlocks-label";
+    label.textContent = unlockedNow.length === 1 ? "Ink opened" : "Inks opened";
+    root.appendChild(label);
+    const list = document.createElement("div");
+    list.className = "hud-overlay__unlocks-list";
+    list.setAttribute("role", "list");
+    for (const skin of unlockedNow) {
+      const item = document.createElement("div");
+      item.className = "hud-unlock";
+      item.setAttribute("role", "listitem");
+      item.style.setProperty("--unlock-dry", skin.dry);
+      item.style.setProperty("--unlock-wet", skin.wet);
+      const pickerId = skin.pickerImageId || skin.patternImageId;
+      const entry = this.catalog?.getEntry?.(pickerId);
+      if (entry) {
+        item.style.setProperty("--unlock-skin-art", catalogAssetUrl(entry.path));
+        item.classList.add("has-art");
+      }
+      item.innerHTML = [
+        '<span class="hud-unlock__burst" aria-hidden="true"></span>',
+        '<span class="hud-unlock__spark" aria-hidden="true"></span>',
+        '<span class="hud-unlock__bead" aria-hidden="true"></span>',
+        '<span class="hud-unlock__name"></span>',
+      ].join("");
+      item.querySelector(".hud-unlock__name").textContent = skin.name;
+      list.appendChild(item);
+    }
+    root.appendChild(list);
   }
 
   setStage(stageStatus) {
@@ -135,7 +206,15 @@ export class Hud {
     }
     if (this.overlay) {
       this.overlay.hidden = true;
-      this.overlay.classList.remove("hud-overlay--win");
+      this.overlay.classList.remove(
+        "hud-overlay--win",
+        "hud-overlay--new-best",
+        "hud-overlay--has-unlocks",
+      );
+    }
+    if (this.overlayUnlocks) {
+      this.overlayUnlocks.hidden = true;
+      this.overlayUnlocks.replaceChildren();
     }
   }
 
@@ -193,6 +272,9 @@ export class Hud {
       if (this.initialPlayerCells !== null && currentCells > this.initialPlayerCells) {
         this.hasClaimed = true;
         if (this.hint) this.hint.classList.add("is-faded");
+        if (this.profile && !this.profile.get("ftueClaimDone", false)) {
+          this.profile.set("ftueClaimDone", true);
+        }
       }
     }
 

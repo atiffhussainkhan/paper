@@ -23,6 +23,7 @@ assert.equal(new Set(SKINS.map((skin) => skin.id)).size, SKINS.length);
 const storage = memoryStorage();
 let profile = new Profile(storage);
 assert.equal(profile.get("bestPct"), 0);
+assert.equal(profile.get("ftueClaimDone"), false);
 assert.equal(equippedSkin(profile).id, "seal");
 assert.equal(equipSkin(profile, "tideglass"), false, "locked skin cannot be equipped");
 
@@ -40,8 +41,12 @@ profile.set("stageIndex", 2);
 
 profile = new Profile(storage);
 assert.equal(profile.get("bestPct"), 3.4);
+assert.equal(profile.get("ftueClaimDone"), false);
+profile.set("ftueClaimDone", true);
 assert.equal(equippedSkin(profile).id, "tideglass");
 assert.equal(profile.get("stageIndex"), 2, "foreign fields persist");
+profile = new Profile(storage);
+assert.equal(profile.get("ftueClaimDone"), true, "ftue persists across reload");
 
 recordRun(profile, 1);
 assert.equal(syncUnlocks(profile).length, 0);

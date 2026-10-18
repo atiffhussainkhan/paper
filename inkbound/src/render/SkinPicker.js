@@ -61,16 +61,18 @@ export class SkinPicker {
     root.addEventListener("keydown", this.handleKeyDown);
   }
 
-  update(profile) {
+  update(profile, celebrateIds = []) {
     const best = profile.get("bestPct", 0);
     const unlocked = profile.get("unlockedSkinIds", []);
     const equipped = profile.get("equippedSkinId");
+    const celebrate = new Set(Array.isArray(celebrateIds) ? celebrateIds : []);
     this.selectedId = equipped;
     for (const skin of SKINS) {
       const button = this.buttons.get(skin.id);
       const open = unlocked.includes(skin.id) || isSkinUnlocked(skin, best);
       const selected = open && skin.id === equipped;
       button.disabled = !open;
+      button.classList.toggle("is-unlocked-new", celebrate.has(skin.id));
       button.setAttribute("aria-checked", String(selected));
       button.tabIndex = selected ? 0 : -1;
       button.classList.toggle("is-selected", selected);

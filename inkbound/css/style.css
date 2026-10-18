@@ -14,7 +14,8 @@
      .hud-overlay[hidden]          death / win card; remove [hidden] to show
         .hud-overlay--win          win variant
         .hud-overlay__title  .hud-overlay__stats  .btn-restart
-        .hud-overlay__best           new-best / unlock line
+        .hud-overlay__best           new-best line
+        .hud-overlay__unlocks        catalog unlock celebration row
         .skin-picker > .skin-chip    player ink picker (src/render/SkinPicker.js)
      .hud-percent__best            persisted best % (data-hud="best")
    ========================================================================== */
@@ -493,6 +494,91 @@ body {
   display: none;
 }
 
+.hud-overlay--new-best .hud-overlay__best {
+  color: var(--ink-player-wet);
+}
+
+.hud-overlay--has-unlocks .hud-overlay__card {
+  border-top-color: var(--ink-player-wet);
+}
+
+.hud-overlay__unlocks {
+  margin: 0 0 16px;
+}
+
+.hud-overlay__unlocks[hidden] {
+  display: none;
+}
+
+.hud-overlay__unlocks-label {
+  margin: 0 0 10px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bone-500);
+}
+
+.hud-overlay__unlocks-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hud-unlock {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid var(--sumi-700);
+  border-radius: var(--radius);
+  background: var(--sumi-900);
+  animation: unlock-pop 520ms var(--ease-out) both;
+}
+
+.hud-unlock__burst {
+  position: absolute;
+  inset: -18px;
+  background: var(--art-unlock-burst, none) center / contain no-repeat;
+  opacity: 0.55;
+  animation: unlock-burst 900ms var(--ease-out) both;
+  pointer-events: none;
+}
+
+.hud-unlock__spark {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  width: 22px;
+  height: 22px;
+  background: var(--art-unlock-spark, none) center / contain no-repeat;
+  animation: unlock-spark 700ms var(--ease-out) 80ms both;
+  pointer-events: none;
+}
+
+.hud-unlock__bead {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background:
+    var(--unlock-skin-art, none) center / cover no-repeat,
+    radial-gradient(circle at 35% 30%, var(--unlock-wet), var(--unlock-dry) 72%);
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.35);
+  flex: none;
+}
+
+.hud-unlock__name {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--bone-100);
+}
+
 .hud-overlay__stage {
   margin: -12px 0 20px;
   font-family: var(--font-ui);
@@ -579,6 +665,12 @@ body {
   margin-left: 2px;
   background: var(--art-equipped, none) center / contain no-repeat;
   flex: none;
+}
+
+.skin-chip.is-unlocked-new {
+  animation: unlock-chip 640ms var(--ease-out) both;
+  border-color: var(--skin-wet);
+  box-shadow: 0 0 0 1px rgb(255 106 74 / 0.35);
 }
 
 .skin-chip:focus-visible {
@@ -681,6 +773,28 @@ body {
 @keyframes card-in {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
+}
+
+@keyframes unlock-pop {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes unlock-burst {
+  from { opacity: 0; transform: scale(0.6); }
+  40%  { opacity: 0.7; transform: scale(1.05); }
+  to   { opacity: 0.35; transform: scale(1.15); }
+}
+
+@keyframes unlock-spark {
+  from { opacity: 0; transform: scale(0.5) rotate(-12deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes unlock-chip {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }
 
 /* ---------- Responsive ---------- */

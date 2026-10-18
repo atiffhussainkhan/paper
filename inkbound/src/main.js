@@ -46,7 +46,8 @@ async function boot() {
     previousTime = performance.now();
   };
 
-  const hud = new Hud(hudRoot, restart);
+  const hud = new Hud(hudRoot, restart, catalog);
+  hud.bindProfile(profile);
   hud.setBest(profile.get("bestPct", 0));
   const stageStatus = getStageStatus(profile);
   hud.setStage(stageStatus);
@@ -67,7 +68,7 @@ async function boot() {
     hud.setStage(stageResult);
     hud.setStageSummary(stageResult);
     renderer.setStageArt(stageResult.stage);
-    skinPicker?.update(profile);
+    skinPicker?.update(profile, summary.unlockedNow.map((skin) => skin.id));
   }
   renderer.resetCamera(game.player.position, game.player.heading);
   hud.render(game);

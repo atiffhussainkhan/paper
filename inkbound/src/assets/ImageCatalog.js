@@ -26,6 +26,8 @@ export const CSS_IMAGE_VARS = Object.freeze({
   "--art-equipped": ["ui", "equippedCheck"],
   "--art-leader-medal": ["ui", "leaderMedal"],
   "--art-stage-medal": ["ui", "stageMedal"],
+  "--art-unlock-burst": ["vfx", "burstRing"],
+  "--art-unlock-spark": ["vfx", "floatSpark"],
   "--art-icon-circle": ["ui", "iconCircle"],
   "--art-plane-grain": ["terrain", "planeGrain"],
   "--art-floor": ["terrain", "floor"],
