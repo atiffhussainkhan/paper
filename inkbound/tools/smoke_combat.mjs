@@ -90,7 +90,7 @@ p2.trail.begin({ x: 0, y: 0 });
 for (let i = 1; i <= 40; i += 1) p2.trail.add({ x: i * 8, y: 0 }, true);
 p2.previousPosition = { x: 39 * 8, y: 0 };
 p2.position = { x: 40 * 8, y: 0 };
-resolveCombat([p2], CONFIG, 0);
+resolveCombat([p2], CONFIG, 0, 0, { playerClaimed: true });
 if (!p2.alive) {
   console.error("FAIL: false self-kill on straight trail:", p2.deathReason);
   process.exit(1);
@@ -109,11 +109,52 @@ for (let i = 1; i <= 12; i += 1) {
 }
 p3.previousPosition = { x: 55, y: 50 };
 p3.position = { x: 40, y: 40 };
-resolveCombat([p3], CONFIG, 2);
+resolveCombat([p3], CONFIG, 2, 0, { playerClaimed: true });
 if (!p3.alive) {
   console.error("FAIL: self-forgiveness should protect early short curves:", p3.deathReason);
   process.exit(1);
 }
 console.log("PASS: early self-forgiveness protects short curves");
+
+// A pointer square closes by crossing the outbound stem. That cross is not
+// lethal until the first seal has already landed. The same geometry kills
+// once the player has claimed and teaching forgiveness has expired.
+function crossingSquare(id) {
+  const body = entity(id, "You", true, 12, -8);
+  body.trail.begin({ x: 0, y: 0 });
+  body.trail.add({ x: 420, y: 0 }, true);
+  body.trail.add({ x: 420, y: 280 }, true);
+  body.trail.add({ x: 12, y: 280 }, true);
+  body.previousPosition = { x: 12, y: 40 };
+  body.position = { x: 12, y: -8 };
+  return body;
+}
+
+const openingCross = crossingSquare(1);
+resolveCombat([openingCross], CONFIG, 4, 0.01, { playerClaimed: false });
+if (!openingCross.alive) {
+  console.error("FAIL: first-claim self-cross should be forgiven", openingCross.deathReason);
+  process.exit(1);
+}
+console.log("PASS: first claim forgives a closing self-cross");
+
+const sealedCross = crossingSquare(1);
+const pastForgiveness = (CONFIG.playerSelfForgivenessSeconds ?? 22) + 1;
+resolveCombat([sealedCross], CONFIG, pastForgiveness, 0.05, { playerClaimed: true });
+if (sealedCross.alive || !/own line/i.test(sealedCross.deathReason || "")) {
+  console.error("FAIL: post-claim self-cross should kill", sealedCross.alive, sealedCross.deathReason);
+  process.exit(1);
+}
+console.log("PASS: self-cross kills after the first claim");
+
+// Arriving on your own ink wins over clipping the stem on that same tick.
+const sealing = crossingSquare(1);
+sealing.capturePending = true;
+resolveCombat([sealing], CONFIG, pastForgiveness, 0.05, { playerClaimed: true });
+if (!sealing.alive) {
+  console.error("FAIL: sealing tick should ignore a self-clip", sealing.deathReason);
+  process.exit(1);
+}
+console.log("PASS: contact seals through a same-tick self-clip");
 
 console.log("All smoke combat checks passed.");

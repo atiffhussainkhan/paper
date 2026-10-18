@@ -6,7 +6,7 @@ import { moveEntity, updateInkContact } from "./Movement.js";
 import { resolveCombat } from "./Combat.js";
 import { captureLoop } from "./Capture.js";
 import { attachBotBrain, updateBotHeadings } from "./Bots.js";
-import { botBeadId, botPatternId } from "../assets/ImageCatalog.js";
+import { botBeadId, botOrbId, botPatternId, playerOrbId } from "../assets/ImageCatalog.js";
 
 export class Game {
   constructor(input, colors, config = CONFIG, random = Math.random, options = {}) {
@@ -61,6 +61,7 @@ export class Game {
       coreColor: skin?.core,
       patternImageId: skin?.patternImageId ?? (isPlayer ? null : botPatternId(this.catalog, spec.id)),
       beadImageId: skin?.beadImageId ?? (isPlayer ? null : botBeadId(this.catalog, spec.id)),
+      orbImageId: skin?.orbImageId ?? (isPlayer ? playerOrbId(this.catalog) : botOrbId(this.catalog, spec.id)),
     };
     return new Entity(
       entitySpec,
@@ -189,10 +190,12 @@ export class Game {
     //    dry ink seals the loop — the first claim uses a slightly wider bead.
     for (const entity of this.entities) {
       if (!entity.alive) continue;
-      const contactRadius = entity.isPlayer && !this.playerClaimed
+      const openingClaim = entity.isPlayer && !this.playerClaimed;
+      const contactRadius = openingClaim
         ? entity.radius * (this.config.firstClaimContactScale ?? 1.28)
         : entity.radius;
-      updateInkContact(entity, this.grid, contactRadius);
+      const nose = openingClaim ? (this.config.firstClaimNose ?? 0) : 0;
+      updateInkContact(entity, this.grid, contactRadius, nose);
     }
 
     // 5. Resolve cuts. Combat only marks deaths; cleanup happens in step 7.
@@ -201,6 +204,7 @@ export class Game {
       this.config,
       this.matchAge,
       this.grid.share(player.id),
+      { playerClaimed: this.playerClaimed },
     );
     this.snapshotDeathShares();
 

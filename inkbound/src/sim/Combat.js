@@ -93,6 +93,7 @@ export function resolveCombat(
   config,
   matchAge = Infinity,
   playerShare = 0,
+  options = {},
 ) {
   const living = entities.filter((entity) => entity.alive);
   const deaths = new Map();
@@ -103,6 +104,8 @@ export function resolveCombat(
   // Self-cuts and player-vs-bot cuts still resolve normally.
   const playerIsSafeFromBots = playerSafeFromBots(matchAge, playerShare, config);
   const forgiveness = playerSelfForgivenessActive(matchAge, config);
+  const playerClaimed = options.playerClaimed ?? false;
+  const firstClaimImmune = (config.playerFirstClaimSelfImmune ?? true) && !playerClaimed;
 
   // Self-cut uses a tighter radius than enemy cuts so normal turning along a
   // fresh stroke does not register as suicide. Early match gives the player
@@ -110,6 +113,12 @@ export function resolveCombat(
   const baseSelfRadiusScale = config.selfCollisionRadiusScale ?? 0.45;
   for (const entity of living) {
     const trail = entity.trail;
+    // Sealing wins over clipping your own stem on the arrival tick. An enemy
+    // cut in this same pass still denies the capture (checked below).
+    if (entity.capturePending) continue;
+    // The first pointer loop is allowed to cross its own outbound line.
+    // Immunity ends the moment that loop seals; later crosses still kill.
+    if (entity.isPlayer && firstClaimImmune) continue;
     let selfGrace = baseSelfGrace;
     let selfRadiusScale = baseSelfRadiusScale;
     if (entity.isPlayer && forgiveness) {

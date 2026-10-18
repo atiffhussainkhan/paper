@@ -246,4 +246,145 @@ if (winner.bots.some((bot) => winGrid.counts[bot.id] > 0)) {
   console.error("FAIL: bot respawned onto a sealed plane");
   process.exit(1);
 }
+for (let extra = 0; extra < 8; extra += 1) winner.tick(dt);
+if (winner.state !== "over" || winner.bots.some((bot) => bot.alive || winGrid.counts[bot.id] > 0)) {
+  console.error("FAIL: win did not stay sealed", winner.state, winner.bots.map((bot) => bot.alive));
+  process.exit(1);
+}
 console.log("PASS: sealed plane wins and does not respawn bots");
+
+const full = new TerritoryGrid(CONFIG.arenaRadius, CONFIG.gridSize, 4);
+full.setDisk(1, 0, 0, CONFIG.startTerritoryRadius);
+const fullTrail = new Trail(CONFIG.trailWidth, CONFIG.trailSampleSpacing, CONFIG.maxTrailPoints);
+const rimR = CONFIG.arenaRadius - CONFIG.bodyRadius;
+fullTrail.begin({ x: 130, y: -6 });
+for (let step = 0; step <= 240; step += 1) {
+  const angle = (step / 240) * Math.PI * 2;
+  fullTrail.add({ x: Math.cos(angle) * rimR, y: Math.sin(angle) * rimR }, true);
+}
+fullTrail.add({ x: 130, y: 6 }, true);
+captureLoop(full, 1, fullTrail);
+if (full.share(1) < CONFIG.winShare) {
+  console.error("FAIL: closed rim circuit did not reach a win share", full.share(1));
+  process.exit(1);
+}
+assertCounts(full, "full");
+assertInsideArena(full, 1, "full");
+console.log("PASS: closed rim circuit is a 100% win", full.share(1).toFixed(4));
+
+const doomed = new Game({ headingFor() { return 0.4; } }, colors, CONFIG, () => 0.25);
+doomed.player.markDead("You crossed your own line.");
+doomed.bots[0].markDead("down");
+const livingAfterDeath = () => doomed.bots.filter((bot) => bot.alive).length;
+const expectedLiving = livingAfterDeath();
+doomed.tick(dt);
+doomed.tick(dt);
+if (
+  doomed.state !== "over"
+  || doomed.outcome?.type !== "death"
+  || livingAfterDeath() !== expectedLiving
+  || doomed.bots[0].alive
+  || doomed.grid.counts[doomed.bots[0].id] > 0
+) {
+  console.error("FAIL: game over respawned a bot", {
+    state: doomed.state,
+    outcome: doomed.outcome,
+    living: livingAfterDeath(),
+    expectedLiving,
+  });
+  process.exit(1);
+}
+console.log("PASS: game over does not respawn bots");
+
+let hookHeading = 0;
+const hook = new Game({ headingFor() { return hookHeading; } }, colors, CONFIG, () => 0.33);
+const hookStart = hook.grid.share(hook.player.id);
+for (let tick = 0; tick < 100 && hook.player.alive; tick += 1) {
+  hookHeading = 0.05;
+  hook.tick(dt);
+}
+for (let tick = 0; tick < 36 && hook.player.alive; tick += 1) {
+  hookHeading = -Math.PI / 2;
+  hook.tick(dt);
+}
+for (let tick = 0; tick < 80 && hook.player.alive && !hook.playerClaimed; tick += 1) {
+  hookHeading = Math.atan2(-hook.player.position.y, 70 - hook.player.position.x);
+  hook.tick(dt);
+}
+for (let tick = 0; tick < 240 && hook.player.alive && !hook.playerClaimed; tick += 1) {
+  hookHeading = Math.atan2(-hook.player.position.y, -hook.player.position.x);
+  hook.tick(dt);
+}
+if (!hook.player.alive || !hook.playerClaimed || hook.grid.share(hook.player.id) <= hookStart + 0.0005) {
+  console.error("FAIL: pointer hook did not seal the first claim", {
+    alive: hook.player.alive,
+    reason: hook.player.deathReason,
+    claimed: hook.playerClaimed,
+    share: hook.grid.share(hook.player.id),
+  });
+  process.exit(1);
+}
+console.log("PASS: sharp hook seals the first claim", hook.grid.share(hook.player.id).toFixed(4));
+
+const noseGrid = new TerritoryGrid(CONFIG.arenaRadius, CONFIG.gridSize, 4);
+noseGrid.setDisk(1, 0, 0, CONFIG.startTerritoryRadius);
+const noseEntity = new Entity(
+  { id: 1, name: "You", color: "#d9452b", wetColor: "#ff6a4a" },
+  { x: 168, y: 0 },
+  Math.PI,
+  CONFIG.playerSpeed,
+  CONFIG,
+);
+noseEntity.outsideOwnTerritory = true;
+noseEntity.clearedHome = true;
+noseEntity.trail.begin({ x: 140, y: -70 });
+noseEntity.trail.add({ x: 168, y: 0 }, true);
+noseEntity.previousPosition = { x: 176, y: 0 };
+const noseShare = noseGrid.share(1);
+updateInkContact(
+  noseEntity,
+  noseGrid,
+  CONFIG.bodyRadius * CONFIG.firstClaimContactScale,
+  CONFIG.firstClaimNose,
+);
+if (!noseEntity.capturePending || noseEntity.outsideOwnTerritory || noseGrid.share(1) !== noseShare) {
+  console.error("FAIL: nose did not arm a first-claim seal", {
+    pending: noseEntity.capturePending,
+    outside: noseEntity.outsideOwnTerritory,
+    centerOwned: noseGrid.isOwnedBy(1, 168, 0),
+  });
+  process.exit(1);
+}
+if (noseGrid.bodyTouchesOwner(1, 168, 0, CONFIG.bodyRadius * CONFIG.firstClaimContactScale)) {
+  console.error("FAIL: nose test center already overlapped ink");
+  process.exit(1);
+}
+console.log("PASS: first-claim nose seals before the center overlaps ink");
+
+for (const rimHeading of [0, 0.8, 2.1, -1.4, Math.PI * 0.5]) {
+  let rimAim = rimHeading;
+  const rimGame = new Game({ headingFor() { return rimAim; } }, colors, CONFIG, () => 0.18);
+  let previous = { ...rimGame.player.position };
+  for (let tick = 0; tick < 480; tick += 1) {
+    rimGame.tick(dt);
+    if (!rimGame.player.alive) {
+      console.error("FAIL: rim heading died", rimHeading, rimGame.player.deathReason);
+      process.exit(1);
+    }
+    const step = Math.hypot(
+      rimGame.player.position.x - previous.x,
+      rimGame.player.position.y - previous.y,
+    );
+    if (step < 0.2) {
+      console.error("FAIL: rim heading stalled", rimHeading, step);
+      process.exit(1);
+    }
+    const radius = Math.hypot(rimGame.player.position.x, rimGame.player.position.y);
+    if (radius > CONFIG.arenaRadius - CONFIG.bodyRadius + 0.5) {
+      console.error("FAIL: rim heading left the arena", rimHeading, radius);
+      process.exit(1);
+    }
+    previous = { ...rimGame.player.position };
+  }
+}
+console.log("PASS: rim slide stays alive from several headings");

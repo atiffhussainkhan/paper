@@ -14,7 +14,9 @@ export function turnToward(current, target, maxTurn) {
 //   not open a vulnerable line.
 // - Once the body has fully left, touching dry ink again seals the loop. The
 //   first claim uses a slightly larger contact radius from the caller.
-export function updateInkContact(entity, grid, contactRadius) {
+//   `noseDistance` probes ahead along the heading so the first return seals
+//   when the bead is aimed at ink, before the center clips the outbound stem.
+export function updateInkContact(entity, grid, contactRadius, noseDistance = 0) {
   if (!entity.alive) return;
   entity.capturePending = false;
 
@@ -25,6 +27,31 @@ export function updateInkContact(entity, grid, contactRadius) {
     entity.position.y,
     contactRadius,
   );
+  const nose = noseDistance > 0
+    ? {
+      x: entity.position.x + Math.cos(entity.heading) * noseDistance,
+      y: entity.position.y + Math.sin(entity.heading) * noseDistance,
+    }
+    : null;
+  const noseHome = Boolean(nose) && grid.bodyTouchesOwner(
+    entity.id,
+    nose.x,
+    nose.y,
+    Math.max(contactRadius * 0.45, 0),
+  );
+
+  const seal = (anchorFrom) => {
+    const anchor = grid.inkBoundaryPoint(
+      entity.id,
+      anchorFrom,
+      entity.position,
+      contactRadius,
+    );
+    entity.trail.add(anchor, true);
+    entity.capturePending = true;
+    entity.outsideOwnTerritory = false;
+    entity.clearedHome = false;
+  };
 
   if (!entity.outsideOwnTerritory) {
     if (!centerHome) {
@@ -43,7 +70,14 @@ export function updateInkContact(entity, grid, contactRadius) {
   }
 
   if (!bodyHome) {
+    const justCleared = !entity.clearedHome;
     entity.clearedHome = true;
+    // The tick that finishes leaving home must not seal on the nose. A return
+    // on a later tick, aimed back at the ink, seals before the stem is clipped.
+    if (!justCleared && noseHome && entity.trail.active) {
+      seal(nose);
+      return;
+    }
     entity.trail.add(entity.position);
     return;
   }

@@ -192,8 +192,9 @@ export class Renderer {
   }
 
   // Open-stroke framing: bbox of the wet line, once it is large enough to
-  // be a real loop rather than the first step off the disk.
-  trailFraming(player) {
+  // be a real loop rather than the first step off the disk. The first claim
+  // also frames the start disk so a pointer aim toward home stays honest.
+  trailFraming(player, game) {
     if (!player?.alive || !player.outsideOwnTerritory || !player.clearedHome) return null;
     const points = player.trail?.points;
     if (!points || points.length < 2) return null;
@@ -214,9 +215,18 @@ export class Renderer {
     if (tail.x > maxX) maxX = tail.x;
     if (tail.y < minY) minY = tail.y;
     if (tail.y > maxY) maxY = tail.y;
+    const firstClaim = Boolean(game && !game.playerClaimed);
+    if (firstClaim) {
+      const homeR = this.config.startTerritoryRadius ?? 120;
+      minX = Math.min(minX, -homeR);
+      maxX = Math.max(maxX, homeR);
+      minY = Math.min(minY, -homeR);
+      maxY = Math.max(maxY, homeR);
+    }
     const span = Math.max(maxX - minX, maxY - minY, 1);
-    if (span < (this.config.cameraTrailZoomMinSpan ?? 96)) return null;
-    return { cx: (minX + maxX) * 0.5, cy: (minY + maxY) * 0.5, span };
+    const minSpan = firstClaim ? 0 : (this.config.cameraTrailZoomMinSpan ?? 96);
+    if (span < minSpan) return null;
+    return { cx: (minX + maxX) * 0.5, cy: (minY + maxY) * 0.5, span, firstClaim };
   }
 
   computeScale() {
@@ -331,35 +341,55 @@ export class Renderer {
 
     const player = game.player;
     const playerPosition = this.interpolatedPosition(player, alpha);
-    const lookGain = player.alive ? this.config.cameraLookAhead : 0;
+    const openingStroke = Boolean(
+      player?.alive && !game.playerClaimed && player.outsideOwnTerritory,
+    );
+    const lookGain = player.alive
+      ? (openingStroke
+        ? (this.config.cameraFirstClaimLookAhead ?? this.config.cameraLookAhead)
+        : this.config.cameraLookAhead)
+      : 0;
     const desiredLookX = Math.cos(player.heading) * lookGain;
     const desiredLookY = Math.sin(player.heading) * lookGain;
 
-    const framing = this.trailFraming(player);
+    const framing = this.trailFraming(player, game);
     const baseHeight = this.config.cameraViewHeight ?? 1000;
     const maxSpan = this.config.cameraMaxViewSpan ?? 1400;
     let desiredHeight = baseHeight;
     let desiredPullX = 0;
     let desiredPullY = 0;
     if (framing) {
+      const padding = framing.firstClaim
+        ? (this.config.cameraFirstClaimPadding ?? this.config.cameraTrailPadding ?? 280)
+        : (this.config.cameraTrailPadding ?? 280);
       desiredHeight = Math.max(
         baseHeight,
-        Math.min(maxSpan, framing.span + (this.config.cameraTrailPadding ?? 280)),
+        Math.min(maxSpan, framing.span + padding),
       );
-      const pull = this.config.cameraHomePull ?? 0.46;
+      const pull = framing.firstClaim
+        ? (this.config.cameraFirstClaimPull ?? this.config.cameraHomePull ?? 0.46)
+        : (this.config.cameraHomePull ?? 0.46);
       desiredPullX = (framing.cx - playerPosition.x) * pull;
       desiredPullY = (framing.cy - playerPosition.y) * pull;
       const pullDist = Math.hypot(desiredPullX, desiredPullY);
-      const pullCap = this.config.cameraHomePullMax ?? 640;
+      const pullCap = framing.firstClaim
+        ? (this.config.cameraFirstClaimPullMax ?? this.config.cameraHomePullMax ?? 640)
+        : (this.config.cameraHomePullMax ?? 640);
       if (pullDist > pullCap) {
         const scaleDown = pullCap / pullDist;
         desiredPullX *= scaleDown;
         desiredPullY *= scaleDown;
       }
     }
-    const zoomBlend = 1 - Math.exp(-(this.config.cameraZoomFollow ?? 2.6) * frameTime);
+    const zoomFollow = framing?.firstClaim
+      ? (this.config.cameraFirstClaimZoomFollow ?? this.config.cameraZoomFollow ?? 2.6)
+      : (this.config.cameraZoomFollow ?? 2.6);
+    const zoomBlend = 1 - Math.exp(-zoomFollow * frameTime);
     this.viewHeight += (desiredHeight - this.viewHeight) * zoomBlend;
-    const pullBlend = 1 - Math.exp(-(this.config.cameraHomePullFollow ?? 3.4) * frameTime);
+    const pullFollow = framing?.firstClaim
+      ? (this.config.cameraFirstClaimPullFollow ?? this.config.cameraHomePullFollow ?? 3.4)
+      : (this.config.cameraHomePullFollow ?? 3.4);
+    const pullBlend = 1 - Math.exp(-pullFollow * frameTime);
     this.framePull.x += (desiredPullX - this.framePull.x) * pullBlend;
     this.framePull.y += (desiredPullY - this.framePull.y) * pullBlend;
 
@@ -373,7 +403,10 @@ export class Renderer {
       this.camera.y = playerPosition.y + desiredLookY + desiredPullY;
       this.cameraReady = true;
     } else {
-      const lookBlend = 1 - Math.exp(-(this.config.cameraLookAheadFollow ?? 5.5) * frameTime);
+      const lookFollow = openingStroke
+        ? (this.config.cameraFirstClaimLookAheadFollow ?? this.config.cameraLookAheadFollow ?? 5.5)
+        : (this.config.cameraLookAheadFollow ?? 5.5);
+      const lookBlend = 1 - Math.exp(-lookFollow * frameTime);
       this.lookAhead.x += (desiredLookX - this.lookAhead.x) * lookBlend;
       this.lookAhead.y += (desiredLookY - this.lookAhead.y) * lookBlend;
 

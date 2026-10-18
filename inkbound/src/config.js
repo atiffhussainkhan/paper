@@ -16,7 +16,13 @@ export const CONFIG = Object.freeze({
   // so a deliberate hook is not a suicide and a flick can still come home.
   steerRate: Math.PI * 1.72,
   // First return only: the bead seals when it overlaps ink, a little early.
-  firstClaimContactScale: 1.28,
+  // The nose reaches ahead of the center so a closing hook seals on the
+  // ink it is aiming at, before that hook can clip the outbound stem.
+  firstClaimContactScale: 1.65,
+  firstClaimNose: 48,
+  // Until the first seal lands, the player's own line cannot kill them.
+  // A pointer square's closing side often crosses the outbound stem.
+  playerFirstClaimSelfImmune: true,
   bodyRadius: 13,
 
   trailWidth: 11,
@@ -88,6 +94,16 @@ export const CONFIG = Object.freeze({
   cameraHomePull: 0.46,
   cameraHomePullFollow: 3.4,
   cameraHomePullMax: 640,
+  // First open stroke: keep the bead near the pointer origin. A large
+  // look-ahead slides the sprite under a still cursor and hooks the line
+  // back across itself. Zoom enough to show the start disk and the head.
+  cameraFirstClaimLookAhead: 36,
+  cameraFirstClaimLookAheadFollow: 8,
+  cameraFirstClaimPadding: 460,
+  cameraFirstClaimPull: 0.72,
+  cameraFirstClaimPullFollow: 4.2,
+  cameraFirstClaimPullMax: 380,
+  cameraFirstClaimZoomFollow: 3.4,
   planeGridSpacing: 120,
 
   winShare: 1,
