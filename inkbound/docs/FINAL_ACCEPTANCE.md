@@ -1,56 +1,108 @@
 # Inkbound — Final acceptance
 
-**Role:** SYSTEM QA / RELEASE
+**Role:** FULL FINAL QA / RELEASE
 **Date:** 2026-10-18
 **Branch:** `cursor/inkbound-final-dev-c3dd` → `main`
-**Integrated tip before this doc:** `4fa7c27` (opening fairness + catalog VFX), then the uncommitted sibling tree below
+**Tip:** `ed4d76178272a9de69470b128b52966ea80390ad`
 **Server:** `python3 -m http.server 8771 --bind 127.0.0.1` with cwd `/workspace/inkbound`
 **Browser:** Chrome 154, Linux. Desktop 1280×800 and phone 375×812.
-**Tester:** SYSTEM QA
+**Shots:** `/opt/cursor/artifacts/inkbound_final_*.png`
 
-Siblings SYS1–4 landed on this branch. `git fetch` of `origin/cursor/inkbound-final-dev-c3dd` matched local `4fa7c27` (0 ahead / 0 behind). No conflict markers. Further sibling edits were still in the working tree (catalog bindings, capture polygon, ink contact, trail camera, HUD art). Those edits are part of this acceptance tree. QA added one fix the browser caught: `Vfx.drawCrown` read `crown` without a local, threw `ReferenceError` on the first crown frame, and stopped `requestAnimationFrame`.
-
-## Catalog-only art
-
-Bitmaps come from `assets/IMAGE_INDEX.json` (49 images, Image repo / Kenney CC0). `tools/smoke_images.mjs` checks sha256, upstream `source_path`, and that every id is bound. CSS does not invent grain (`feTurbulence`) or `data:image/svg` bitmaps. UI seals are catalog files. A fresh load resolves the brand seal to `http://127.0.0.1:8771/assets/catalog/ui/ui-brand-seal.png` (absolute, so `css/style.css` does not request `/css/assets/...`).
+This is the full web build (catalog art, claim, skins, stages, juice). It is not a Phase 0-only prototype. Godot stays a scaffold.
 
 ## Smoke matrix
 
-Run from `/workspace/inkbound` on the integrated tree. All exit 0.
+Run from `/workspace/inkbound` at `ed4d761`. All exit 0.
 
 | Smoke | Result | What it locks |
 |-------|--------|----------------|
-| `node tools/smoke_combat.mjs` | **pass** | Opening safety blocks bot cuts; low-share extension; cut works after grace; aggression ramps with age and share; no false self-kill on a straight trail; early self-forgiveness on short curves |
-| `node tools/smoke_loop.mjs` | **pass** | Scripted claim stays alive (0.0103 → 0.0276). Small loop steals only enclosed ink (share 0.0262). Majority circuit claims the interior (share 0.6715) and stays inside the arena. Grazing home does not commit a stroke. Straight run rim-slides (distance 1187) without stopping. A sealed plane wins and does not respawn bots |
-| `node tools/smoke_hud.mjs` | **pass** | Best % and Stage (Quiet Plane + bar) hooks and contrast styles. No Paper.io strings in HTML/CSS/HUD |
-| `node tools/smoke_vfx.mjs` | **pass** | Capture `+%` floats, three-phase death juice, crown holder, and `drawCrown` does not throw |
-| `node tools/smoke_meta.mjs` | **pass** | Five skins, best %, stage credit and clear |
-| `node tools/smoke_images.mjs` | **pass** | 49 images `{ background: 7, character: 6, skin: 8, ui: 7, vfx: 7, terrain: 14 }`, hashes, bindings, catalog-only CSS |
+| `node tools/smoke_combat.mjs` | **PASS** | Opening bot safety, self-forgiveness, first-claim self-immunity, self-cross after the first seal, same-tick contact vs clip |
+| `node tools/smoke_loop.mjs` | **PASS** | Scripted claim 1.03% → 2.76%; pocket steal; majority circuit 67%; rim slide; sealed-plane win with no bot respawn; sharp hook; nose seal |
+| `node tools/smoke_hud.mjs` | **PASS** | Best % and Stage hooks, contrast, no Paper.io strings |
+| `node tools/smoke_vfx.mjs` | **PASS** | Capture float, three-phase death, crown, kill slash / pop |
+| `node tools/smoke_meta.mjs` | **PASS** | Five skins, best %, stage credit and clear |
+| `node tools/smoke_images.mjs` | **PASS** | 58 images `{ background: 7, character: 15, skin: 8, ui: 7, vfx: 7, terrain: 14 }`, hashes, bindings, catalog-only CSS |
 
-## Browser (served from `/workspace/inkbound`)
+## Browser proof
 
-| Check | Result | Evidence |
-|-------|--------|----------|
-| Loads. Title Inkbound. Catalog `ready`, count 49. Console exceptions none on a fresh load | **pass** | Second load after the crown fix: `bad: []` |
-| HUD at spawn: `1.0%`, Best `0.0%`, Stage 1 · Quiet Plane, hint, four rows (You, Tide, Ochre, Moss). Overlay hidden | **pass** | Boot readout |
-| No Paper.io in the document | **pass** | DOM scan |
-| Always moving. Full-canvas hash changed across 0.9 s with no input; a wet stroke leaves the start disk | **pass** | Boot frame shows an open trail |
-| Pointer square. Self-cut overlay: "You crossed your own line." Stats `1.0% of the plane.` Best becomes `1.0%`. Stage line `+1.0% toward Quiet Plane (2%)`. Ink picker shows Seal | **pass** | Death overlay |
-| Restart. Overlay hides, share returns to `1.0%`, four living rows, Best stays `1.0%` | **pass** | Post-restart frame |
-| 375×812. No horizontal overflow. Percent, Best, and stage name still in the first screen | **pass** | `overflowX: false` |
-| Catalog seal URL is under `/assets/catalog/`, not `/css/assets/` | **pass** | Computed style |
-| Fresh reload after the fix: zero HTTP ≥400, zero exceptions, overlay hidden, percent `1.0%` | **pass** | Network log |
+Served only from `/workspace/inkbound`. Fresh profile. Catalog `ready`, count 58. Zero console exceptions. Zero HTTP ≥ 400. No Paper.io in the document. Brand seal resolves to `http://127.0.0.1:8771/assets/catalog/ui/ui-brand-seal.png`.
+
+| Check | Result | What happened |
+|-------|--------|----------------|
+| Boot | **PASS** | Title Inkbound. 1.0%, Best 0.0%, Stage 1 · Quiet Plane. Princess figure on a parchment plate. Four living rows (You, Tide, Ochre, Moss). `inkbound_final_boot.png` |
+| Always moving + trail | **PASS** | WASD leaves the start disk and draws a wet stroke. `inkbound_final_trail.png`, `inkbound_final_stage_hud.png` |
+| Human claim | **PASS** | Keyboard square (D, S, A, W) closed the loop. Share 1.0% → **6.4%**. Float **+5.4%**. Hint faded. `inkbound_final_claim.png` |
+| Self-cut after the seal | **PASS** | Overlay: "You crossed your own line." Stats "6.4% of the plane." You row 0.0%. `inkbound_final_death.png` |
+| Skins | **PASS** | New best. Tideglass and Emberline unlocked from catalog picker art. Emberline equipped. Restart spawned the dragon plate on rose ink, Best stayed 6.4%. `inkbound_final_skins.png`, `inkbound_final_restart.png` |
+| Stage HUD | **PASS** | After the run: "+6.4% toward Quiet Plane (13%)." A profile on stage 6 shows Unsealed Horizon at 40% on a different catalog plate and the Bone figure. `inkbound_final_catalog_stage.png` |
+| Catalog load | **PASS** | All 7 backgrounds and all 15 character files decoded. Figures draw as standing plates (Princess, Knight, Dragon, Kenney toons), not missing-image fallbacks |
+| Phone 375×812 | **PASS** | No horizontal overflow. Percent, Best 6.4%, and Stage 1 · Quiet Plane stay clear of the character strip. `inkbound_final_mobile.png` |
+| Restart | **PASS** | Overlay hides. Share returns to 1.0%. Four living rows. No leftover trail |
+
+The recorded claim used WASD, which is the desktop bias control. An earlier pointer pass did turn the bead (east, then south) before the first-seal immunity landed. This session did not close a second loop with the mouse.
+
+## GDD requirements
+
+Source: `TerritoryIO_Professional_Requirements_GDD.md`, read against the locked Inkbound decisions (web canvas, 3 bots, no revive, original IP).
+
+### Must-have MVP
+
+| Requirement | Result | Note |
+|-------------|--------|------|
+| 360° continuous motion, no full stop | **PASS** | Steer rate limited. Avatar keeps moving with no input |
+| Own territory is safety | **PASS** | Open trail only while outside owned ink |
+| Trail + loop capture, `+%` float | **PASS** | Browser 6.4% and +5.4%. Smoke also covers pocket steal and a majority circuit |
+| Self-trail death | **PASS** | Browser overlay after the first seal. The first loop may clip its own stem and still seal (`playerFirstClaimSelfImmune`) |
+| Enemy trail cut | **PASS** | `smoke_combat.mjs`. Not driven in this browser session |
+| Territory clears on death | **PASS** | You dropped to 0.0% on the board |
+| Bots, names, leaderboard | **PASS** | Tide, Ochre, Moss. Three bots, not the GDD's example of 8–15 |
+| % score and best % | **PASS** | One decimal. Best persisted across restart |
+| Run summary and restart | **PASS** | Cause, final %, new best, stage line, Restart |
+| At least 5 cosmetic skins | **PASS** | Seal, Tideglass, Emberline, Nightquarry, Bone. Unlock by best % |
+| Original art identity | **PASS** | Image-repo / CC0 catalog. No Paper.io strings |
+| Mobile and desktop controls | **PASS** | Pointer aim and WASD / arrows. Phone layout checked at 375px |
+
+### Should-have
+
+| Requirement | Result | Note |
+|-------------|--------|------|
+| Stage progression with cumulative credit | **PASS** | Six zones. Run peak share credits the active stage. Quiet Plane moved to 13% in the browser |
+| Revive / continue | **Not in this build** | Locked decision: death, summary, Restart. Not a defect |
+| Skin unlocks | **PASS** | Tideglass at 2%, Emberline at 5%, shown in the browser |
+| Crown for the leader | **PASS** | Leader row wears the medal. World crown is in `smoke_vfx.mjs` |
+| Kill callout | **PARTIAL** | Slash and pop are in `smoke_vfx.mjs`. This browser session did not cut a bot |
+| Settings and colorblind mode | **PARTIAL** | No settings screen. Territory uses catalog splat patterns; there is no colorblind toggle |
+
+### Could-have and won't
+
+Powers, shop, dual currency, weekly events, true multiplayer, and replay are **not in this build**. Open world, loot-box gambling, and pay-to-win map percentage are absent. Those match the locked non-goals.
+
+### QA matrix
+
+| ID | Result | Note |
+|----|--------|------|
+| T01 Leave and return | **PASS** | Browser 1.0% → 6.4%, trail cleared |
+| T02 Cross own trail | **PASS** | After the first seal |
+| T03 Enemy crosses you | **PARTIAL** | Smoke only this session |
+| T04 You cross an enemy | **PARTIAL** | Smoke only this session |
+| T05 Die with territory | **PASS** | Ink cleared. +6.4% stage credit remained |
+| T06 Reach 100% | **PARTIAL** | `smoke_loop.mjs` reaches `outcome.type === "win"` and the line "The plane is yours." The overlay was not opened in the browser |
+| T07 Bot spawn off your fill | **PASS** | Smoke. Restart showed three fresh bots |
+| T08 Rim slide | **PASS** | Smoke, several headings. Not repeated in the browser this session |
+| T09 Mutual cut | **PASS** | Same-tick cuts kill both. Combat runs before capture, so a cut denies the seal |
+| T10 Colorblind mode | **PARTIAL** | Patterns exist. No mode switch |
+| T11 Background / foreground | **Not run** | Frame clamp is `maxFrameTime` 0.2s and 8 steps. No 30s tab-switch was performed |
+| T12 Ad revive cancel | **Not in this build** | No ads |
 
 ## Gaps
 
-- **Godot is not the playable build.** `godot/scripts/sim/capture.gd` `capture_loop` still returns 0. The comment now matches the web fill rule. Do not ship the Godot project as the game.
-- **Browser did not close a successful claim.** The pointer square cut its own line first. Territory growth on a closed loop is **pass** in `smoke_loop.mjs` (1.03% → 2.76%, plus the pocket and majority-circuit cases).
-- **Win overlay copy was not shown in the browser.** `smoke_loop.mjs` does seal the plane and reaches `state === "over"` with `outcome.type === "win"`. The on-screen line "The plane is yours." was not opened.
-- **Rim slide was not driven in the browser.** `smoke_loop.mjs` holds a straight heading for 520 ticks, keeps moving, and finishes at distance 1187 (arena radius 1200).
+- **Win overlay was not shown in the browser.** Headless smoke does seal the plane.
 - **No five-minute soak and no tab-switch test.**
-- **A sharp pointer hook still dies on your own line.** Seen in this session. Opening grace does not make every flick safe.
-- **Out of scope, confirmed absent as product:** real multiplayer, shop, ads, powers. Not treated as defects.
+- **Browser did not cut a bot or get cut by a bot** in this session.
+- **Godot is not the game.** `godot/scripts/sim/capture.gd` still returns 0. Ship the web build from `/workspace/inkbound`.
+- **No home screen, settings, revive, shop, powers, or real multiplayer.**
+- **Population is 3 bots.** The GDD's 8–15 figure was an example, and the locked decision is 3.
 
 ## Release call
 
-The web build on this branch is acceptable to open against `main` with the gaps above. Play it from `/workspace/inkbound` over HTTP. The Godot folder stays a port scaffold.
+The web build at `ed4d761` is the full final candidate to open against `main`. Play it over HTTP from `/workspace/inkbound`.
