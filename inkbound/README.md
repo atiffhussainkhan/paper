@@ -26,6 +26,8 @@ npx --yes serve -l 8080 .
 
 Then open <http://localhost:8080/>.
 
+To publish this folder (not the repository root), follow [`docs/DEPLOY.md`](docs/DEPLOY.md). The ship gate is `node tools/run_acceptance.mjs`.
+
 Firefox can sometimes load modules from `file://` when `security.fileuri.strict_origin_policy`
 is relaxed, but that isn't a supported way to run the game.
 
